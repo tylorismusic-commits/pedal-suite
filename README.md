@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.5.0-alpha — 41 pedals, Cab IR, tuner, boards and MIDI.**
+**Status: 0.5.2-alpha — 41 pedals, Cab IR, tuner, boards and MIDI.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,

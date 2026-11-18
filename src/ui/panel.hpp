@@ -98,7 +98,7 @@ public:
   std::vector<WidgetRect> widgetRects() const;
 
 private:
-  enum class Kind { Knob, Pill, Button, SlotCard, ModuleButton, ModelButton, ModuleToggle, Power, ModuleName, ModulePresetButton, Footswitch, ModuleDragHandle, BrowserOption, BrowserTab, BrowserScroll, BrowserSearch };
+  enum class Kind { Knob, Pill, Button, SlotCard, ModuleButton, ModelButton, ModuleToggle, Power, ModuleName, ModulePresetButton, CabIrButton, Footswitch, ModuleDragHandle, BrowserOption, BrowserTab, BrowserScroll, BrowserSearch };
   struct Widget {
     Kind kind = Kind::Knob;
     uint32_t param = 0;

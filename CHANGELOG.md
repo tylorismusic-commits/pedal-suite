@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.2-alpha — 2026-11-18
+
+- Tidied the About page: the UP/DOWN buttons no longer overlap the footer
+  text, the SOURCE column is now a clearer TYPE column, and the repeated
+  "Pedal Suite exclusive"/"Amp Suite" source labels are gone.
+- Browser option subtitles now show the pedal type instead of the source.
+
+## 0.5.1-alpha — 2026-11-18
+
+- The Cab pedal now has a prominent **LOAD IR** button below its name.
+  It turns amber, outlines in accent and shows a green dot when an IR is
+  loaded.
+- Pedal browser tabs are centered, and partial option rows are centered
+  too (the last row no longer hangs to the left).
+- The current pedal highlight is a subtle module-tinted card with an accent
+  border instead of a solid accent fill, so the name stays readable.
+
 ## 0.5.0-alpha — 2026-11-18
 
 - Added **Cab**, an impulse-response cabinet pedal with Low Cut, High Cut,
