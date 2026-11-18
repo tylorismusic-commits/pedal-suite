@@ -376,6 +376,8 @@ struct Plugin {
   std::shared_ptr<const pedal::IrBank> irBank;
   int lastIrIndex = -2;
   bool irDirty = true;
+  std::vector<std::string> namNames;
+  int lastNamIndex = -2;
   std::atomic<bool> active{false};
   int reportedTypes[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
   uint8_t lastCc[128] = {};
@@ -794,6 +796,10 @@ bool pluginActivate(const clap_plugin_t* p, double sampleRate, uint32_t,
   s->engine.prepare(static_cast<float>(sampleRate));
   s->irBank = pedal::loadIrBank(
       pedal::irDir(), static_cast<int>(std::lround(sampleRate)));
+  s->namNames = pedal::listNamFiles(pedal::namDir());
+  s->shared.namBankCount.store(
+      static_cast<int>(s->namNames.size()), std::memory_order_relaxed);
+  s->lastNamIndex = -2;
   s->shared.irBankCount.store(
       s->irBank ? static_cast<int>(s->irBank->entries.size()) : 0,
       std::memory_order_relaxed);
@@ -908,6 +914,19 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
     }
   }
 
+  const int namIndex =
+      static_cast<int>(std::lround(s->shared.get(P_NAM_MODEL)));
+  if (namIndex != s->lastNamIndex) {
+    s->lastNamIndex = namIndex;
+    std::string namPath;
+    if (namIndex > 0 &&
+        namIndex <= static_cast<int>(s->namNames.size())) {
+      namPath = pedal::namDir() + "/" +
+                s->namNames[static_cast<size_t>(namIndex - 1)];
+    }
+    s->engine.setNamModel(namPath);
+  }
+
   bool typesChanged = false;
   for (int i = 0; i < kSlotCount; ++i) {
     const int type = static_cast<int>(
@@ -1012,6 +1031,9 @@ Plugin* createPlugin(const clap_host_t* host) {
   s->engine.prepare(48000.0f);
   initializeRack(s->shared);
   s->irBank = pedal::loadIrBank(pedal::irDir(), 48000);
+  s->namNames = pedal::listNamFiles(pedal::namDir());
+  s->shared.namBankCount.store(
+      static_cast<int>(s->namNames.size()), std::memory_order_relaxed);
   s->shared.irBankCount.store(
       s->irBank ? static_cast<int>(s->irBank->entries.size()) : 0,
       std::memory_order_relaxed);

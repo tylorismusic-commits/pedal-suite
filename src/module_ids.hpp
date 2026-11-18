@@ -49,6 +49,7 @@ enum ModuleId : int {
   Wah,
   Laser,
   Cab,
+  Nam,
   Count
 };
 
@@ -63,12 +64,16 @@ inline constexpr const char* kModuleLabels[] = {
     "Digital Delay", "Ping-Pong", "Plate Reverb", "Room Reverb",
     "FET Comp", "Opto Comp", "Envelope Filter", "Noise Gate", "Tight Gate",
     "3-Band EQ", "Bass EQ", "Lo-Fi", "Tape Sat", "Precision Drive", "Wah",
-    "Laser", "Cab"};
+    "Laser", "Cab", "NAM Amp"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
 
 constexpr int kRackControlCount = 12;
+
+// NAM models are expensive (memory and CPU). Keep at most two live in a
+// session; further NAM slots pass dry and show a limit warning.
+inline constexpr int kMaxNamSlots = 2;
 
 // Shared control indices used by the first pedal controls.
 constexpr int kCtlGain = 0;
@@ -421,6 +426,15 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 1: return 0.55;  // High cut
         case 2: return 0.50;  // Level
         case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::Nam:
+      switch (control) {
+        case 0: return 0.50;  // Gain
+        case 1: return 0.50;  // Bass
+        case 2: return 0.50;  // Mid
+        case 3: return 0.50;  // Treble
+        case 4: return 0.50;  // Level
         default: return 0.50;
       }
     default:

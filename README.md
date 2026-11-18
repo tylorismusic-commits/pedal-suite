@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.5.2-alpha — 41 pedals, Cab IR, tuner, boards and MIDI.**
+**Status: 0.6.0-alpha — 42 pedals including NAM, Cab IR, tuner and MIDI.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -25,6 +25,12 @@ and full board visuals land in later milestones.
 ![Pedal Suite — signature pedals](docs/pedal-board-signature.png)
 
 ![Pedal Suite — cabinet IR picker](docs/pedal-cab-ir.png)
+
+![Pedal Suite — NAM amp](docs/pedal-board-nam.png)
+
+![Pedal Suite — NAM model picker](docs/pedal-nam.png)
+
+![Pedal Suite — NAM limit](docs/pedal-nam-limit.png)
 
 ![Pedal Suite — tuner](docs/pedal-tuner.png)
 
@@ -79,6 +85,7 @@ and full board visuals land in later milestones.
 - **Wah** — Pedal, Q, Range, Mix.
 - **Laser** — Pitch, Ring, Sens, Pedal, Mix.
 - **Cab** — Low Cut, High Cut, Level, Mix, with user WAV IRs.
+- **NAM Amp** — Gain, Bass, Mid, Treble, Level, with Neural Amp Modeler `.nam` files.
 
 Compressors and gates report gain reduction to the pedals, the CLAP host and
 the LV2 `slotN_gr` ports. Delay and reverb tails keep ringing when bypassed.
@@ -89,6 +96,12 @@ note, octave, cents, frequency and confidence.
 **MIDI footswitch:** notes 36–43 or 60–67, and CC 20–27 or 80–87, toggle
 pedals 1–8. CC 4 or 11 drives the first Wah pedal. Both CLAP and LV2 accept
 the events.
+
+**NAM amps:** drop `.nam` files in `~/.local/share/pedal-suite/nam` (or
+`$XDG_DATA_HOME/pedal-suite/nam`), then use **LOAD AMP**. Only **two** NAM
+blocks run per session; further NAM pedals pass dry and show a limit warning.
+Models are resampled to the host rate, DC-blocked, and add 64 samples of
+reported latency.
 
 **Cab IRs:** drop 16/24/32-bit or float WAV files in
 `~/.local/share/pedal-suite/irs` (or `$XDG_DATA_HOME/pedal-suite/irs`), then

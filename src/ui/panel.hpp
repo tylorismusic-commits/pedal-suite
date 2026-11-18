@@ -35,6 +35,7 @@ struct PanelState {
   bool tunerOpen = false;
   int irPickerSlot = -1;
   int irScroll = 0;
+  bool pickerNam = false;
   std::vector<std::string> irNames;
   int aboutScroll = 0;
   int textParam = -1;
@@ -98,7 +99,7 @@ public:
   std::vector<WidgetRect> widgetRects() const;
 
 private:
-  enum class Kind { Knob, Pill, Button, SlotCard, ModuleButton, ModelButton, ModuleToggle, Power, ModuleName, ModulePresetButton, CabIrButton, Footswitch, ModuleDragHandle, BrowserOption, BrowserTab, BrowserScroll, BrowserSearch };
+  enum class Kind { Knob, Pill, Button, SlotCard, ModuleButton, ModelButton, ModuleToggle, Power, ModuleName, ModulePresetButton, CabIrButton, NamModelButton, Footswitch, ModuleDragHandle, BrowserOption, BrowserTab, BrowserScroll, BrowserSearch };
   struct Widget {
     Kind kind = Kind::Knob;
     uint32_t param = 0;

@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.6.0-alpha — 2026-11-18
+
+- Added **NAM Amp**, a Neural Amp Modeler player with Gain, Bass, Mid,
+  Treble and Level.
+- Load `.nam` models with the LOAD AMP button. Models are resampled to the
+  host rate and run through a DC blocker.
+- **Hard limit of two live NAM blocks per session.** Extra NAM slots pass
+  dry and show a red "2 AMP LIMIT" warning, so eight NAM blocks cannot crash
+  or exhaust memory.
+- NAM adds a 64-sample block latency, reported to the host and summed across
+  active NAM slots.
+- Model loading is capped at 32 MB per file; missing, malformed or
+  unsupported models are rejected and pass dry safely.
+- Fixed the round footswitch hit area: clicks now toggle bypass instead of
+  falling through to the pedal picker.
+- Fixed the LV2 manifest's missing `doap:` prefix that strict hosts rejected.
+- The LV2 editor lists IR and NAM files directly from disk, so the pickers
+  work in hosts that run the UI in a separate process.
+- NAM models are settled on load, and a DC blocker removes the constant
+  offset they produce with silence.
+
 ## 0.5.2-alpha — 2026-11-18
 
 - Tidied the About page: the UP/DOWN buttons no longer overlap the footer

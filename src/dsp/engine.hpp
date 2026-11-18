@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <string>
 
 #include <hdsp/db.hpp>
 #include <stomp/modules/modules.hpp>
@@ -34,15 +35,57 @@ public:
     powerTarget_ = c.power ? 1.0f : 0.0f;
     inputTarget_ = hdsp::dbToGain(c.inputDb);
     outputTarget_ = hdsp::dbToGain(c.outputDb);
+    int namRank = 0;
+    for (int i = 0; i < kSlotCount; ++i) {
+      const bool isNam = c.slot[i].type == static_cast<int>(ModuleId::Nam);
+      namActive_[i] = isNam && namRank < kMaxNamSlots;
+      if (isNam) ++namRank;
+    }
     for (int i = 0; i < kSlotCount; ++i) {
       const int type = c.slot[i].type;
-      if (type != preparedType_[i]) {
+      const bool isNam = type == static_cast<int>(ModuleId::Nam);
+      const bool allowed = !isNam || namActive_[i];
+      if (type != preparedType_[i] && allowed) {
         prepareSlot(i, type);
         preparedType_[i] = type;
       }
+      if (preparedType_[i] == static_cast<int>(ModuleId::Nam) && !isNam) {
+        nam_[i].clearModel();
+      }
+      if (isNam && !namActive_[i]) nam_[i].clearModel();
       slot_[i] = c.slot[i];
       setSlotControls(i, type, c.slot[i]);
+      if (isNam && namActive_[i]) {
+        if (namPath_.empty()) {
+          nam_[i].clearModel();
+        } else {
+          nam_[i].loadModel(namPath_);
+        }
+      }
     }
+  }
+
+  void setNamModel(const std::string& path) noexcept {
+    if (path == namPath_) return;
+    namPath_ = path;
+    for (int i = 0; i < kSlotCount; ++i) {
+      if (!namActive_[i]) continue;
+      if (namPath_.empty()) {
+        nam_[i].clearModel();
+      } else {
+        nam_[i].loadModel(namPath_);
+      }
+    }
+  }
+
+  int activeNamSlots() const noexcept {
+    int count = 0;
+    for (bool active : namActive_) count += active ? 1 : 0;
+    return count;
+  }
+
+  bool namSlotActive(int slot) const noexcept {
+    return slot >= 0 && slot < kSlotCount && namActive_[slot];
   }
 
   void setCabIr(const float* h, int taps) noexcept {
@@ -63,6 +106,7 @@ public:
         const SlotControls& c = slot_[s];
         if (c.type == static_cast<int>(ModuleId::Off)) continue;
         const ModuleId id = static_cast<ModuleId>(c.type);
+        if (id == ModuleId::Nam && !namActive_[s]) continue;
         if (c.bypass) {
           // Let delay and reverb tails ring out with the input muted.
           if (moduleHasTails(c.type)) {
@@ -175,6 +219,7 @@ public:
     for (auto& p : wah_) p.reset();
     for (auto& p : laser_) p.reset();
     for (auto& p : cab_) p.reset();
+    for (auto& p : nam_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -194,6 +239,9 @@ public:
           break;
         case ModuleId::Laser:
           latency += laser_[s].latencySamples();
+          break;
+        case ModuleId::Nam:
+          if (namActive_[s]) latency += nam_[s].latencySamples();
           break;
         default:
           break;
@@ -246,6 +294,7 @@ private:
       case ModuleId::Wah: wah_[s].prepare(sr_); break;
       case ModuleId::Laser: laser_[s].prepare(sr_); break;
       case ModuleId::Cab: cab_[s].prepare(sr_); break;
+      case ModuleId::Nam: nam_[s].prepare(sr_); break;
       default: break;
     }
   }
@@ -293,6 +342,7 @@ private:
       case ModuleId::Wah: wah_[s].setControls(wahControlsFrom(c)); break;
       case ModuleId::Laser: laser_[s].setControls(laserControlsFrom(c)); break;
       case ModuleId::Cab: cab_[s].setControls(cabControlsFrom(c)); break;
+      case ModuleId::Nam: nam_[s].setControls(namControlsFrom(c)); break;
       default: break;
     }
   }
@@ -340,6 +390,7 @@ private:
       case ModuleId::Wah: wah_[s].process(l, r); break;
       case ModuleId::Laser: laser_[s].process(l, r); break;
       case ModuleId::Cab: cab_[s].process(l, r); break;
+      case ModuleId::Nam: nam_[s].process(l, r); break;
       default: break;
     }
   }
@@ -393,6 +444,9 @@ private:
   stomp::modules::Wah wah_[kSlotCount];
   stomp::modules::Laser laser_[kSlotCount];
   stomp::modules::Cabinet cab_[kSlotCount];
+  stomp::modules::NamAmpPedal nam_[kSlotCount];
+  bool namActive_[kSlotCount] = {};
+  std::string namPath_;
   stomp::modules::Tuner tuner_;
 };
 

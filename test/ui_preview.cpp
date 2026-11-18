@@ -101,6 +101,31 @@ int main(int argc, char** argv) {
   state.irPickerSlot = -1;
   s.set(P_CAB_IR, 0);
 
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::Nam));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Cab));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::PrecisionDrive));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::NoiseGate));
+  state.selectedSlot = 4;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-board-nam.png").c_str());
+
+  state.irNames = {"Misha Rhythm.nam", "Gojira Clean.nam",
+                   "V30 Crunch.nam", "Bass DI.nam"};
+  state.irScroll = 0;
+  state.irPickerSlot = 4;
+  state.pickerNam = true;
+  s.set(P_NAM_MODEL, 1);
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-nam.png").c_str());
+  state.irPickerSlot = -1;
+  state.pickerNam = false;
+  s.set(P_NAM_MODEL, 0);
+
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Nam));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::Nam));
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-nam-limit.png").c_str());
+
   state.browserSlot = 4;
   state.browserCategory = 1;
   panel.draw(cr, s, state);

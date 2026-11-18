@@ -167,7 +167,8 @@ inline bool isWavName(const std::string& name) {
 
 constexpr int kMaxIrFiles = 64;
 
-inline std::vector<std::string> listIrFiles(const std::string& dir) {
+inline std::vector<std::string> listFilesWithExt(const std::string& dir,
+                                                 const char* ext) {
   std::vector<std::string> names;
   std::error_code ec;
   if (!std::filesystem::is_directory(dir, ec)) return names;
@@ -175,13 +176,34 @@ inline std::vector<std::string> listIrFiles(const std::string& dir) {
     if (ec) break;
     if (!entry.is_regular_file(ec)) continue;
     const std::string name = entry.path().filename().string();
-    if (isWavName(name)) names.push_back(name);
+    if (name.size() < 4) continue;
+    std::string suffix = name.substr(name.size() - 4);
+    for (char& c : suffix) {
+      if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
+    }
+    if (suffix == ext) names.push_back(name);
   }
   std::sort(names.begin(), names.end());
   if (static_cast<int>(names.size()) > kMaxIrFiles) {
     names.resize(static_cast<size_t>(kMaxIrFiles));
   }
   return names;
+}
+
+inline std::vector<std::string> listIrFiles(const std::string& dir) {
+  return listFilesWithExt(dir, ".wav");
+}
+
+inline std::string namDir() {
+  const char* xdg = std::getenv("XDG_DATA_HOME");
+  if (xdg && *xdg) return std::string(xdg) + "/pedal-suite/nam";
+  const char* home = std::getenv("HOME");
+  if (home && *home) return std::string(home) + "/.local/share/pedal-suite/nam";
+  return "pedal-suite/nam";
+}
+
+inline std::vector<std::string> listNamFiles(const std::string& dir) {
+  return listFilesWithExt(dir, ".nam");
 }
 
 inline void normalizeIrAt1k(std::vector<float>& h, int sampleRate) noexcept {

@@ -206,6 +206,14 @@ inline constexpr ControlDesc kSpringReverbControls[] = {
     {2, "MIX", "Mix", ControlFormat::Percent},
 };
 
+inline constexpr ControlDesc kNamControls[] = {
+    {0, "GAIN", "Gain", ControlFormat::PedalDriveDb},
+    {1, "BASS", "Bass", ControlFormat::HybridGain15},
+    {2, "MID", "Mid", ControlFormat::HybridGain15},
+    {3, "TREBLE", "Treble", ControlFormat::HybridGain15},
+    {4, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+
 inline constexpr ControlDesc kCabControls[] = {
     {0, "LOW CUT", "Low Cut", ControlFormat::EqHpfHz},
     {1, "HIGH CUT", "High Cut", ControlFormat::EqLpfHz},
@@ -567,12 +575,17 @@ inline constexpr ModuleDesc kModules[] = {
      0,
      static_cast<int>(sizeof(kCabControls) / sizeof(kCabControls[0])),
      kCabControls},
+    {ModuleId::Nam, "NAM Amp", "Amp", "Neural amp model player", false, false,
+     0,
+     static_cast<int>(sizeof(kNamControls) / sizeof(kNamControls[0])),
+     kNamControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

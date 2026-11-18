@@ -209,6 +209,17 @@ ModuleStyle styleFor(int type) {
   }
 }
 
+int namRankForSlot(const Shared& shared, int slot) {
+  int rank = 0;
+  for (int s = 0; s < slot; ++s) {
+    if (static_cast<int>(shared.get(slotParam(s, kSlotOffsetType)) + 0.5) ==
+        static_cast<int>(ModuleId::Nam)) {
+      ++rank;
+    }
+  }
+  return rank;
+}
+
 bool browserCategoryMatches(int id, int category) {
   const ModuleDesc* d = moduleDesc(id);
   if (category == 1) return std::strcmp(d->category, "Drive") == 0;
@@ -376,6 +387,21 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
         ir.styleSlot = slot;
         ir.styleType = type;
         widgets_.push_back(ir);
+      }
+      if (type == static_cast<int>(ModuleId::Nam) &&
+          namRankForSlot(shared, slot) < kMaxNamSlots) {
+        Widget amp{};
+        amp.kind = Kind::NamModelButton;
+        amp.param = slotParam(slot, kSlotOffsetType);
+        amp.value = slot;
+        amp.x = x + colW - 112;
+        amp.y = y + 48;
+        amp.w = 92;
+        amp.h = 18;
+        amp.label = "LOAD AMP";
+        amp.styleSlot = slot;
+        amp.styleType = type;
+        widgets_.push_back(amp);
       }
     }
 
@@ -695,6 +721,10 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
            0.95, 0.92);
       if (moduleHasGr(type)) {
         drawGrMeter(cr, x + 28, y + 54, colW - 56, 6, state.slotGrDb[slot]);
+      }
+      if (type == static_cast<int>(ModuleId::Nam) &&
+          namRankForSlot(shared, slot) >= kMaxNamSlots) {
+        text(cr, "2 AMP LIMIT", x + colW * 0.5, y + 58, 8, 1, 1.0, 0.45, 0.34);
       }
 
     }
@@ -1154,14 +1184,16 @@ void Panel::drawIrPicker(cairo_t* cr, const Shared& shared,
   cairo_stroke(cr);
 
   char title[64];
-  std::snprintf(title, sizeof(title), "CABINET IMPULSE \u00b7 PEDAL %d",
+  std::snprintf(title, sizeof(title), "%s \u00b7 PEDAL %d",
+                state.pickerNam ? "NAM AMP MODEL" : "CABINET IMPULSE",
                 state.irPickerSlot + 1);
   text(cr, title, bx + bw * 0.5, by + 34, 14, 1, kText.r, kText.g, kText.b);
-  text(cr, "WAV files from the IR folder", bx + bw * 0.5, by + 54, 8, 1,
-       kDim.r, kDim.g, kDim.b);
+  text(cr, state.pickerNam ? "Neural amp models from the NAM folder"
+                           : "WAV files from the IR folder",
+       bx + bw * 0.5, by + 54, 8, 1, kDim.r, kDim.g, kDim.b);
 
-  const int selected =
-      static_cast<int>(std::lround(shared.get(P_CAB_IR)));
+  const int selected = static_cast<int>(std::lround(
+      shared.get(state.pickerNam ? P_NAM_MODEL : P_CAB_IR)));
   const int visible = 11;
   const int count = static_cast<int>(state.irNames.size()) + 1;
   const int maxScroll = std::max(0, count - visible);
@@ -1176,15 +1208,17 @@ void Panel::drawIrPicker(cairo_t* cr, const Shared& shared,
     setRgb(cr, isSelected ? Rgb{0.30, 0.24, 0.14} : Rgb{0.16, 0.145, 0.125});
     cairo_fill(cr);
     const std::string label =
-        index == 0 ? std::string("NONE (bypass the cabinet)")
-                   : state.irNames[static_cast<size_t>(index - 1)];
+        index == 0
+            ? std::string(state.pickerNam ? "NONE (no amp model)"
+                                          : "NONE (bypass the cabinet)")
+            : state.irNames[static_cast<size_t>(index - 1)];
     text(cr, label.c_str(), bx + 34, ry + 15, 9, 0,
          isSelected ? kAccent.r : kText.r, isSelected ? kAccent.g : kText.g,
          isSelected ? kAccent.b : kText.b);
   }
 
-  text(cr, irDir().c_str(), bx + bw * 0.5, by + 384, 6.5, 1, kDim.r, kDim.g,
-       kDim.b);
+  text(cr, (state.pickerNam ? namDir() : irDir()).c_str(), bx + bw * 0.5,
+       by + 384, 6.5, 1, kDim.r, kDim.g, kDim.b);
   roundRect(cr, bx + 20, by + 396, 58, 26, 4);
   setRgb(cr, scroll > 0 ? Rgb{0.20, 0.17, 0.14} : Rgb{0.12, 0.11, 0.10});
   cairo_fill(cr);
@@ -1336,8 +1370,29 @@ void Panel::drawWidget(cairo_t* cr, const Widget& w, const Shared& shared,
            on ? 0.95 : 0.72, on ? 0.95 : 0.72, on ? 0.90 : 0.70);
       break;
     }
+    case Kind::NamModelButton: {
+      const bool open =
+          state.irPickerSlot == static_cast<int>(w.value) && state.pickerNam;
+      const bool loaded = shared.get(P_NAM_MODEL) > 0.5;
+      roundRect(cr, w.x, w.y, w.w, w.h, 4);
+      setRgb(cr, open ? kAccent : Rgb{0.26, 0.21, 0.13});
+      cairo_fill(cr);
+      setRgb(cr, loaded ? kAccent : st.accent, loaded ? 1.0 : 0.7);
+      cairo_set_line_width(cr, 1.2);
+      roundRect(cr, w.x + 0.5, w.y + 0.5, w.w - 1, w.h - 1, 4);
+      cairo_stroke(cr);
+      text(cr, w.label, w.x + w.w * 0.5, w.y + 12, 7.5, 1,
+           open ? 0.10 : 0.95, open ? 0.08 : 0.92, open ? 0.05 : 0.84);
+      if (loaded) {
+        setRgb(cr, {0.42, 0.92, 0.50});
+        cairo_arc(cr, w.x + w.w - 7, w.y + 9, 2.2, 0, 2 * kPi);
+        cairo_fill(cr);
+      }
+      break;
+    }
     case Kind::CabIrButton: {
-      const bool open = state.irPickerSlot == static_cast<int>(w.value);
+      const bool open =
+          state.irPickerSlot == static_cast<int>(w.value) && !state.pickerNam;
       const bool loaded = shared.get(P_CAB_IR) > 0.5;
       roundRect(cr, w.x, w.y, w.w, w.h, 4);
       setRgb(cr, open ? kAccent : Rgb{0.26, 0.21, 0.13});
@@ -1614,6 +1669,11 @@ bool Panel::hitWidget(const Widget& w, double x, double y) const {
     const double dx = x - w.x, dy = y - w.y;
     return dx * dx + dy * dy <= w.r * w.r * 1.3;
   }
+  if (w.kind == Kind::Footswitch) {
+    const double dx = x - w.x, dy = y - w.y;
+    const double hit = w.r + 6.0;
+    return dx * dx + dy * dy <= hit * hit;
+  }
   return x >= w.x && x <= w.x + w.w && y >= w.y && y <= w.y + w.h;
 }
 
@@ -1726,7 +1786,7 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
       const int index =
           state.irScroll + static_cast<int>((y - rowStart) / 26.0);
       if (index >= 0 && index <= static_cast<int>(state.irNames.size())) {
-        shared.set(P_CAB_IR, index);
+        shared.set(state.pickerNam ? P_NAM_MODEL : P_CAB_IR, index);
       }
       state.irPickerSlot = -1;
       return true;
@@ -1998,16 +2058,22 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
       case Kind::SlotCard:
         state.selectedSlot = static_cast<int>(w.param);
         return true;
-      case Kind::CabIrButton: {
+      case Kind::NamModelButton: {
         state.irPickerSlot = static_cast<int>(w.value);
         state.irScroll = 0;
+        state.pickerNam = true;
+        state.irNames = listNamFiles(namDir());
+        state.aboutOpen = false;
+        state.tunerOpen = false;
+        state.presetOpen = 0;
+        state.browserSlot = -1;
+        return true;
+      }
+    case Kind::CabIrButton: {
+        state.irPickerSlot = static_cast<int>(w.value);
+        state.irScroll = 0;
+        state.pickerNam = false;
         state.irNames = listIrFiles(irDir());
-        const int bankCount =
-            shared.irBankCount.load(std::memory_order_relaxed);
-        if (bankCount >= 0 &&
-            static_cast<int>(state.irNames.size()) > bankCount) {
-          state.irNames.resize(static_cast<size_t>(bankCount));
-        }
         state.aboutOpen = false;
         state.tunerOpen = false;
         state.presetOpen = 0;

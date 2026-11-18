@@ -85,6 +85,19 @@ int main() {
   check(clickParam(panel, s, state, P_SLOT4_BYPASS),
         "footswitch is clickable");
   check(s.get(P_SLOT4_BYPASS) == 1.0, "footswitch bypasses the pedal");
+  // A click offset from the exact centre must still hit the round switch.
+  s.set(P_SLOT4_BYPASS, 0.0);
+  bool offsetHit = false;
+  for (const auto& r : panel.widgetRects()) {
+    if (r.param != P_SLOT4_BYPASS) continue;
+    panel.pointerDown(s, state, r.x + 7.0, r.y + 3.0, false);
+    panel.pointerUp(s, state);
+    offsetHit = true;
+    break;
+  }
+  check(offsetHit && s.get(P_SLOT4_BYPASS) == 1.0,
+        "footswitch hit area covers the whole switch");
+  check(state.browserSlot < 0, "footswitch does not open the picker");
 
   // Typed value.
   s.set(slotParam(0, kSlotOffsetC0), 0.40);

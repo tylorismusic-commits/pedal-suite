@@ -242,6 +242,17 @@ inline stomp::modules::RoomReverbControls roomReverbControlsFrom(
   return out;
 }
 
+inline stomp::modules::NamAmpControls namControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::NamAmpControls out;
+  out.gain = c.c[0];
+  out.bass = c.c[1];
+  out.mid = c.c[2];
+  out.treble = c.c[3];
+  out.level = c.c[4];
+  return out;
+}
+
 inline stomp::modules::CabControls cabControlsFrom(
     const SlotControls& c) noexcept {
   stomp::modules::CabControls out;
