@@ -89,6 +89,14 @@ buffers 64 samples, reports that latency, and passes dry if a model is
 missing. A DC blocker removes the offset models produce with silence, and
 only two NAM blocks are ever live (tested with eight).
 
+## NAM gate
+
+The NAM pedal now gates the model output from the dry input. With a quiet
+input the model's noise floor is muted, and with a downstream Drive or
+Distortion the residual noise drops from ~-80 dB to essentially zero after
+the first 50 ms. The gate starts closed so the model-load thump cannot reach
+later gain blocks.
+
 ## Cab / IR
 
 The Cab pedal uses zero-latency direct FIR convolution (up to 4096 taps) with

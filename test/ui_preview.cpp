@@ -134,9 +134,13 @@ int main(int argc, char** argv) {
 
   state.presetOpen = 1;
   state.presetIndex = kPresetCount;
+  state.presetScroll = 0;
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-presets.png").c_str());
   state.presetOpen = 0;
+  state.presetScroll = 0;
+
+  state.browserSlot = -1;
 
   state.tunerOpen = true;
   s.tunerHz.store(440.0f);

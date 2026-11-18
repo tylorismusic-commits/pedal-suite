@@ -212,6 +212,7 @@ inline constexpr ControlDesc kNamControls[] = {
     {2, "MID", "Mid", ControlFormat::HybridGain15},
     {3, "TREBLE", "Treble", ControlFormat::HybridGain15},
     {4, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+    {5, "GATE", "Gate", ControlFormat::Percent},
 };
 
 inline constexpr ControlDesc kCabControls[] = {

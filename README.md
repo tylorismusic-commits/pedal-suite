@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.6.2-alpha — 42 pedals, NAM, Cab IR, tuner and MIDI.**
+**Status: 0.6.3-alpha — 42 pedals, NAM, Cab IR, tuner and MIDI.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -85,7 +85,7 @@ and full board visuals land in later milestones.
 - **Wah** — Pedal, Q, Range, Mix.
 - **Laser** — Pitch, Ring, Sens, Pedal, Mix.
 - **Cab** — Low Cut, High Cut, Level, Mix, with user WAV IRs.
-- **NAM Amp** — Gain, Bass, Mid, Treble, Level, with Neural Amp Modeler `.nam` files. Find it under the **AMP** browser page.
+- **NAM Amp** — Gain, Bass, Mid, Treble, Level, Gate, with Neural Amp Modeler `.nam` files. Find it under the **AMP** browser page. The gate mutes captured amp hiss so later gain blocks stay quiet.
 
 Compressors and gates report gain reduction to the pedals, the CLAP host and
 the LV2 `slotN_gr` ports. Delay and reverb tails keep ringing when bypassed.

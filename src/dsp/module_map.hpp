@@ -250,6 +250,7 @@ inline stomp::modules::NamAmpControls namControlsFrom(
   out.mid = c.c[2];
   out.treble = c.c[3];
   out.level = c.c[4];
+  out.gate = c.c[5];
   return out;
 }
 

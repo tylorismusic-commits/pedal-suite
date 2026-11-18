@@ -435,6 +435,7 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 2: return 0.50;  // Mid
         case 3: return 0.50;  // Treble
         case 4: return 0.50;  // Level
+        case 5: return 0.35;  // Gate
         default: return 0.50;
       }
     default:

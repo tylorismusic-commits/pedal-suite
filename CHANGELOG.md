@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.3-alpha — 2026-11-18
+
+- NAM Amp now has a **Gate** control. The gate starts closed on load, mutes
+  the model's captured noise floor, and stops downstream drives from
+  amplifying amp hiss. The startup thump after a NAM block is gone.
+- The board preset list has proper breathing room above the footer; the
+  last row is no longer crammed against the buttons.
+
 ## 0.6.2-alpha — 2026-11-18
 
 - Restored the **NAM Amp** pedal and its two-instance safety limit.
