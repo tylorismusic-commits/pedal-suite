@@ -98,6 +98,7 @@ enum class ControlFormat {
   Semitones,
   Cents,
   LowCut300,
+  EchoTimeMs,
 };
 
 struct ControlDesc {
@@ -187,6 +188,18 @@ inline constexpr ControlDesc kRetuneControls[] = {
     {1, "CENTS", "Cents", ControlFormat::Cents},
     {2, "LOW CUT", "Low Cut", ControlFormat::LowCut300},
     {3, "MIX", "Mix", ControlFormat::Percent},
+};
+
+inline constexpr ControlDesc kAnalogDelayControls[] = {
+    {0, "TIME", "Time", ControlFormat::EchoTimeMs},
+    {1, "FEEDBACK", "Feedback", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kSpringReverbControls[] = {
+    {0, "DECAY", "Decay", ControlFormat::SpaceDecayS},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "MIX", "Mix", ControlFormat::Percent},
 };
 
 inline constexpr ControlDesc kChorusControls[] = {
@@ -320,12 +333,24 @@ inline constexpr ModuleDesc kModules[] = {
      0,
      static_cast<int>(sizeof(kTremoloControls) / sizeof(kTremoloControls[0])),
      kTremoloControls},
+    {ModuleId::AnalogDelay, "Analog Delay", "Time",
+     "Bucketed analog-voiced delay", false, false, 0,
+     static_cast<int>(sizeof(kAnalogDelayControls) /
+                      sizeof(kAnalogDelayControls[0])),
+     kAnalogDelayControls},
+    {ModuleId::SpringReverb, "Spring Reverb", "Time",
+     "Drippy spring tank", false, false, 0,
+     static_cast<int>(sizeof(kSpringReverbControls) /
+                      sizeof(kSpringReverbControls[0])),
+     kSpringReverbControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

@@ -74,6 +74,9 @@ inline std::string formatControlValue(const ModuleDesc& module,
     case ControlFormat::LowCut300:
       std::snprintf(buf, sizeof(buf), "%.0f Hz", 40.0f + 260.0f * v);
       return buf;
+    case ControlFormat::EchoTimeMs:
+      std::snprintf(buf, sizeof(buf), "%.0f ms", 20.0f + 980.0f * v);
+      return buf;
     case ControlFormat::ThresholdDb:
       std::snprintf(buf, sizeof(buf), "%+.1f dB", -40.0f + 40.0f * v);
       return buf;
@@ -557,6 +560,7 @@ inline bool isMillisecondFormat(ControlFormat format) {
     case ControlFormat::SpaceDelayMs:
     case ControlFormat::DelayMs:
     case ControlFormat::DetuneMs:
+    case ControlFormat::EchoTimeMs:
     case ControlFormat::AttackMs:
     case ControlFormat::ReleaseMs:
     case ControlFormat::L2ReleaseMs:
@@ -705,6 +709,7 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
         break;
       case ControlFormat::Cents: v = (v + 50.0) / 100.0; break;
       case ControlFormat::LowCut300: v = (v - 40.0) / 260.0; break;
+      case ControlFormat::EchoTimeMs: v = (v - 20.0) / 980.0; break;
       case ControlFormat::ScHpfHz:
         v = std::log(std::max(v, 20.0) / 20.0) / std::log(20.0);
         break;

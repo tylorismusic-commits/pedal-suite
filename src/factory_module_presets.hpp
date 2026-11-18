@@ -102,6 +102,18 @@ inline constexpr FactoryModulePreset kFactoryModulePresets[] = {
      {0.35f, 0.55f, 0.15f, 1.00f}},
     {"Chop", "Pedal Suite exclusive", ModuleId::Tremolo,
      {0.55f, 0.85f, 0.85f, 1.00f}},
+    {"Slapback", "Pedal Suite exclusive", ModuleId::AnalogDelay,
+     {0.09f, 0.15f, 0.55f, 0.30f}},
+    {"Warm Echo", "Pedal Suite exclusive", ModuleId::AnalogDelay,
+     {0.40f, 0.55f, 0.40f, 0.35f}},
+    {"Long Repeat", "Pedal Suite exclusive", ModuleId::AnalogDelay,
+     {0.65f, 0.72f, 0.35f, 0.32f}},
+    {"Tight Spring", "Pedal Suite exclusive", ModuleId::SpringReverb,
+     {0.25f, 0.60f, 0.28f}},
+    {"Drip Tank", "Pedal Suite exclusive", ModuleId::SpringReverb,
+     {0.55f, 0.45f, 0.40f}},
+    {"Long Spring", "Pedal Suite exclusive", ModuleId::SpringReverb,
+     {0.80f, 0.55f, 0.35f}},
 };
 
 inline constexpr int kFactoryModulePresetCount =

@@ -145,6 +145,25 @@ inline stomp::modules::TremoloControls tremoloControlsFrom(
   return out;
 }
 
+inline stomp::modules::AnalogDelayControls analogDelayControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::AnalogDelayControls out;
+  out.time = c.c[0];
+  out.feedback = c.c[1];
+  out.tone = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::SpringReverbControls springReverbControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::SpringReverbControls out;
+  out.decay = c.c[0];
+  out.tone = c.c[1];
+  out.mix = c.c[2];
+  return out;
+}
+
 inline stomp::modules::ToneBenderControls toneBenderControlsFrom(
     const SlotControls& c) noexcept {
   stomp::modules::ToneBenderControls out;

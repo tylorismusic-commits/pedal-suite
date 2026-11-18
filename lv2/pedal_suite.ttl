@@ -22,8 +22,8 @@
         foaf:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
-    lv2:minorVersion 1 ;
-    lv2:microVersion 6 ;
+    lv2:minorVersion 2 ;
+    lv2:microVersion 0 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
     ui:ui <https://github.com/tylorismusic-commits/pedal-suite#ui> ;
@@ -95,7 +95,7 @@
         lv2:name "Module" ;
         lv2:default 1 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -115,7 +115,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot1> ;
     ] ,
     [
@@ -279,7 +281,7 @@
         lv2:name "Module" ;
         lv2:default 2 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -299,7 +301,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot2> ;
     ] ,
     [
@@ -463,7 +467,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -483,7 +487,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot3> ;
     ] ,
     [
@@ -647,7 +653,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -667,7 +673,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot4> ;
     ] ,
     [
@@ -831,7 +839,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -851,7 +859,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot5> ;
     ] ,
     [
@@ -1015,7 +1025,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1035,7 +1045,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot6> ;
     ] ,
     [
@@ -1199,7 +1211,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1219,7 +1231,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot7> ;
     ] ,
     [
@@ -1383,7 +1397,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 18 ;
+        lv2:maximum 20 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1403,7 +1417,9 @@
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
-            [ rdf:value 18 ; rdfs:label "Tremolo" ] ;
+            [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
+            [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot8> ;
     ] ,
     [

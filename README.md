@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.1.6-alpha — drive/fuzz, pitch and modulation.**
+**Status: 0.2.0-alpha — 21 pedals across drive, pitch, modulation and time.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -15,6 +15,8 @@ and full board visuals land in later milestones.
 ![Pedal Suite — page 2](docs/pedal-board-page2.png)
 
 ![Pedal Suite — pitch pedals](docs/pedal-board-pitch.png)
+
+![Pedal Suite — time pedals](docs/pedal-board-time.png)
 
 ## Current slice
 
@@ -44,6 +46,8 @@ and full board visuals land in later milestones.
 - **Flanger** — Rate, Depth, Feedback, Mix.
 - **Phaser** — Rate, Depth, Feedback, Mix.
 - **Tremolo** — Rate, Depth, Shape, Mix.
+- **Analog Delay** — Time, Feedback, Tone, Mix.
+- **Spring Reverb** — Decay, Tone, Mix.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.

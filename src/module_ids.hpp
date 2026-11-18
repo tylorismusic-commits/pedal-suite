@@ -26,6 +26,8 @@ enum ModuleId : int {
   Flanger,
   Phaser,
   Tremolo,
+  AnalogDelay,
+  SpringReverb,
   Count
 };
 
@@ -35,7 +37,8 @@ inline constexpr const char* kModuleLabels[] = {
     "Off",       "Boost",     "808 Drive",  "Treble Boost", "Overdrive",
     "Blues Drive", "Distortion", "Rat",     "Big Fuzz",   "Fuzz Face",
     "Tone Bender", "Bass Drive", "Bass Fuzz", "Pitch Drop", "Retune",
-    "Chorus", "Flanger", "Phaser", "Tremolo"};
+    "Chorus", "Flanger", "Phaser", "Tremolo", "Analog Delay",
+    "Spring Reverb"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -194,6 +197,21 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 1: return 0.60;  // Depth
         case 2: return 0.20;  // Shape
         case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::AnalogDelay:
+      switch (control) {
+        case 0: return 0.40;  // 400 ms
+        case 1: return 0.40;  // Feedback
+        case 2: return 0.50;  // Tone
+        case 3: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::SpringReverb:
+      switch (control) {
+        case 0: return 0.40;  // Decay
+        case 1: return 0.50;  // Tone
+        case 2: return 0.30;  // Mix
         default: return 0.50;
       }
     default:

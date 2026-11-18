@@ -163,6 +163,30 @@ int main() {
           "Phaser is audible");
   }
   {
+    const int n = 48000;
+    auto tail = [&](ModuleId id, int mixControl) {
+      Shared s;
+      initializeRack(s);
+      applyModuleDefaults(s, 0, static_cast<int>(id), false);
+      s.set(slotParam(0, kSlotOffsetC0 + mixControl), 1.0);
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      std::vector<float> l(n, 0.0f), r(n, 0.0f);
+      for (int i = 0; i < 2400; ++i) {
+        l[i] = r[i] = 0.3f * std::sin(2.0f * 3.14159265f * 330.0f * i /
+                                      48000.0f);
+      }
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      return rms(l, 9600, n);
+    };
+    check(tail(ModuleId::AnalogDelay, 3) > 1.0e-4,
+          "Analog Delay produces a tail");
+    check(tail(ModuleId::SpringReverb, 2) > 1.0e-4,
+          "Spring Reverb produces a tail");
+  }
+  {
     const int n = 12000;
     std::vector<float> x(n);
     for (int i = 0; i < n; ++i) {

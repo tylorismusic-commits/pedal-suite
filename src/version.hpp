@@ -4,7 +4,7 @@
 
 namespace pedal {
 constexpr int kVersionMajor = 0;
-constexpr int kVersionMinor = 1;
-constexpr int kVersionMicro = 6;
-constexpr const char* kVersion = "0.1.6-alpha";
+constexpr int kVersionMinor = 2;
+constexpr int kVersionMicro = 0;
+constexpr const char* kVersion = "0.2.0-alpha";
 } // namespace pedal

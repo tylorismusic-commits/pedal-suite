@@ -55,6 +55,14 @@ int main(int argc, char** argv) {
   cairo_surface_write_to_png(surf, (out + "/pedal-board-pitch.png").c_str());
   state.selectedSlot = 4;
 
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::AnalogDelay));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::SpringReverb));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::Chorus));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Tremolo));
+  state.selectedSlot = 4;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-board-time.png").c_str());
+
   state.browserSlot = 4;
   state.browserCategory = 1;
   panel.draw(cr, s, state);

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0-alpha — 2026-11-18
+
+- Added Analog Delay and Spring Reverb, bringing the board to 21 pedal
+  types — the public-alpha pedal target.
+- Analog Delay uses the hearth-dsp BBD-voiced delay with Time, Feedback,
+  Tone and Mix.
+- Spring Reverb uses the hearth-dsp spring tank with Decay, Tone and Mix.
+- Factory presets for both, plus delay/reverb tail tests.
+
 ## 0.1.6-alpha — 2026-11-18
 
 - Added Chorus, Flanger, Phaser and Tremolo.

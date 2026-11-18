@@ -38,6 +38,8 @@ public:
     for (auto& p : flanger_) p.prepare(sr_);
     for (auto& p : phaser_) p.prepare(sr_);
     for (auto& p : tremolo_) p.prepare(sr_);
+    for (auto& p : analogDelay_) p.prepare(sr_);
+    for (auto& p : springReverb_) p.prepare(sr_);
     reset();
   }
 
@@ -65,6 +67,8 @@ public:
       flanger_[i].setControls(flangerControlsFrom(c.slot[i]));
       phaser_[i].setControls(phaserControlsFrom(c.slot[i]));
       tremolo_[i].setControls(tremoloControlsFrom(c.slot[i]));
+      analogDelay_[i].setControls(analogDelayControlsFrom(c.slot[i]));
+      springReverb_[i].setControls(springReverbControlsFrom(c.slot[i]));
     }
   }
 
@@ -136,6 +140,12 @@ public:
           case ModuleId::Tremolo:
             tremolo_[s].process(l, r);
             break;
+          case ModuleId::AnalogDelay:
+            analogDelay_[s].process(l, r);
+            break;
+          case ModuleId::SpringReverb:
+            springReverb_[s].process(l, r);
+            break;
           case ModuleId::Off:
           case ModuleId::Count:
             continue;
@@ -192,6 +202,8 @@ public:
     for (auto& p : flanger_) p.reset();
     for (auto& p : phaser_) p.reset();
     for (auto& p : tremolo_) p.reset();
+    for (auto& p : analogDelay_) p.reset();
+    for (auto& p : springReverb_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -240,6 +252,8 @@ private:
   stomp::modules::Flanger flanger_[kSlotCount];
   stomp::modules::Phaser phaser_[kSlotCount];
   stomp::modules::Tremolo tremolo_[kSlotCount];
+  stomp::modules::AnalogDelay analogDelay_[kSlotCount];
+  stomp::modules::SpringReverb springReverb_[kSlotCount];
 };
 
 } // namespace pedal
