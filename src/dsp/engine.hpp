@@ -29,6 +29,9 @@ public:
     for (auto& p : rat_) p.prepare(sr_);
     for (auto& p : bigFuzz_) p.prepare(sr_);
     for (auto& p : fuzzFace_) p.prepare(sr_);
+    for (auto& p : toneBender_) p.prepare(sr_);
+    for (auto& p : bassDrive_) p.prepare(sr_);
+    for (auto& p : bassFuzz_) p.prepare(sr_);
     reset();
   }
 
@@ -47,6 +50,9 @@ public:
       rat_[i].setControls(ratControlsFrom(c.slot[i]));
       bigFuzz_[i].setControls(bigFuzzControlsFrom(c.slot[i]));
       fuzzFace_[i].setControls(fuzzFaceControlsFrom(c.slot[i]));
+      toneBender_[i].setControls(toneBenderControlsFrom(c.slot[i]));
+      bassDrive_[i].setControls(bassDriveControlsFrom(c.slot[i]));
+      bassFuzz_[i].setControls(bassFuzzControlsFrom(c.slot[i]));
     }
   }
 
@@ -90,6 +96,15 @@ public:
             break;
           case ModuleId::FuzzFace:
             fuzzFace_[s].process(l, r);
+            break;
+          case ModuleId::ToneBender:
+            toneBender_[s].process(l, r);
+            break;
+          case ModuleId::BassDrive:
+            bassDrive_[s].process(l, r);
+            break;
+          case ModuleId::BassFuzz:
+            bassFuzz_[s].process(l, r);
             break;
           case ModuleId::Off:
           case ModuleId::Count:
@@ -138,6 +153,9 @@ public:
     for (auto& p : rat_) p.reset();
     for (auto& p : bigFuzz_) p.reset();
     for (auto& p : fuzzFace_) p.reset();
+    for (auto& p : toneBender_) p.reset();
+    for (auto& p : bassDrive_) p.reset();
+    for (auto& p : bassFuzz_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -160,6 +178,9 @@ private:
   stomp::modules::Rat rat_[kSlotCount];
   stomp::modules::BigFuzz bigFuzz_[kSlotCount];
   stomp::modules::FuzzFace fuzzFace_[kSlotCount];
+  stomp::modules::ToneBender toneBender_[kSlotCount];
+  stomp::modules::BassDrive bassDrive_[kSlotCount];
+  stomp::modules::BassFuzz bassFuzz_[kSlotCount];
 };
 
 } // namespace pedal

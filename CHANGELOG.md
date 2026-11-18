@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4-alpha — 2026-11-18
+
+- Added Tone Bender, Bass Drive and Bass Fuzz.
+- Bass pedals keep a clean low band while blending the driven high band.
+- Added factory presets for all three.
+- P3 drive/fuzz family is now complete.
+
 ## 0.1.3-alpha — 2026-11-18
 
 - Added the first drive/fuzz family: Treble Boost, Overdrive, Blues Drive,

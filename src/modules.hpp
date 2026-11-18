@@ -173,6 +173,23 @@ inline constexpr ControlDesc kFuzzFaceControls[] = {
     {1, "BIAS", "Bias", ControlFormat::Percent},
     {2, "VOLUME", "Volume", ControlFormat::Percent},
 };
+inline constexpr ControlDesc kToneBenderControls[] = {
+    {0, "ATTACK", "Attack", ControlFormat::Percent},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kBassDriveControls[] = {
+    {0, "DRIVE", "Drive", ControlFormat::Percent},
+    {1, "BLEND", "Blend", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kBassFuzzControls[] = {
+    {0, "FUZZ", "Fuzz", ControlFormat::Percent},
+    {1, "BLEND", "Blend", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
 
 inline constexpr ModuleDesc kModules[] = {
     {ModuleId::Off, "Off", "Off", "Empty pedal slot", false, false, 0, 0,
@@ -217,12 +234,30 @@ inline constexpr ModuleDesc kModules[] = {
      false, 0,
      static_cast<int>(sizeof(kFuzzFaceControls) / sizeof(kFuzzFaceControls[0])),
      kFuzzFaceControls},
+    {ModuleId::ToneBender, "Tone Bender", "Drive", "Silicon fuzz", false, false,
+     0,
+     static_cast<int>(sizeof(kToneBenderControls) /
+                      sizeof(kToneBenderControls[0])),
+     kToneBenderControls},
+    {ModuleId::BassDrive, "Bass Drive", "Drive",
+     "Bass overdrive with clean low end", false, false, 0,
+     static_cast<int>(sizeof(kBassDriveControls) /
+                      sizeof(kBassDriveControls[0])),
+     kBassDriveControls},
+    {ModuleId::BassFuzz, "Bass Fuzz", "Drive",
+     "Bass fuzz with clean low end", false, false, 0,
+     static_cast<int>(sizeof(kBassFuzzControls) /
+                      sizeof(kBassFuzzControls[0])),
+     kBassFuzzControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

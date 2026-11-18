@@ -81,6 +81,35 @@ inline stomp::modules::FuzzFaceControls fuzzFaceControlsFrom(
   return out;
 }
 
+inline stomp::modules::ToneBenderControls toneBenderControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::ToneBenderControls out;
+  out.attack = c.c[0];
+  out.tone = c.c[1];
+  out.level = c.c[2];
+  return out;
+}
+
+inline stomp::modules::BassDriveControls bassDriveControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::BassDriveControls out;
+  out.drive = c.c[0];
+  out.blend = c.c[1];
+  out.tone = c.c[2];
+  out.level = c.c[3];
+  return out;
+}
+
+inline stomp::modules::BassFuzzControls bassFuzzControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::BassFuzzControls out;
+  out.fuzz = c.c[0];
+  out.blend = c.c[1];
+  out.tone = c.c[2];
+  out.level = c.c[3];
+  return out;
+}
+
 inline stomp::modules::Drive808Controls drive808ControlsFrom(
     const SlotControls& c) noexcept {
   stomp::modules::Drive808Controls out;

@@ -17,6 +17,9 @@ enum ModuleId : int {
   Rat,
   BigFuzz,
   FuzzFace,
+  ToneBender,
+  BassDrive,
+  BassFuzz,
   Count
 };
 
@@ -24,7 +27,8 @@ constexpr int kModuleCount = static_cast<int>(ModuleId::Count);
 
 inline constexpr const char* kModuleLabels[] = {
     "Off",       "Boost",     "808 Drive",  "Treble Boost", "Overdrive",
-    "Blues Drive", "Distortion", "Rat",     "Big Fuzz",   "Fuzz Face"};
+    "Blues Drive", "Distortion", "Rat",     "Big Fuzz",   "Fuzz Face",
+    "Tone Bender", "Bass Drive", "Bass Fuzz"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -111,6 +115,29 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 0: return 0.60;  // Fuzz
         case 1: return 0.50;  // Bias
         case 2: return 0.50;  // Volume
+        default: return 0.50;
+      }
+    case ModuleId::ToneBender:
+      switch (control) {
+        case 0: return 0.60;  // Attack
+        case 1: return 0.50;  // Tone
+        case 2: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::BassDrive:
+      switch (control) {
+        case 0: return 0.45;  // Drive
+        case 1: return 0.80;  // Blend
+        case 2: return 0.50;  // Tone
+        case 3: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::BassFuzz:
+      switch (control) {
+        case 0: return 0.60;  // Fuzz
+        case 1: return 0.80;  // Blend
+        case 2: return 0.50;  // Tone
+        case 3: return 0.50;  // Level
         default: return 0.50;
       }
     default:

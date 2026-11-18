@@ -56,6 +56,18 @@ inline constexpr FactoryModulePreset kFactoryModulePresets[] = {
      {0.42f, 0.50f, 0.60f}},
     {"Full Fuzz", "Pedal Suite exclusive", ModuleId::FuzzFace,
      {0.88f, 0.50f, 0.45f}},
+    {"Classic Bender", "Pedal Suite exclusive", ModuleId::ToneBender,
+     {0.62f, 0.50f, 0.50f}},
+    {"Bender Lead", "Pedal Suite exclusive", ModuleId::ToneBender,
+     {0.86f, 0.62f, 0.45f}},
+    {"Bass Grit", "Pedal Suite exclusive", ModuleId::BassDrive,
+     {0.45f, 0.80f, 0.50f, 0.50f}},
+    {"Bass Push", "Pedal Suite exclusive", ModuleId::BassDrive,
+     {0.75f, 0.65f, 0.55f, 0.45f}},
+    {"Bass Wall", "Pedal Suite exclusive", ModuleId::BassFuzz,
+     {0.70f, 0.85f, 0.45f, 0.48f}},
+    {"Bass Fuzz Lead", "Pedal Suite exclusive", ModuleId::BassFuzz,
+     {0.92f, 0.72f, 0.60f, 0.42f}},
 };
 
 inline constexpr int kFactoryModulePresetCount =

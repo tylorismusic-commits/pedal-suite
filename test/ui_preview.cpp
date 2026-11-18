@@ -39,10 +39,10 @@ int main(int argc, char** argv) {
 
   state.boardPage = 1;
   state.selectedSlot = 4;
-  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::Rat));
-  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BigFuzz));
-  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::FuzzFace));
-  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Drive808));
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::ToneBender));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BassDrive));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::BassFuzz));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::FuzzFace));
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-page2.png").c_str());
 
