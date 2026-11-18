@@ -34,6 +34,10 @@ public:
     for (auto& p : bassFuzz_) p.prepare(sr_);
     for (auto& p : pitchDrop_) p.prepare(sr_);
     for (auto& p : retune_) p.prepare(sr_);
+    for (auto& p : chorus_) p.prepare(sr_);
+    for (auto& p : flanger_) p.prepare(sr_);
+    for (auto& p : phaser_) p.prepare(sr_);
+    for (auto& p : tremolo_) p.prepare(sr_);
     reset();
   }
 
@@ -57,6 +61,10 @@ public:
       bassFuzz_[i].setControls(bassFuzzControlsFrom(c.slot[i]));
       pitchDrop_[i].setControls(pitchDropControlsFrom(c.slot[i]));
       retune_[i].setControls(retuneControlsFrom(c.slot[i]));
+      chorus_[i].setControls(chorusControlsFrom(c.slot[i]));
+      flanger_[i].setControls(flangerControlsFrom(c.slot[i]));
+      phaser_[i].setControls(phaserControlsFrom(c.slot[i]));
+      tremolo_[i].setControls(tremoloControlsFrom(c.slot[i]));
     }
   }
 
@@ -116,6 +124,18 @@ public:
           case ModuleId::Retune:
             retune_[s].process(l, r);
             break;
+          case ModuleId::Chorus:
+            chorus_[s].process(l, r);
+            break;
+          case ModuleId::Flanger:
+            flanger_[s].process(l, r);
+            break;
+          case ModuleId::Phaser:
+            phaser_[s].process(l, r);
+            break;
+          case ModuleId::Tremolo:
+            tremolo_[s].process(l, r);
+            break;
           case ModuleId::Off:
           case ModuleId::Count:
             continue;
@@ -168,6 +188,10 @@ public:
     for (auto& p : bassFuzz_) p.reset();
     for (auto& p : pitchDrop_) p.reset();
     for (auto& p : retune_) p.reset();
+    for (auto& p : chorus_) p.reset();
+    for (auto& p : flanger_) p.reset();
+    for (auto& p : phaser_) p.reset();
+    for (auto& p : tremolo_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -212,6 +236,10 @@ private:
   stomp::modules::BassFuzz bassFuzz_[kSlotCount];
   stomp::modules::PitchDrop pitchDrop_[kSlotCount];
   stomp::modules::Retune retune_[kSlotCount];
+  stomp::modules::Chorus chorus_[kSlotCount];
+  stomp::modules::Flanger flanger_[kSlotCount];
+  stomp::modules::Phaser phaser_[kSlotCount];
+  stomp::modules::Tremolo tremolo_[kSlotCount];
 };
 
 } // namespace pedal

@@ -39,12 +39,21 @@ int main(int argc, char** argv) {
 
   state.boardPage = 1;
   state.selectedSlot = 4;
-  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::ToneBender));
-  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BassDrive));
-  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::PitchDrop));
-  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Retune));
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::Chorus));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Flanger));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::Phaser));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Tremolo));
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-page2.png").c_str());
+
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::BassDrive));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BassFuzz));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::PitchDrop));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Retune));
+  state.selectedSlot = 6;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-board-pitch.png").c_str());
+  state.selectedSlot = 4;
 
   state.browserSlot = 4;
   state.browserCategory = 1;

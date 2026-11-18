@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.6-alpha — 2026-11-18
+
+- Added Chorus, Flanger, Phaser and Tremolo.
+- Restored the Pitch Drop Tone control and added a 3+2 knob layout for
+  five-control pedals so the footswitch stays clear.
+- Added factory presets for the modulation pedals and a pitch preview.
+
 ## 0.1.5-alpha — 2026-11-18
 
 - Added Pitch Drop with Whammy Up, Whammy Down, Drop, Harmony and Detune

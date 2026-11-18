@@ -121,6 +121,18 @@ ModuleStyle styleFor(int type) {
     case ModuleId::Retune:
       return {{0.07, 0.20, 0.38}, {0.02, 0.08, 0.18},
               {0.44, 0.82, 1.00}, {0.82, 0.93, 1.00}};
+    case ModuleId::Chorus:
+      return {{0.06, 0.30, 0.30}, {0.02, 0.12, 0.12},
+              {0.42, 1.00, 0.88}, {0.82, 0.98, 0.94}};
+    case ModuleId::Flanger:
+      return {{0.26, 0.08, 0.40}, {0.10, 0.02, 0.16},
+              {0.86, 0.50, 1.00}, {0.93, 0.86, 0.98}};
+    case ModuleId::Phaser:
+      return {{0.44, 0.20, 0.04}, {0.18, 0.07, 0.01},
+              {1.00, 0.66, 0.26}, {0.99, 0.88, 0.70}};
+    case ModuleId::Tremolo:
+      return {{0.30, 0.22, 0.05}, {0.12, 0.09, 0.02},
+              {1.00, 0.84, 0.34}, {0.98, 0.93, 0.72}};
     default:
       return {{0.105, 0.10, 0.095}, {0.24, 0.22, 0.19},
               {0.55, 0.50, 0.44}, {0.72, 0.70, 0.66}};
@@ -295,11 +307,22 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
     const ModuleDesc* module = moduleDesc(type);
     const double cx1 = x + 60, cx2 = x + 176;
     if (module->controlCount > 0) {
+      const bool fiveKnobs = module->controlCount == 5;
       for (int k = 0; k < module->controlCount; ++k) {
         const ControlDesc& control = module->controls[k];
         double kx = (k & 1) ? cx2 : cx1;
         double ky = y + 132.0 + (k / 2) * 86.0;
-        if (module->controlCount == 3 && k == 2) {
+        double kr = 22.0;
+        if (fiveKnobs) {
+          kr = 18.0;
+          if (k < 3) {
+            kx = x + colW * ((k + 0.5) / 3.0);
+            ky = y + 120.0;
+          } else {
+            kx = x + colW * (0.30 + 0.40 * (k - 3));
+            ky = y + 204.0;
+          }
+        } else if (module->controlCount == 3 && k == 2) {
           kx = x + colW * 0.5;
           ky = y + 232.0;
         }
@@ -307,7 +330,7 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
         if (control.stepped && control.format == ControlFormat::Semitones) {
           steps = 25;
         }
-        knob(slotParam(slot, kSlotOffsetC0 + control.param), kx, ky, 22,
+        knob(slotParam(slot, kSlotOffsetC0 + control.param), kx, ky, kr,
              control.label, slot, true, control.param, steps);
       }
     }

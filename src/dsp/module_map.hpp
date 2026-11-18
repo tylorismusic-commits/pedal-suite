@@ -90,8 +90,8 @@ inline stomp::modules::PitchDropControls pitchDropControlsFrom(
   out.pitch = c.c[0];
   out.mode = static_cast<int>(std::lround(std::clamp(c.c[1], 0.0f, 1.0f) * 4.0f));
   out.glide = c.c[2];
-  out.tone = 1.0f;
-  out.mix = c.c[3];
+  out.tone = c.c[3];
+  out.mix = c.c[4];
   return out;
 }
 
@@ -101,6 +101,46 @@ inline stomp::modules::RetuneControls retuneControlsFrom(
   out.semitones = c.c[0];
   out.cents = c.c[1];
   out.lowCut = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::ChorusControls chorusControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::ChorusControls out;
+  out.rate = c.c[0];
+  out.depth = c.c[1];
+  out.width = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::FlangerControls flangerControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::FlangerControls out;
+  out.rate = c.c[0];
+  out.depth = c.c[1];
+  out.feedback = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::PhaserControls phaserControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::PhaserControls out;
+  out.rate = c.c[0];
+  out.depth = c.c[1];
+  out.feedback = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::TremoloControls tremoloControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::TremoloControls out;
+  out.rate = c.c[0];
+  out.depth = c.c[1];
+  out.shape = c.c[2];
   out.mix = c.c[3];
   return out;
 }

@@ -179,12 +179,38 @@ inline constexpr ControlDesc kPitchDropControls[] = {
     {1, "MODE", "Mode", ControlFormat::Percent, true,
      labels(kPitchModeLabels)},
     {2, "GLIDE", "Glide", ControlFormat::Percent},
-    {3, "MIX", "Mix", ControlFormat::Percent},
+    {3, "TONE", "Tone", ControlFormat::Percent},
+    {4, "MIX", "Mix", ControlFormat::Percent},
 };
 inline constexpr ControlDesc kRetuneControls[] = {
     {0, "SEMITONES", "Semitones", ControlFormat::Semitones, true},
     {1, "CENTS", "Cents", ControlFormat::Cents},
     {2, "LOW CUT", "Low Cut", ControlFormat::LowCut300},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+
+inline constexpr ControlDesc kChorusControls[] = {
+    {0, "RATE", "Rate", ControlFormat::LfoRateHz},
+    {1, "DEPTH", "Depth", ControlFormat::Percent},
+    {2, "WIDTH", "Width", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kFlangerControls[] = {
+    {0, "RATE", "Rate", ControlFormat::LfoRateHz},
+    {1, "DEPTH", "Depth", ControlFormat::Percent},
+    {2, "FEEDBACK", "Feedback", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kPhaserControls[] = {
+    {0, "RATE", "Rate", ControlFormat::LfoRateHz},
+    {1, "DEPTH", "Depth", ControlFormat::Percent},
+    {2, "FEEDBACK", "Feedback", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kTremoloControls[] = {
+    {0, "RATE", "Rate", ControlFormat::LfoRateHz},
+    {1, "DEPTH", "Depth", ControlFormat::Percent},
+    {2, "SHAPE", "Shape", ControlFormat::Percent},
     {3, "MIX", "Mix", ControlFormat::Percent},
 };
 
@@ -279,12 +305,31 @@ inline constexpr ModuleDesc kModules[] = {
      static_cast<int>(sizeof(kRetuneControls) /
                       sizeof(kRetuneControls[0])),
      kRetuneControls},
+    {ModuleId::Chorus, "Chorus", "Mod", "Analog stereo chorus", false, false,
+     0,
+     static_cast<int>(sizeof(kChorusControls) / sizeof(kChorusControls[0])),
+     kChorusControls},
+    {ModuleId::Flanger, "Flanger", "Mod", "Feedback flanger", false, false, 0,
+     static_cast<int>(sizeof(kFlangerControls) / sizeof(kFlangerControls[0])),
+     kFlangerControls},
+    {ModuleId::Phaser, "Phaser", "Mod", "Six-stage all-pass phaser", false,
+     false, 0,
+     static_cast<int>(sizeof(kPhaserControls) / sizeof(kPhaserControls[0])),
+     kPhaserControls},
+    {ModuleId::Tremolo, "Tremolo", "Mod", "Bias/optical tremolo", false, false,
+     0,
+     static_cast<int>(sizeof(kTremoloControls) / sizeof(kTremoloControls[0])),
+     kTremoloControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

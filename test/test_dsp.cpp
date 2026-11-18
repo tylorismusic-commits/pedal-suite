@@ -133,6 +133,36 @@ int main() {
     check(retune.second > 0, "Retune reports latency");
   }
   {
+    const int n = 24000;
+    std::vector<float> x(n);
+    for (int i = 0; i < n; ++i) {
+      x[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+    }
+    auto run = [&](ModuleId id, int control, double value) {
+      Shared s;
+      initializeRack(s);
+      applyModuleDefaults(s, 0, static_cast<int>(id), false);
+      s.set(slotParam(0, kSlotOffsetC0 + control), value);
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      auto l = x, r = x;
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      return rms(l, n / 2, n);
+    };
+    check(run(ModuleId::Tremolo, 1, 1.0) <
+              run(ModuleId::Tremolo, 1, 0.0) * 0.7,
+          "Tremolo depth modulates level");
+    const double dry = rms(x, n / 2, n);
+    check(std::fabs(run(ModuleId::Chorus, 3, 0.5) - dry) > dry * 0.02,
+          "Chorus is audible");
+    check(std::fabs(run(ModuleId::Flanger, 3, 0.5) - dry) > dry * 0.02,
+          "Flanger is audible");
+    check(std::fabs(run(ModuleId::Phaser, 3, 0.5) - dry) > dry * 0.02,
+          "Phaser is audible");
+  }
+  {
     const int n = 12000;
     std::vector<float> x(n);
     for (int i = 0; i < n; ++i) {
