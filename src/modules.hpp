@@ -206,6 +206,26 @@ inline constexpr ControlDesc kSpringReverbControls[] = {
     {2, "MIX", "Mix", ControlFormat::Percent},
 };
 
+inline constexpr ControlDesc kPrecisionDriveControls[] = {
+    {0, "GATE", "Gate", ControlFormat::Percent},
+    {1, "DRIVE", "Drive", ControlFormat::Percent},
+    {2, "ATTACK", "Attack", ControlFormat::Percent},
+    {3, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kWahControls[] = {
+    {0, "PEDAL", "Pedal", ControlFormat::Percent},
+    {1, "Q", "Q", ControlFormat::Percent},
+    {2, "RANGE", "Range", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kLaserControls[] = {
+    {0, "PITCH", "Pitch", ControlFormat::PitchSemis},
+    {1, "RING", "Ring", ControlFormat::Percent},
+    {2, "SENS", "Sensitivity", ControlFormat::Percent},
+    {3, "PEDAL", "Pedal", ControlFormat::Percent},
+    {4, "MIX", "Mix", ControlFormat::Percent},
+};
+
 inline constexpr ControlDesc kFetCompControls[] = {
     {0, "INPUT", "Input", ControlFormat::PedalDriveDb},
     {1, "RATIO", "Ratio", ControlFormat::Ratio2To20},
@@ -524,12 +544,27 @@ inline constexpr ModuleDesc kModules[] = {
      false, 0,
      static_cast<int>(sizeof(kTapeSatControls) / sizeof(kTapeSatControls[0])),
      kTapeSatControls},
+    {ModuleId::PrecisionDrive, "Precision Drive", "Drive",
+     "Tight high-gain boost with input gate", false, false, 0,
+     static_cast<int>(sizeof(kPrecisionDriveControls) /
+                      sizeof(kPrecisionDriveControls[0])),
+     kPrecisionDriveControls},
+    {ModuleId::Wah, "Wah", "Mod", "Classic band-pass wah", false, false, 0,
+     static_cast<int>(sizeof(kWahControls) / sizeof(kWahControls[0])),
+     kWahControls},
+    {ModuleId::Laser, "Laser", "Mod",
+     "Expression pitch and ring-mod laser", false, false, 0,
+     static_cast<int>(sizeof(kLaserControls) / sizeof(kLaserControls[0])),
+     kLaserControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

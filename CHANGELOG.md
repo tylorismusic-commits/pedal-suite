@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.0-alpha — 2026-11-18
+
+- Added Horizon Devices-style **Precision Drive** with Gate, Drive, Attack
+  and Level. Attack tightens the pre-clip low end; the input gate reports GR.
+- Added a classic band-pass **Wah** with Pedal, Q, Range and Mix. MIDI
+  expression (CC 4 or 11) moves the first Wah in the chain.
+- Added a **Laser** pitch/ring-mod pedal with Pitch, Ring, Sens, Pedal and
+  Mix, including envelope-driven sweeps.
+- New boards: Precision Metal, Laser Lead and Wah Rock.
+- Modules are now prepared lazily per slot: idle and small boards use far
+  less memory and start immediately, which clears the way for amp/cab/NAM
+  models.
+- Control updates are gated by a shared revision counter; modules are no
+  longer reconfigured every audio block.
+- Every pedal is now checked for audible output, and slot type changes are
+  covered by a test.
+
 ## 0.3.4-alpha — 2026-11-18
 
 - MIDI footswitch control in CLAP and LV2: notes 36-43 or 60-67 and

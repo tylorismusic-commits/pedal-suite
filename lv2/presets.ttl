@@ -43,6 +43,10 @@
     a pset:Bank ;
     rdfs:label "Lo-Fi" .
 
+<https://github.com/tylorismusic-commits/pedal-suite#bank_rock>
+    a pset:Bank ;
+    rdfs:label "Rock" .
+
 <https://github.com/tylorismusic-commits/pedal-suite#preset_init>
     a pset:Preset ;
     lv2:appliesTo <https://github.com/tylorismusic-commits/pedal-suite> ;
@@ -365,10 +369,11 @@
     [ lv2:symbol "slot0_c1" ; pset:value 0.06 ] ,
     [ lv2:symbol "slot0_c2" ; pset:value 0.95 ] ,
     [ lv2:symbol "slot0_c3" ; pset:value 1 ] ,
-    [ lv2:symbol "slot1_type" ; pset:value 2 ] ,
-    [ lv2:symbol "slot1_c0" ; pset:value 0.3 ] ,
-    [ lv2:symbol "slot1_c1" ; pset:value 0.5 ] ,
-    [ lv2:symbol "slot1_c2" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot1_type" ; pset:value 38 ] ,
+    [ lv2:symbol "slot1_c0" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot1_c1" ; pset:value 0.35 ] ,
+    [ lv2:symbol "slot1_c2" ; pset:value 0.8 ] ,
+    [ lv2:symbol "slot1_c3" ; pset:value 0.5 ] ,
     [ lv2:symbol "slot2_type" ; pset:value 6 ] ,
     [ lv2:symbol "slot2_c0" ; pset:value 0.85 ] ,
     [ lv2:symbol "slot2_c1" ; pset:value 0.55 ] ,
@@ -378,6 +383,105 @@
     [ lv2:symbol "slot3_c1" ; pset:value 0.35 ] ,
     [ lv2:symbol "slot3_c2" ; pset:value 0.62 ] ,
     [ lv2:symbol "slot3_c3" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot4_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot5_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot6_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot7_type" ; pset:value 0 ] .
+
+<https://github.com/tylorismusic-commits/pedal-suite#preset_precision-metal>
+    a pset:Preset ;
+    lv2:appliesTo <https://github.com/tylorismusic-commits/pedal-suite> ;
+    rdfs:label "Precision Metal" ;
+    rdfs:comment "Metal" ;
+    pset:bank <https://github.com/tylorismusic-commits/pedal-suite#bank_metal> ;
+    lv2:port
+    [ lv2:symbol "power" ; pset:value 1 ] ,
+    [ lv2:symbol "slot0_type" ; pset:value 33 ] ,
+    [ lv2:symbol "slot0_c0" ; pset:value 0.6 ] ,
+    [ lv2:symbol "slot0_c1" ; pset:value 0.06 ] ,
+    [ lv2:symbol "slot0_c2" ; pset:value 0.95 ] ,
+    [ lv2:symbol "slot0_c3" ; pset:value 1 ] ,
+    [ lv2:symbol "slot1_type" ; pset:value 38 ] ,
+    [ lv2:symbol "slot1_c0" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot1_c1" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot1_c2" ; pset:value 0.78 ] ,
+    [ lv2:symbol "slot1_c3" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot2_type" ; pset:value 6 ] ,
+    [ lv2:symbol "slot2_c0" ; pset:value 0.82 ] ,
+    [ lv2:symbol "slot2_c1" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot2_c2" ; pset:value 0.42 ] ,
+    [ lv2:symbol "slot3_type" ; pset:value 34 ] ,
+    [ lv2:symbol "slot3_c0" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot3_c1" ; pset:value 0.38 ] ,
+    [ lv2:symbol "slot3_c2" ; pset:value 0.62 ] ,
+    [ lv2:symbol "slot3_c3" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot4_type" ; pset:value 32 ] ,
+    [ lv2:symbol "slot4_c0" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot4_c1" ; pset:value 0.2 ] ,
+    [ lv2:symbol "slot4_c2" ; pset:value 0.75 ] ,
+    [ lv2:symbol "slot5_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot6_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot7_type" ; pset:value 0 ] .
+
+<https://github.com/tylorismusic-commits/pedal-suite#preset_laser-lead>
+    a pset:Preset ;
+    lv2:appliesTo <https://github.com/tylorismusic-commits/pedal-suite> ;
+    rdfs:label "Laser Lead" ;
+    rdfs:comment "Lead" ;
+    pset:bank <https://github.com/tylorismusic-commits/pedal-suite#bank_lead> ;
+    lv2:port
+    [ lv2:symbol "power" ; pset:value 1 ] ,
+    [ lv2:symbol "slot0_type" ; pset:value 40 ] ,
+    [ lv2:symbol "slot0_c0" ; pset:value 0.6458 ] ,
+    [ lv2:symbol "slot0_c1" ; pset:value 0.35 ] ,
+    [ lv2:symbol "slot0_c2" ; pset:value 0.4 ] ,
+    [ lv2:symbol "slot0_c3" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot0_c4" ; pset:value 0.8 ] ,
+    [ lv2:symbol "slot1_type" ; pset:value 4 ] ,
+    [ lv2:symbol "slot1_c0" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot1_c1" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot1_c2" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot1_c3" ; pset:value 1 ] ,
+    [ lv2:symbol "slot2_type" ; pset:value 19 ] ,
+    [ lv2:symbol "slot2_c0" ; pset:value 0.4 ] ,
+    [ lv2:symbol "slot2_c1" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot2_c2" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot2_c3" ; pset:value 0.3 ] ,
+    [ lv2:symbol "slot3_type" ; pset:value 27 ] ,
+    [ lv2:symbol "slot3_c0" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot3_c1" ; pset:value 0.6 ] ,
+    [ lv2:symbol "slot3_c2" ; pset:value 0.28 ] ,
+    [ lv2:symbol "slot4_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot5_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot6_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot7_type" ; pset:value 0 ] .
+
+<https://github.com/tylorismusic-commits/pedal-suite#preset_wah-rock>
+    a pset:Preset ;
+    lv2:appliesTo <https://github.com/tylorismusic-commits/pedal-suite> ;
+    rdfs:label "Wah Rock" ;
+    rdfs:comment "Rock" ;
+    pset:bank <https://github.com/tylorismusic-commits/pedal-suite#bank_rock> ;
+    lv2:port
+    [ lv2:symbol "power" ; pset:value 1 ] ,
+    [ lv2:symbol "slot0_type" ; pset:value 39 ] ,
+    [ lv2:symbol "slot0_c0" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot0_c1" ; pset:value 0.65 ] ,
+    [ lv2:symbol "slot0_c2" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot0_c3" ; pset:value 1 ] ,
+    [ lv2:symbol "slot1_type" ; pset:value 2 ] ,
+    [ lv2:symbol "slot1_c0" ; pset:value 0.4 ] ,
+    [ lv2:symbol "slot1_c1" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot1_c2" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot2_type" ; pset:value 19 ] ,
+    [ lv2:symbol "slot2_c0" ; pset:value 0.35 ] ,
+    [ lv2:symbol "slot2_c1" ; pset:value 0.35 ] ,
+    [ lv2:symbol "slot2_c2" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot2_c3" ; pset:value 0.25 ] ,
+    [ lv2:symbol "slot3_type" ; pset:value 28 ] ,
+    [ lv2:symbol "slot3_c0" ; pset:value 0.3 ] ,
+    [ lv2:symbol "slot3_c1" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot3_c2" ; pset:value 0.25 ] ,
     [ lv2:symbol "slot4_type" ; pset:value 0 ] ,
     [ lv2:symbol "slot5_type" ; pset:value 0 ] ,
     [ lv2:symbol "slot6_type" ; pset:value 0 ] ,

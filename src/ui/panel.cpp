@@ -190,6 +190,15 @@ ModuleStyle styleFor(int type) {
     case ModuleId::TapeSat:
       return {{0.36, 0.26, 0.10}, {0.14, 0.10, 0.04},
               {1.00, 0.82, 0.48}, {0.99, 0.94, 0.82}};
+    case ModuleId::PrecisionDrive:
+      return {{0.10, 0.20, 0.12}, {0.03, 0.07, 0.04},
+              {0.66, 1.00, 0.54}, {0.90, 0.99, 0.84}};
+    case ModuleId::Wah:
+      return {{0.30, 0.08, 0.07}, {0.11, 0.02, 0.02},
+              {1.00, 0.72, 0.52}, {0.99, 0.90, 0.80}};
+    case ModuleId::Laser:
+      return {{0.12, 0.06, 0.30}, {0.04, 0.02, 0.12},
+              {0.46, 0.98, 1.00}, {0.84, 0.99, 1.00}};
     default:
       return {{0.105, 0.10, 0.095}, {0.24, 0.22, 0.19},
               {0.55, 0.50, 0.44}, {0.72, 0.70, 0.66}};
@@ -999,6 +1008,8 @@ void Panel::drawAbout(cairo_t* cr, const Shared& /*shared*/,
        120, 582, 7.0, 0, kDim.r, kDim.g, kDim.b);
   text(cr, "MIDI footswitch: notes 36-43 or 60-67, CC 20-27 or 80-87 toggle pedals 1-8.",
        120, 596, 7.0, 0, kDim.r, kDim.g, kDim.b);
+  text(cr, "MIDI expression: CC 4 or 11 moves the first Wah pedal.",
+       120, 610, 7.0, 0, kDim.r, kDim.g, kDim.b);
 
   roundRect(cr, 820, 654, 80, 26, 4);
   setRgb(cr, kAccent);

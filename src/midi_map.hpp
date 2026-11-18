@@ -22,6 +22,28 @@ inline constexpr int footswitchSlotForCc(int cc) noexcept {
   return -1;
 }
 
+inline void setWahPedal(Shared& shared, int slot, float position) noexcept {
+  if (slot < 0 || slot >= kSlotCount) return;
+  if (static_cast<int>(shared.get(slotParam(slot, kSlotOffsetType)) + 0.5) !=
+      static_cast<int>(ModuleId::Wah)) {
+    return;
+  }
+  const float v = position < 0.0f ? 0.0f : (position > 1.0f ? 1.0f : position);
+  shared.set(slotParam(slot, kSlotOffsetC0 + 0), v);
+}
+
+// An expression pedal drives the first Wah in the chain.
+inline void setFirstWahPedal(Shared& shared, float position) noexcept {
+  for (int slot = 0; slot < kSlotCount; ++slot) {
+    if (static_cast<int>(
+            shared.get(slotParam(slot, kSlotOffsetType)) + 0.5) ==
+        static_cast<int>(ModuleId::Wah)) {
+      setWahPedal(shared, slot, position);
+      return;
+    }
+  }
+}
+
 inline void toggleSlotBypass(Shared& shared, int slot) noexcept {
   if (slot < 0 || slot >= kSlotCount) return;
   const uint32_t param = slotParam(slot, kSlotOffsetBypass);

@@ -23,8 +23,8 @@
         foaf:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
-    lv2:minorVersion 3 ;
-    lv2:microVersion 4 ;
+    lv2:minorVersion 4 ;
+    lv2:microVersion 0 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
     ui:ui <https://github.com/tylorismusic-commits/pedal-suite#ui> ;
@@ -96,7 +96,7 @@
         lv2:name "Module" ;
         lv2:default 1 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -135,7 +135,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot1> ;
     ] ,
     [
@@ -299,7 +302,7 @@
         lv2:name "Module" ;
         lv2:default 2 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -338,7 +341,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot2> ;
     ] ,
     [
@@ -502,7 +508,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -541,7 +547,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot3> ;
     ] ,
     [
@@ -705,7 +714,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -744,7 +753,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot4> ;
     ] ,
     [
@@ -908,7 +920,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -947,7 +959,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot5> ;
     ] ,
     [
@@ -1111,7 +1126,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1150,7 +1165,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot6> ;
     ] ,
     [
@@ -1314,7 +1332,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1353,7 +1371,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot7> ;
     ] ,
     [
@@ -1517,7 +1538,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 37 ;
+        lv2:maximum 40 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1556,7 +1577,10 @@
             [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
             [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
             [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
-            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
+            [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
+            [ rdf:value 39 ; rdfs:label "Wah" ] ,
+            [ rdf:value 40 ; rdfs:label "Laser" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot8> ;
     ] ,
     [

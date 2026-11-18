@@ -45,6 +45,9 @@ enum ModuleId : int {
   BassEq,
   LoFi,
   TapeSat,
+  PrecisionDrive,
+  Wah,
+  Laser,
   Count
 };
 
@@ -58,7 +61,8 @@ inline constexpr const char* kModuleLabels[] = {
     "Spring Reverb", "Bass Chorus", "Vibrato", "Octave", "Tape Echo",
     "Digital Delay", "Ping-Pong", "Plate Reverb", "Room Reverb",
     "FET Comp", "Opto Comp", "Envelope Filter", "Noise Gate", "Tight Gate",
-    "3-Band EQ", "Bass EQ", "Lo-Fi", "Tape Sat"};
+    "3-Band EQ", "Bass EQ", "Lo-Fi", "Tape Sat", "Precision Drive", "Wah",
+    "Laser"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -99,6 +103,7 @@ inline constexpr bool moduleHasGr(int type) noexcept {
     case ModuleId::OptoComp:
     case ModuleId::NoiseGate:
     case ModuleId::TightGate:
+    case ModuleId::PrecisionDrive:
       return true;
     default:
       return false;
@@ -382,6 +387,31 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 0: return 0.50;  // Drive
         case 1: return 0.50;  // Tone
         case 2: return 0.70;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::PrecisionDrive:
+      switch (control) {
+        case 0: return 0.35;  // Gate
+        case 1: return 0.45;  // Drive
+        case 2: return 0.70;  // Attack
+        case 3: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::Wah:
+      switch (control) {
+        case 0: return 0.35;  // Pedal
+        case 1: return 0.55;  // Q
+        case 2: return 0.60;  // Range
+        case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::Laser:
+      switch (control) {
+        case 0: return 0.50;  // Pitch
+        case 1: return 0.35;  // Ring
+        case 2: return 0.45;  // Sens
+        case 3: return 0.50;  // Pedal
+        case 4: return 1.00;  // Mix
         default: return 0.50;
       }
     default:

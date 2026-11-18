@@ -109,7 +109,7 @@ LV2_Handle instantiate(const LV2_Descriptor*, double rate, const char*,
   }
   p->engine.prepare(p->sampleRate);
   pedal::initializeRack(p->shared);
-  p->engine.setControls(pedal::controlsFrom(p->shared));
+  p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
   return p;
 }
 
@@ -150,7 +150,7 @@ void connectPort(LV2_Handle handle, uint32_t port, void* data) {
 void activate(LV2_Handle handle) {
   auto* p = static_cast<Plugin*>(handle);
   p->engine.reset();
-  p->engine.setControls(pedal::controlsFrom(p->shared));
+  p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
   if (p->latency) {
     *p->latency = static_cast<float>(p->engine.latencySamples());
   }
@@ -186,6 +186,10 @@ void run(LV2_Handle handle, uint32_t frames) {
         if (slot >= 0) pedal::toggleSlotBypass(p->shared, slot);
       } else if (status == 0xB0) {
         const int cc = msg[1] & 0x7F;
+        if (cc == 11 || cc == 4) {
+          pedal::setFirstWahPedal(p->shared, (msg[2] & 0x7F) / 127.0f);
+          continue;
+        }
         const bool now = (msg[2] & 0x7F) >= 64;
         const bool was = p->lastCc[cc] >= 64;
         p->lastCc[cc] = msg[2] & 0x7F;
@@ -197,7 +201,7 @@ void run(LV2_Handle handle, uint32_t frames) {
     }
   }
 
-  p->engine.setControls(pedal::controlsFrom(p->shared));
+  p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
 
   if (p->audioOutL != p->audioInL) {
     std::memcpy(p->audioOutL, p->audioInL, frames * sizeof(float));

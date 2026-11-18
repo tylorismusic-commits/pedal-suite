@@ -164,8 +164,12 @@ public:
     const ParamSpec& s = kParamSpecs[p];
     v = std::min(std::max(v, s.min), s.max);
     if (s.stepped) v = static_cast<double>(static_cast<int>(v + (v >= 0 ? 0.5 : -0.5)));
+    const double previous = values_[p].load(std::memory_order_relaxed);
     values_[p].store(v, std::memory_order_relaxed);
     dirty_[p].store(true, std::memory_order_release);
+    if (v != previous) {
+      revision_.fetch_add(1, std::memory_order_relaxed);
+    }
   }
 
   void setFromHost(uint32_t p, double v) noexcept {
@@ -173,7 +177,11 @@ public:
     const ParamSpec& s = kParamSpecs[p];
     v = std::min(std::max(v, s.min), s.max);
     if (s.stepped) v = static_cast<double>(static_cast<int>(v + (v >= 0 ? 0.5 : -0.5)));
+    const double previous = values_[p].load(std::memory_order_relaxed);
     values_[p].store(v, std::memory_order_relaxed);
+    if (v != previous) {
+      revision_.fetch_add(1, std::memory_order_relaxed);
+    }
   }
 
   bool takeDirty(uint32_t p) noexcept {
@@ -196,9 +204,14 @@ public:
   std::atomic<float> tunerHz, tunerCents, tunerConfidence;
   std::atomic<int> tunerNote;
 
+  uint64_t revision() const noexcept {
+    return revision_.load(std::memory_order_relaxed);
+  }
+
 private:
   std::atomic<double> values_[P_COUNT];
   std::atomic<bool> dirty_[P_COUNT];
+  std::atomic<uint64_t> revision_{0};
 };
 
 inline Controls controlsFrom(const Shared& s) noexcept {

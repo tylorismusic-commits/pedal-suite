@@ -787,7 +787,7 @@ bool pluginActivate(const clap_plugin_t* p, double sampleRate, uint32_t,
   Plugin* s = self(p);
   s->sampleRate = sampleRate;
   s->engine.prepare(static_cast<float>(sampleRate));
-  s->engine.setControls(controlsFrom(s->shared));
+  s->engine.setControls(controlsFrom(s->shared), s->shared.revision());
   for (int i = 0; i < kSlotCount; ++i) {
     s->reportedTypes[i] = static_cast<int>(
         s->shared.get(slotParam(i, kSlotOffsetType)) + 0.5);
@@ -863,6 +863,10 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
         const auto* midi = reinterpret_cast<const clap_event_midi_t*>(header);
         if ((midi->data[0] & 0xF0) != 0xB0) continue;
         const int cc = midi->data[1] & 0x7F;
+        if (cc == 11 || cc == 4) {
+          setFirstWahPedal(s->shared, (midi->data[2] & 0x7F) / 127.0f);
+          continue;
+        }
         const bool now = (midi->data[2] & 0x7F) >= 64;
         const bool was = s->lastCc[cc] >= 64;
         s->lastCc[cc] = midi->data[2] & 0x7F;
@@ -874,7 +878,7 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
     }
   }
 
-  s->engine.setControls(controlsFrom(s->shared));
+  s->engine.setControls(controlsFrom(s->shared), s->shared.revision());
 
   bool typesChanged = false;
   for (int i = 0; i < kSlotCount; ++i) {

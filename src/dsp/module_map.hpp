@@ -242,6 +242,37 @@ inline stomp::modules::RoomReverbControls roomReverbControlsFrom(
   return out;
 }
 
+inline stomp::modules::PrecisionDriveControls precisionDriveControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::PrecisionDriveControls out;
+  out.gate = c.c[0];
+  out.drive = c.c[1];
+  out.attack = c.c[2];
+  out.level = c.c[3];
+  return out;
+}
+
+inline stomp::modules::WahControls wahControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::WahControls out;
+  out.pedal = c.c[0];
+  out.q = c.c[1];
+  out.range = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::LaserControls laserControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::LaserControls out;
+  out.pitch = c.c[0];
+  out.ring = c.c[1];
+  out.sens = c.c[2];
+  out.pedal = c.c[3];
+  out.mix = c.c[4];
+  return out;
+}
+
 inline stomp::modules::FetCompControls fetCompControlsFrom(
     const SlotControls& c) noexcept {
   stomp::modules::FetCompControls out;

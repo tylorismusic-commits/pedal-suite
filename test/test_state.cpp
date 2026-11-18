@@ -110,6 +110,12 @@ int main() {
     toggleSlotBypass(m, 3);
     const bool off = m.get(slotParam(3, kSlotOffsetBypass)) <= 0.5;
     check(on && off, "MIDI footswitch toggles bypass");
+    Shared w;
+    initializeRack(w);
+    applyModuleDefaults(w, 5, static_cast<int>(ModuleId::Wah), false);
+    setFirstWahPedal(w, 0.8f);
+    check(std::fabs(w.get(slotParam(5, kSlotOffsetC0 + 0)) - 0.8) < 1e-6,
+          "MIDI expression moves the Wah pedal");
   }
   {
     bool ok = true;

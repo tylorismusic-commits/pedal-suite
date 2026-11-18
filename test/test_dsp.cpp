@@ -366,6 +366,7 @@ int main() {
       x[i] = 0.2f * std::sin(2.0f * 3.14159265f * 330.0f * i / 48000.0f);
     }
     bool allFinite = true;
+    bool allAudible = true;
     for (int id = 1; id < kModuleCount; ++id) {
       Shared s;
       initializeRack(s);
@@ -384,8 +385,44 @@ int main() {
       Meters m;
       e.process(l.data(), r.data(), n, m);
       for (float v : l) if (!std::isfinite(v)) allFinite = false;
+      if (rms(l, 1000, n) < 1.0e-6) {
+        allAudible = false;
+        std::printf("module %d produced silence\n", id);
+      }
     }
     check(allFinite, "every pedal module stays finite");
+    check(allAudible, "every pedal module produces sound");
+  }
+  {
+    Shared s;
+    initializeRack(s);
+    for (int slot = 0; slot < kSlotCount; ++slot) {
+      applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Off), false);
+    }
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    const int n = 24000;
+    std::vector<float> l(n), r(n);
+    Meters m;
+    auto runTone = [&] {
+      for (int i = 0; i < n; ++i) {
+        l[i] = r[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i /
+                                      48000.0f);
+      }
+      e.process(l.data(), r.data(), n, m);
+    };
+    runTone();
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::DigitalDelay));
+    s.set(slotParam(0, kSlotOffsetC0 + 3), 1.0);
+    e.setControls(controlsFrom(s));
+    runTone();
+    const bool delayAudible = rms(l, 4800, n) > 1.0e-5;
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Wah));
+    e.setControls(controlsFrom(s));
+    runTone();
+    const bool wahAudible = rms(l, 1000, n) > 1.0e-5;
+    check(delayAudible && wahAudible, "slot type changes prepare new modules");
   }
 
   std::printf("%d failure(s)\n", failures);

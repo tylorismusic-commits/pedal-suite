@@ -18,7 +18,12 @@ fixed everything the measurements exposed. The automated equivalents live in
 | Plate Reverb | Decay 2.05 s | 2.10 s at 300 Hz |
 | Room Reverb | Decay 1.76 s | 1.70 s at 300 Hz |
 | Spring Reverb | Decay 1.16 s | 1.10 s at 300 Hz |
-| All 37 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
+| Precision Drive | 80 Hz, Attack 0 → 1 | −19.4 dB (tightened) |
+| Precision Drive | Gate 90%, quiet input | 80 dB reduction |
+| Wah | 700 Hz, Pedal 0 → 50% | +23.2 dB through the band-pass |
+| Laser | Pitch +12, 220 Hz input | 440.0 Hz (55 ms reported latency) |
+| All 40 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
+| All 40 pedals | default settings | audible output |
 | All values | display → parse round-trip | within one display step |
 
 ## Fixes made
@@ -50,6 +55,40 @@ fixed everything the measurements exposed. The automated equivalents live in
   ringing while its input is muted. Non-time pedals remain silent when
   bypassed.
 - A full **extreme-settings sweep** at 48 and 96 kHz for every pedal.
+
+## Signature pedals
+
+The Precision Drive follows the documented Horizon Devices topology: an input
+gate, a pre-clip high-pass driven by **Attack**, a 720 Hz mid bump, soft
+clipping and a 9 kHz output low-pass. It was tuned against the measured
+target response of a tight high-gain boost, not against the proprietary
+Tone 3K or Amp Locker models (those cannot be loaded into the test suite).
+At full Attack it removes 19 dB at 80 Hz while keeping the mid push, which is
+the behaviour players use in front of high-gain amps, cabs and NAM profiles.
+
+The Laser follows the Misha Mansoor X design: an expression-swept pitch
+shifter with ring modulation and an envelope follower. Pedal sweeps ±12
+semitones around the Pitch setting, Sens adds envelope movement, and Ring
+blends in the metallic carrier. It reports its Rubber Band latency.
+
+The Wah is a band-pass state-variable filter with a 1.8–3 octave sweep and
+Q up to 12. MIDI CC 4 or 11 moves the first Wah in the chain.
+
+## NAM / amp / cab preparation
+
+- **Lazy module preparation:** only modules selected by a slot are prepared.
+  A heavy eight-pedal board dropped from 84.6 MB RSS / 102 ms prepare to
+  15.3 MB / 0.1 ms; empty boards are nearly free. This leaves room for large
+  amp, cab and NAM models per slot.
+- **Revision-gated controls:** the plugins only push controls to the engine
+  when a parameter actually changes, instead of rebuilding every module
+  every block.
+- **Coverage:** every module is checked for audible output, and changing a
+  slot from Off to Delay to Wah is tested so lazy preparation cannot silence
+  a newly selected module.
+- The state blob is versioned and size-checked; trailing bytes are tolerated
+  so a future resource section (IR/NAM file paths) can be appended without
+  breaking older parameter layouts.
 
 ## Known limitations
 

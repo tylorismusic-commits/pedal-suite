@@ -81,6 +81,16 @@ int main(int argc, char** argv) {
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-dyn.png").c_str());
 
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::PrecisionDrive));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Wah));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::Laser));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::EnvFilter));
+  for (float& gr : state.slotGrDb) gr = 0.0f;
+  state.slotGrDb[4] = 3.5f;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf,
+                            (out + "/pedal-board-signature.png").c_str());
+
   state.browserSlot = 4;
   state.browserCategory = 1;
   panel.draw(cr, s, state);
