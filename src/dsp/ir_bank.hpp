@@ -194,6 +194,17 @@ inline std::vector<std::string> listIrFiles(const std::string& dir) {
   return listFilesWithExt(dir, ".wav");
 }
 
+inline std::string namDir() {
+  const char* xdg = std::getenv("XDG_DATA_HOME");
+  if (xdg && *xdg) return std::string(xdg) + "/pedal-suite/nam";
+  const char* home = std::getenv("HOME");
+  if (home && *home) return std::string(home) + "/.local/share/pedal-suite/nam";
+  return "pedal-suite/nam";
+}
+
+inline std::vector<std::string> listNamFiles(const std::string& dir) {
+  return listFilesWithExt(dir, ".nam");
+}
 
 inline void normalizeIrAt1k(std::vector<float>& h, int sampleRate) noexcept {
   if (h.empty() || sampleRate <= 0) return;

@@ -1,12 +1,11 @@
 # Changelog
 
-## 0.6.1-alpha — 2026-11-18
+## 0.6.2-alpha — 2026-11-18
 
-- Removed the NAM amp pedal and the vendored NAM runtime. The build is
-  lighter and faster again.
-- Added the missing **UTIL** browser page with the EQ, Lo-Fi and Tape Sat
-  pedals.
-- Moved the **Cab** pedal from DRIVE to UTIL.
+- Restored the **NAM Amp** pedal and its two-instance safety limit.
+- Added an **AMP** browser page so NAM is easy to find.
+- Added the **UTIL** browser page with the EQ, Lo-Fi, Tape Sat and Cab pedals.
+- Moved **Cab** from DRIVE to UTIL.
 
 ## 0.6.0-alpha — 2026-11-18
 

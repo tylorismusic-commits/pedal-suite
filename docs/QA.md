@@ -24,8 +24,11 @@ fixed everything the measurements exposed. The automated equivalents live in
 | Laser | Pitch +12, 220 Hz input | 440.0 Hz (55 ms reported latency) |
 | Cab | unit IR, 220 Hz | transparent within 10% |
 | IR bank | 16-bit WAV load | 1 entry, normalised |
-| All 41 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
-| All 41 pedals | default settings | audible output |
+| NAM | 220 Hz test model at 44.1/48/96 kHz | 220 Hz preserved |
+| NAM | zero input with a model | DC blocked; ~0 after 1 s |
+| NAM | eight blocks, 2 live | finite, third+ dry |
+| All 42 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
+| All 42 pedals | default settings | audible output |
 | All values | display → parse round-trip | within one display step |
 
 ## Fixes made
@@ -76,6 +79,16 @@ blends in the metallic carrier. It reports its Rubber Band latency.
 The Wah is a band-pass state-variable filter with a 1.8–3 octave sweep and
 Q up to 12. MIDI CC 4 or 11 moves the first Wah in the chain.
 
+## NAM amp
+
+The official NeuralAmpModelerCore runs WaveNet, ConvNet, LSTM, Linear,
+Sequential and Slimmable architectures. Models are loaded from
+`~/.local/share/pedal-suite/nam`, validated against a 32 MB cap, and run at
+their training rate with linear resampling at other host rates. The pedal
+buffers 64 samples, reports that latency, and passes dry if a model is
+missing. A DC blocker removes the offset models produce with silence, and
+only two NAM blocks are ever live (tested with eight).
+
 ## Cab / IR
 
 The Cab pedal uses zero-latency direct FIR convolution (up to 4096 taps) with
@@ -85,6 +98,18 @@ The picker lists the same sorted files as the engine bank, so parameter
 indices and the UI agree. A unit-impulse test confirms the Cab is transparent
 within 10%. The redundant VERB browser tab was removed because all reverbs
 are already in TIME.
+
+## NAM amp
+
+The official NeuralAmpModelerCore runs WaveNet, ConvNet, LSTM, Linear,
+Sequential and Slimmable architectures. Models are loaded from
+`~/.local/share/pedal-suite/nam`, validated against a 32 MB cap, and run at
+their training rate with linear resampling at other host rates. The pedal
+buffers 64 samples so the model processes blocks, reports that latency, and
+passes dry if a model is missing or fails. A DC blocker removes the constant
+offset many models produce with silence, and **only two NAM blocks are ever
+live**; the rest pass dry and show a limit warning. Eight NAM blocks were
+tested at 48 kHz without dropouts or non-finite output.
 
 ## NAM / amp / cab preparation
 
