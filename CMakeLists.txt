@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pedal_suite VERSION 0.1.4 LANGUAGES CXX)
+project(pedal_suite VERSION 0.1.5 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,9 +22,11 @@ if(NOT EXISTS "${PEDAL_DSP_DIR}/include/stomp/modules/modules.hpp")
   message(FATAL_ERROR "pedal-dsp not found at ${PEDAL_DSP_DIR}")
 endif()
 include_directories("${PEDAL_DSP_DIR}/include")
-add_library(pedal_dsp STATIC "${PEDAL_DSP_DIR}/src/drive808.cpp")
+add_library(pedal_dsp STATIC "${PEDAL_DSP_DIR}/src/drive808.cpp"
+  "${PEDAL_DSP_DIR}/src/pitch.cpp")
 target_include_directories(pedal_dsp PUBLIC
   "${PEDAL_DSP_DIR}/include" "${HEARTH_DSP_DIR}/include")
+target_link_libraries(pedal_dsp PUBLIC PkgConfig::RUBBERBAND)
 target_include_directories(pedal_dsp PRIVATE
   "${PEDAL_DSP_DIR}/third_party/guitarix/plugins")
 
@@ -35,6 +37,7 @@ find_package(Threads REQUIRED)
 pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
 pkg_check_modules(FREETYPE REQUIRED IMPORTED_TARGET freetype2)
 pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
+pkg_check_modules(RUBBERBAND REQUIRED IMPORTED_TARGET rubberband)
 
 set(RACK_UI_SOURCES src/ui/panel.cpp)
 

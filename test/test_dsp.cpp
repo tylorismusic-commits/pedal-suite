@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <utility>
 #include <vector>
 
 #include "dsp/engine.hpp"
@@ -87,6 +88,49 @@ int main() {
       check(finite, label);
       check(e.latencySamples() == 0, "pedalboard reports zero latency");
     }
+  }
+  {
+    const int n = 24000;
+    std::vector<float> x(n);
+    for (int i = 0; i < n; ++i) {
+      x[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+    }
+    auto shifted = [&](ModuleId id, int control, double value) {
+      Shared s;
+      initializeRack(s);
+      applyModuleDefaults(s, 0, static_cast<int>(id), false);
+      s.set(slotParam(0, kSlotOffsetC0 + control), value);
+      if (id == ModuleId::PitchDrop) {
+        s.set(slotParam(0, kSlotOffsetC0 + 2), 0.0);
+      }
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      auto l = x, r = x;
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      const int latency = e.latencySamples();
+      int crossings = 0;
+      float prev = 0.0f;
+      const int start = std::min(n - 1, latency + 2400);
+      for (int i = start; i < n; ++i) {
+        if ((prev <= 0.0f && l[i] > 0.0f) ||
+            (prev >= 0.0f && l[i] < 0.0f)) {
+          ++crossings;
+        }
+        prev = l[i];
+      }
+      const double seconds = (n - start) / 48000.0;
+      return std::make_pair(crossings * 0.5 / seconds, latency);
+    };
+    const auto pitch = shifted(ModuleId::PitchDrop, 0, 0.75);
+    check(std::fabs(pitch.first - 440.0) < 30.0,
+          "Pitch Drop shifts up an octave");
+    check(pitch.second > 0, "Pitch Drop reports latency");
+    const auto retune = shifted(ModuleId::Retune, 0, 1.0);
+    check(std::fabs(retune.first - 440.0) < 30.0,
+          "Retune shifts up twelve semitones");
+    check(retune.second > 0, "Retune reports latency");
   }
   {
     const int n = 12000;

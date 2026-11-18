@@ -32,6 +32,8 @@ public:
     for (auto& p : toneBender_) p.prepare(sr_);
     for (auto& p : bassDrive_) p.prepare(sr_);
     for (auto& p : bassFuzz_) p.prepare(sr_);
+    for (auto& p : pitchDrop_) p.prepare(sr_);
+    for (auto& p : retune_) p.prepare(sr_);
     reset();
   }
 
@@ -53,6 +55,8 @@ public:
       toneBender_[i].setControls(toneBenderControlsFrom(c.slot[i]));
       bassDrive_[i].setControls(bassDriveControlsFrom(c.slot[i]));
       bassFuzz_[i].setControls(bassFuzzControlsFrom(c.slot[i]));
+      pitchDrop_[i].setControls(pitchDropControlsFrom(c.slot[i]));
+      retune_[i].setControls(retuneControlsFrom(c.slot[i]));
     }
   }
 
@@ -106,6 +110,12 @@ public:
           case ModuleId::BassFuzz:
             bassFuzz_[s].process(l, r);
             break;
+          case ModuleId::PitchDrop:
+            pitchDrop_[s].process(l, r);
+            break;
+          case ModuleId::Retune:
+            retune_[s].process(l, r);
+            break;
           case ModuleId::Off:
           case ModuleId::Count:
             continue;
@@ -156,12 +166,31 @@ public:
     for (auto& p : toneBender_) p.reset();
     for (auto& p : bassDrive_) p.reset();
     for (auto& p : bassFuzz_) p.reset();
+    for (auto& p : pitchDrop_) p.reset();
+    for (auto& p : retune_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
   }
 
-  int latencySamples() const noexcept { return 0; }
+  int latencySamples() const noexcept {
+    int latency = 0;
+    for (int s = 0; s < kSlotCount; ++s) {
+      const SlotControls& c = slot_[s];
+      if (c.bypass) continue;
+      switch (static_cast<ModuleId>(c.type)) {
+        case ModuleId::PitchDrop:
+          latency += pitchDrop_[s].latencySamples();
+          break;
+        case ModuleId::Retune:
+          latency += retune_[s].latencySamples();
+          break;
+        default:
+          break;
+      }
+    }
+    return latency;
+  }
 
 private:
   float sr_ = 48000.0f;
@@ -181,6 +210,8 @@ private:
   stomp::modules::ToneBender toneBender_[kSlotCount];
   stomp::modules::BassDrive bassDrive_[kSlotCount];
   stomp::modules::BassFuzz bassFuzz_[kSlotCount];
+  stomp::modules::PitchDrop pitchDrop_[kSlotCount];
+  stomp::modules::Retune retune_[kSlotCount];
 };
 
 } // namespace pedal

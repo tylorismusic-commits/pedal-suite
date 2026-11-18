@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
   state.selectedSlot = 4;
   applyModuleDefaults(s, 4, static_cast<int>(ModuleId::ToneBender));
   applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BassDrive));
-  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::BassFuzz));
-  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::FuzzFace));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::PitchDrop));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Retune));
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-page2.png").c_str());
 

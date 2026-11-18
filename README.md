@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.1.4-alpha — complete drive/fuzz family.**
+**Status: 0.1.5-alpha — drive/fuzz family plus pitch.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -34,6 +34,10 @@ and full board visuals land in later milestones.
 - **Tone Bender** — Attack, Tone, Level.
 - **Bass Drive** — Drive, Blend, Tone, Level.
 - **Bass Fuzz** — Fuzz, Blend, Tone, Level.
+- **Pitch Drop** — Gojira-style Whammy Up, Whammy Down, Drop, Harmony
+  and Detune modes with Pitch, Mode, Glide, Tone and Mix.
+- **Retune** — Low-latency semitone/cent tuning with Semitones, Cents,
+  Low Cut and Mix.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.

@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#include <algorithm>
+#include <cmath>
+
 #include <stomp/modules/modules.hpp>
 
 #include "dsp/controls.hpp"
@@ -78,6 +81,27 @@ inline stomp::modules::FuzzFaceControls fuzzFaceControlsFrom(
   out.fuzz = c.c[0];
   out.bias = c.c[1];
   out.volume = c.c[2];
+  return out;
+}
+
+inline stomp::modules::PitchDropControls pitchDropControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::PitchDropControls out;
+  out.pitch = c.c[0];
+  out.mode = static_cast<int>(std::lround(std::clamp(c.c[1], 0.0f, 1.0f) * 4.0f));
+  out.glide = c.c[2];
+  out.tone = 1.0f;
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::RetuneControls retuneControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::RetuneControls out;
+  out.semitones = c.c[0];
+  out.cents = c.c[1];
+  out.lowCut = c.c[2];
+  out.mix = c.c[3];
   return out;
 }
 

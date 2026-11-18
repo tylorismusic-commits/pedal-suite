@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.5-alpha — 2026-11-18
+
+- Added Pitch Drop with Whammy Up, Whammy Down, Drop, Harmony and Detune
+  modes on a Rubber Band Live low-latency engine.
+- Added Retune with semitone, cent and low-cut controls for step tuning.
+- Both pitch pedals report their latency to the host.
+- Parameter text entry understands semitones, cents and Hz for the new
+  controls, and the semitone knob snaps to 25 steps.
+- Save/rename text fields ignore duplicate key events within 60 ms.
+
 ## 0.1.4-alpha — 2026-11-18
 
 - Added Tone Bender, Bass Drive and Bass Fuzz.

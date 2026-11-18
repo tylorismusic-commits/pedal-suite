@@ -115,6 +115,12 @@ ModuleStyle styleFor(int type) {
     case ModuleId::BassFuzz:
       return {{0.20, 0.10, 0.26}, {0.08, 0.03, 0.12},
               {0.88, 0.52, 1.00}, {0.94, 0.87, 0.98}};
+    case ModuleId::PitchDrop:
+      return {{0.42, 0.07, 0.10}, {0.18, 0.02, 0.04},
+              {1.00, 0.42, 0.36}, {0.98, 0.86, 0.82}};
+    case ModuleId::Retune:
+      return {{0.07, 0.20, 0.38}, {0.02, 0.08, 0.18},
+              {0.44, 0.82, 1.00}, {0.82, 0.93, 1.00}};
     default:
       return {{0.105, 0.10, 0.095}, {0.24, 0.22, 0.19},
               {0.55, 0.50, 0.44}, {0.72, 0.70, 0.66}};
@@ -297,9 +303,12 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
           kx = x + colW * 0.5;
           ky = y + 232.0;
         }
+        int steps = control.stepped ? control.labels.count : 0;
+        if (control.stepped && control.format == ControlFormat::Semitones) {
+          steps = 25;
+        }
         knob(slotParam(slot, kSlotOffsetC0 + control.param), kx, ky, 22,
-             control.label, slot, true, control.param,
-             control.stepped ? control.labels.count : 0);
+             control.label, slot, true, control.param, steps);
       }
     }
 

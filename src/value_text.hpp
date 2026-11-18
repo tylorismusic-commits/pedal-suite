@@ -57,6 +57,23 @@ inline std::string formatControlValue(const ModuleDesc& module,
     case ControlFormat::PedalLevelDb:
       std::snprintf(buf, sizeof(buf), "%+.1f dB", -12.0f + 24.0f * v);
       return buf;
+    case ControlFormat::Semitones: {
+      const int semis =
+          static_cast<int>(std::lround(v * 24.0f)) - 12;
+      if (semis == 0) return "0 st";
+      std::snprintf(buf, sizeof(buf), "%+d st", semis);
+      return buf;
+    }
+    case ControlFormat::Cents: {
+      const int cents =
+          static_cast<int>(std::lround(v * 100.0f)) - 50;
+      if (cents == 0) return "0 ct";
+      std::snprintf(buf, sizeof(buf), "%+d ct", cents);
+      return buf;
+    }
+    case ControlFormat::LowCut300:
+      std::snprintf(buf, sizeof(buf), "%.0f Hz", 40.0f + 260.0f * v);
+      return buf;
     case ControlFormat::ThresholdDb:
       std::snprintf(buf, sizeof(buf), "%+.1f dB", -40.0f + 40.0f * v);
       return buf;
@@ -522,6 +539,7 @@ inline bool isFrequencyFormat(ControlFormat format) {
     case ControlFormat::HybridLowFreq:
     case ControlFormat::HybridMidFreq:
     case ControlFormat::HybridHighFreq:
+    case ControlFormat::LowCut300:
       return true;
     default:
       return false;
@@ -681,6 +699,12 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
       case ControlFormat::Percent: v = v / 100.0; break;
       case ControlFormat::PedalGainDb: v = v / 24.0; break;
       case ControlFormat::PedalLevelDb: v = (v + 12.0) / 24.0; break;
+      case ControlFormat::Semitones:
+        v = (v + 12.0) / 24.0;
+        v = std::round(v * 24.0) / 24.0;
+        break;
+      case ControlFormat::Cents: v = (v + 50.0) / 100.0; break;
+      case ControlFormat::LowCut300: v = (v - 40.0) / 260.0; break;
       case ControlFormat::ScHpfHz:
         v = std::log(std::max(v, 20.0) / 20.0) / std::log(20.0);
         break;

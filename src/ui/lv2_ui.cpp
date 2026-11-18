@@ -48,6 +48,8 @@ struct Ui {
 
   Display* dpy = nullptr;
   Window win = 0;
+  KeyCode lastKeyCode = 0;
+  std::chrono::steady_clock::time_point lastKeyTime{};
   cairo_surface_t* windowSurface = nullptr;
   cairo_surface_t* backing = nullptr;
   cairo_t* cr = nullptr;
@@ -156,6 +158,13 @@ struct Ui {
         } else if (sym == XK_BackSpace) {
           panel.textKey(shared, state, pedal::Panel::kTextBackspace, 0);
         } else if (n > 0) {
+          const auto now = std::chrono::steady_clock::now();
+          if (ev.xkey.keycode == lastKeyCode &&
+              now - lastKeyTime < std::chrono::milliseconds(60)) {
+            break;
+          }
+          lastKeyCode = ev.xkey.keycode;
+          lastKeyTime = now;
           panel.textKey(shared, state, 0, buf[0]);
         }
         dirty = true;

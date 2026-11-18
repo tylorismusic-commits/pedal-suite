@@ -95,6 +95,9 @@ enum class ControlFormat {
   HybridHighAtten,
   PedalGainDb,
   PedalLevelDb,
+  Semitones,
+  Cents,
+  LowCut300,
 };
 
 struct ControlDesc {
@@ -168,6 +171,23 @@ inline constexpr ControlDesc kBigFuzzControls[] = {
     {1, "TONE", "Tone", ControlFormat::Percent},
     {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
 };
+inline constexpr const char* kPitchModeLabels[] = {
+    "Whammy Up", "Whammy Down", "Drop", "Harmony", "Detune"};
+
+inline constexpr ControlDesc kPitchDropControls[] = {
+    {0, "PITCH", "Pitch", ControlFormat::Percent},
+    {1, "MODE", "Mode", ControlFormat::Percent, true,
+     labels(kPitchModeLabels)},
+    {2, "GLIDE", "Glide", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kRetuneControls[] = {
+    {0, "SEMITONES", "Semitones", ControlFormat::Semitones, true},
+    {1, "CENTS", "Cents", ControlFormat::Cents},
+    {2, "LOW CUT", "Low Cut", ControlFormat::LowCut300},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+
 inline constexpr ControlDesc kFuzzFaceControls[] = {
     {0, "FUZZ", "Fuzz", ControlFormat::Percent},
     {1, "BIAS", "Bias", ControlFormat::Percent},
@@ -249,12 +269,24 @@ inline constexpr ModuleDesc kModules[] = {
      static_cast<int>(sizeof(kBassFuzzControls) /
                       sizeof(kBassFuzzControls[0])),
      kBassFuzzControls},
+    {ModuleId::PitchDrop, "Pitch Drop", "Mod",
+     "Gojira-style whammy pitch pedal", false, false, 0,
+     static_cast<int>(sizeof(kPitchDropControls) /
+                      sizeof(kPitchDropControls[0])),
+     kPitchDropControls},
+    {ModuleId::Retune, "Retune", "Mod",
+     "Low-latency step tuning", false, false, 0,
+     static_cast<int>(sizeof(kRetuneControls) /
+                      sizeof(kRetuneControls[0])),
+     kRetuneControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

@@ -116,6 +116,9 @@ public:
     return opened_;
   }
 
+  KeyCode lastKeyCode_ = 0;
+  std::chrono::steady_clock::time_point lastKeyTime_{};
+
   void close() {
     {
       std::lock_guard<std::mutex> lock(mutex_);
@@ -313,6 +316,13 @@ private:
         } else if (sym == XK_BackSpace) {
           panel_.textKey(shared_, state_, Panel::kTextBackspace, 0);
         } else if (n > 0) {
+          const auto now = std::chrono::steady_clock::now();
+          if (ev.xkey.keycode == lastKeyCode_ &&
+              now - lastKeyTime_ < std::chrono::milliseconds(60)) {
+            break;
+          }
+          lastKeyCode_ = ev.xkey.keycode;
+          lastKeyTime_ = now;
           panel_.textKey(shared_, state_, 0, buf[0]);
         }
         break;
