@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <vector>
 
+#include "midi_map.hpp"
 #include "module_ids.hpp"
 #include "modules.hpp"
 #include "params.hpp"
@@ -88,6 +89,27 @@ int main() {
       }
     }
     check(ok, "factory pedal presets are valid");
+  }
+  {
+    bool ok = true;
+    for (int i = 0; i < kSlotCount; ++i) {
+      if (footswitchSlotForNote(36 + i) != i) ok = false;
+      if (footswitchSlotForNote(60 + i) != i) ok = false;
+      if (footswitchSlotForCc(20 + i) != i) ok = false;
+      if (footswitchSlotForCc(80 + i) != i) ok = false;
+    }
+    if (footswitchSlotForNote(35) != -1) ok = false;
+    if (footswitchSlotForNote(44) != -1) ok = false;
+    if (footswitchSlotForCc(19) != -1) ok = false;
+    if (footswitchSlotForCc(28) != -1) ok = false;
+    check(ok, "MIDI footswitch mapping covers eight slots");
+    Shared m;
+    initializeRack(m);
+    toggleSlotBypass(m, 3);
+    const bool on = m.get(slotParam(3, kSlotOffsetBypass)) > 0.5;
+    toggleSlotBypass(m, 3);
+    const bool off = m.get(slotParam(3, kSlotOffsetBypass)) <= 0.5;
+    check(on && off, "MIDI footswitch toggles bypass");
   }
   {
     bool ok = true;

@@ -64,6 +64,8 @@ constexpr MeterPort kMeters[] = {
     {"slot4_gr", "Slot 4 Gain Reduction", false, true},
     {"slot5_gr", "Slot 5 Gain Reduction", false, true},
     {"slot6_gr", "Slot 6 Gain Reduction", false, true},
+    {"slot7_gr", "Slot 7 Gain Reduction", false, true},
+    {"slot8_gr", "Slot 8 Gain Reduction", false, true},
     {"latency", "Latency", true},
 };
 
@@ -177,6 +179,7 @@ std::string buildPluginTtl() {
   out << "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n";
   out << "@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n";
   out << "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n";
+  out << "@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .\n";
   out << "@prefix urid:  <http://lv2plug.in/ns/ext/urid#> .\n";
   out << "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n";
   out << "\n";
@@ -250,6 +253,19 @@ std::string buildPluginTtl() {
                                 false, false, {}, "dB",
                                 groupUri("Meter").c_str(), true, !m.gr));
     }
+  }
+
+  {
+    std::ostringstream p;
+    p << "    [\n";
+    p << "        a lv2:InputPort , atom:AtomPort ;\n";
+    p << "        lv2:index " << index++ << " ;\n";
+    p << "        lv2:symbol \"midi_in\" ;\n";
+    p << "        lv2:name \"MIDI In\" ;\n";
+    p << "        atom:bufferType atom:Sequence ;\n";
+    p << "        atom:supports midi:MidiEvent ;\n";
+    p << "    ]";
+    ports.push_back(p.str());
   }
 
   for (size_t i = 0; i < ports.size(); ++i) {

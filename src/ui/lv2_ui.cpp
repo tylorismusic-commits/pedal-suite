@@ -32,7 +32,7 @@
 namespace {
 
 constexpr const char* kUiUri =
-    "https://github.com/tylorismusic-commits/suite-rack#ui";
+    "https://github.com/tylorismusic-commits/pedal-suite#ui";
 constexpr uint32_t kFirstParam = 4;
 constexpr uint32_t kMeterBase = kFirstParam + pedal::P_COUNT;
 constexpr auto kFrameInterval = std::chrono::milliseconds(33);
@@ -361,6 +361,8 @@ void uiPortEvent(LV2UI_Handle handle, uint32_t port, uint32_t size,
     case kMeterBase + 9:
     case kMeterBase + 10:
     case kMeterBase + 11:
+    case kMeterBase + 12:
+    case kMeterBase + 13:
       ui->shared.slotGrDb[port - (kMeterBase + 6)].store(v);
       break;
     default:

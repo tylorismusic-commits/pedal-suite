@@ -25,6 +25,7 @@
 #include <thread>
 
 #include "dsp/engine.hpp"
+#include "midi_map.hpp"
 #include "modules.hpp"
 #include "params.hpp"
 #include "state.hpp"
@@ -372,12 +373,12 @@ struct Plugin {
   std::atomic<uint32_t> reportedLatency{0xffffffffu};
   std::atomic<bool> rescanQueued{false};
   std::atomic<bool> active{false};
-  int reportedTypes[kSlotCount] = {-1, -1, -1, -1, -1, -1};
-  float reportedGr[kSlotCount] = {-1, -1, -1, -1, -1, -1};
+  int reportedTypes[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
+  uint8_t lastCc[128] = {};
+  float reportedGr[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
 };
 
 const char* const kFeatures[] = {CLAP_PLUGIN_FEATURE_AUDIO_EFFECT,
-                                 CLAP_PLUGIN_FEATURE_GATE,
                                  CLAP_PLUGIN_FEATURE_STEREO, nullptr};
 
 const clap_plugin_descriptor_t kDescriptor = {
@@ -385,11 +386,11 @@ const clap_plugin_descriptor_t kDescriptor = {
     kPluginId,
     kPluginName,
     kVendor,
-    "https://github.com/tylorismusic-commits/suite-rack",
+    "https://github.com/tylorismusic-commits/pedal-suite",
     "",
     "",
     kVersion,
-    "Virtual mix rack with six serial slots and EQ/Comp modules.",
+    "Eight-slot virtual guitar and bass pedalboard.",
     kFeatures,
 };
 
@@ -846,6 +847,31 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
   }
   if (right != inR) {
     std::memcpy(right, inR, frames * sizeof(float));
+  }
+
+  if (proc->in_events) {
+    const uint32_t count = proc->in_events->size(proc->in_events);
+    for (uint32_t i = 0; i < count; ++i) {
+      const auto* header = proc->in_events->get(proc->in_events, i);
+      if (!header || header->space_id != CLAP_CORE_EVENT_SPACE_ID) continue;
+      if (header->type == CLAP_EVENT_NOTE_ON) {
+        const auto* note = reinterpret_cast<const clap_event_note_t*>(header);
+        if (note->velocity <= 0.0) continue;
+        const int slot = footswitchSlotForNote(note->key);
+        if (slot >= 0) toggleSlotBypass(s->shared, slot);
+      } else if (header->type == CLAP_EVENT_MIDI) {
+        const auto* midi = reinterpret_cast<const clap_event_midi_t*>(header);
+        if ((midi->data[0] & 0xF0) != 0xB0) continue;
+        const int cc = midi->data[1] & 0x7F;
+        const bool now = (midi->data[2] & 0x7F) >= 64;
+        const bool was = s->lastCc[cc] >= 64;
+        s->lastCc[cc] = midi->data[2] & 0x7F;
+        if (now && !was) {
+          const int slot = footswitchSlotForCc(cc);
+          if (slot >= 0) toggleSlotBypass(s->shared, slot);
+        }
+      }
+    }
   }
 
   s->engine.setControls(controlsFrom(s->shared));

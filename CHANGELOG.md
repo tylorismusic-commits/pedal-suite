@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.4-alpha — 2026-11-18
+
+- MIDI footswitch control in CLAP and LV2: notes 36-43 or 60-67 and
+  CC 20-27 or 80-87 toggle pedals 1-8.
+- LV2 now exposes all eight gain-reduction ports (slots 7-8 were missing).
+- Fixed the LV2 plugin and UI URIs, which stopped the LV2 editor from
+  opening in hosts; the editor now loads and draws in REAPER.
+- Corrected the CLAP descriptor URL, description and feature list.
+- User preset files now use the `.pedal-suite` extension; `.suite-rack`
+  files from earlier alphas still load and migrate on save.
+
 ## 0.3.3-alpha — 2026-11-18
 
 - Eight new curated board presets: Ambient Wash, Gojira Drop, Bass Growl,

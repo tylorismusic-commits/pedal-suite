@@ -997,6 +997,8 @@ void Panel::drawAbout(cairo_t* cr, const Shared& /*shared*/,
        120, 568, 7.0, 0, kDim.r, kDim.g, kDim.b);
   text(cr, "Jost font: SIL OFL 1.1. CLAP headers: MIT. Exclusive pedals are unique to this plugin.",
        120, 582, 7.0, 0, kDim.r, kDim.g, kDim.b);
+  text(cr, "MIDI footswitch: notes 36-43 or 60-67, CC 20-27 or 80-87 toggle pedals 1-8.",
+       120, 596, 7.0, 0, kDim.r, kDim.g, kDim.b);
 
   roundRect(cr, 820, 654, 80, 26, 4);
   setRgb(cr, kAccent);

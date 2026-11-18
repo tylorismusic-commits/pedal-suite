@@ -8,6 +8,7 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
 @prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -23,7 +24,7 @@
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     lv2:minorVersion 3 ;
-    lv2:microVersion 3 ;
+    lv2:microVersion 4 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
     ui:ui <https://github.com/tylorismusic-commits/pedal-suite#ui> ;
@@ -1853,6 +1854,28 @@
     [
         a lv2:OutputPort , lv2:ControlPort ;
         lv2:index 147 ;
+        lv2:symbol "slot7_gr" ;
+        lv2:name "Slot 7 Gain Reduction" ;
+        lv2:default 0 ;
+        lv2:minimum -120 ;
+        lv2:maximum 24 ;
+        units:unit units:db ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#meter> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 148 ;
+        lv2:symbol "slot8_gr" ;
+        lv2:name "Slot 8 Gain Reduction" ;
+        lv2:default 0 ;
+        lv2:minimum -120 ;
+        lv2:maximum 24 ;
+        units:unit units:db ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#meter> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 149 ;
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:default 0 ;
@@ -1861,6 +1884,14 @@
         lv2:designation lv2:latency ;
         lv2:portProperty pprops:notOnGUI ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#latency> ;
+    ] ,
+    [
+        a lv2:InputPort , atom:AtomPort ;
+        lv2:index 150 ;
+        lv2:symbol "midi_in" ;
+        lv2:name "MIDI In" ;
+        atom:bufferType atom:Sequence ;
+        atom:supports midi:MidiEvent ;
     ] .
 
 

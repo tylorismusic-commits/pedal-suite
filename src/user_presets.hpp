@@ -16,6 +16,11 @@
 
 namespace pedal {
 
+// Files written by 0.3.3 and earlier used Suite Rack's extension by mistake.
+// New files use .pedal-suite; the loader still accepts the legacy extension.
+inline constexpr const char* kUserPresetExt = ".pedal-suite";
+inline constexpr const char* kLegacyPresetExt = ".suite-rack";
+
 struct UserPreset {
   std::string name;
   std::vector<double> values;
@@ -72,8 +77,9 @@ inline bool writeUserPreset(const std::filesystem::path& dir,
   std::filesystem::create_directories(dir, ec);
   if (ec) return false;
 
-  const std::filesystem::path finalPath = dir / (name + ".suite-rack");
-  const std::filesystem::path tempPath = dir / (name + ".suite-rack.tmp");
+  const std::filesystem::path finalPath = dir / (name + kUserPresetExt);
+  const std::filesystem::path tempPath =
+      dir / (name + std::string(kUserPresetExt) + ".tmp");
   std::ofstream out(tempPath, std::ios::trunc);
   if (!out) return false;
   out << "PedalSuitePreset 1\n";
@@ -89,6 +95,11 @@ inline bool writeUserPreset(const std::filesystem::path& dir,
     std::filesystem::remove(finalPath, ec);
     ec.clear();
     std::filesystem::rename(tempPath, finalPath, ec);
+  }
+  if (!ec) {
+    // Drop a migration duplicate with the old extension.
+    std::error_code ignored;
+    std::filesystem::remove(dir / (name + kLegacyPresetExt), ignored);
   }
   return !ec;
 }
@@ -106,7 +117,11 @@ inline bool deleteUserPreset(const std::filesystem::path& dir,
   const std::string name = sanitizePresetName(rawName);
   if (name.empty()) return false;
   std::error_code ec;
-  return std::filesystem::remove(dir / (name + ".suite-rack"), ec) && !ec;
+  if (std::filesystem::remove(dir / (name + kUserPresetExt), ec) && !ec) {
+    return true;
+  }
+  ec.clear();
+  return std::filesystem::remove(dir / (name + kLegacyPresetExt), ec) && !ec;
 }
 
 inline bool renameUserPreset(const std::filesystem::path& dir,
@@ -118,7 +133,10 @@ inline bool renameUserPreset(const std::filesystem::path& dir,
   if (oldClean.empty() || newClean.empty()) return false;
   if (oldClean != newClean) {
     std::error_code ec;
-    if (std::filesystem::exists(dir / (newClean + ".suite-rack"), ec) && !ec) {
+    if ((std::filesystem::exists(dir / (newClean + kUserPresetExt), ec) &&
+         !ec) ||
+        (std::filesystem::exists(dir / (newClean + kLegacyPresetExt), ec) &&
+         !ec)) {
       return false;
     }
   }
@@ -153,6 +171,11 @@ inline bool writeModulePreset(const std::filesystem::path& dir,
     std::filesystem::remove(finalPath, ec);
     ec.clear();
     std::filesystem::rename(tempPath, finalPath, ec);
+  }
+  if (!ec) {
+    // Drop a migration duplicate with the old extension.
+    std::error_code ignored;
+    std::filesystem::remove(dir / (name + kLegacyPresetExt), ignored);
   }
   return !ec;
 }
@@ -242,7 +265,8 @@ inline std::vector<UserPreset> loadUserPresets(
   for (const auto& entry : std::filesystem::directory_iterator(dir, ec)) {
     if (ec) break;
     if (!entry.is_regular_file()) continue;
-    if (entry.path().extension() != ".suite-rack") continue;
+    const std::string ext = entry.path().extension().string();
+    if (ext != kUserPresetExt && ext != kLegacyPresetExt) continue;
     files.push_back(entry.path());
   }
   std::sort(files.begin(), files.end());

@@ -5,6 +5,7 @@
 // The meter ports follow the parameter block in the same order as the LV2 UI.
 
 #include <lv2/atom/atom.h>
+#include <lv2/atom/util.h>
 #include <lv2/core/lv2.h>
 #include <lv2/state/state.h>
 #include <lv2/urid/urid.h>
@@ -17,6 +18,7 @@
 #include <vector>
 
 #include "dsp/engine.hpp"
+#include "midi_map.hpp"
 #include "modules.hpp"
 #include "params.hpp"
 #include "state.hpp"
@@ -24,7 +26,7 @@
 namespace {
 
 constexpr const char* kPluginUri =
-    "https://github.com/tylorismusic-commits/suite-rack";
+    "https://github.com/tylorismusic-commits/pedal-suite";
 
 enum Port : uint32_t {
   PORT_AUDIO_IN_L = 0,
@@ -44,7 +46,10 @@ enum Port : uint32_t {
   PORT_SLOT3_GR,
   PORT_SLOT4_GR,
   PORT_SLOT5_GR,
+  PORT_SLOT6_GR,
+  PORT_SLOT7_GR,
   PORT_LATENCY,
+  PORT_MIDI_IN,
   PORT_COUNT
 };
 
@@ -71,10 +76,14 @@ struct Plugin {
   float* outPeak = nullptr;
   float* slotGr[pedal::kSlotCount] = {};
   float* latency = nullptr;
+  const LV2_Atom_Sequence* midiIn = nullptr;
+  uint8_t lastCc[128] = {};
 
   const LV2_URID_Map* map = nullptr;
   LV2_URID stateKey = 0;
+  LV2_URID legacyStateKey = 0;
   LV2_URID chunkType = 0;
+  LV2_URID midiEventType = 0;
 };
 
 LV2_Handle instantiate(const LV2_Descriptor*, double rate, const char*,
@@ -90,8 +99,13 @@ LV2_Handle instantiate(const LV2_Descriptor*, double rate, const char*,
   if (p->map) {
     p->stateKey = p->map->map(
         p->map->handle,
+        "https://github.com/tylorismusic-commits/pedal-suite#state");
+    p->legacyStateKey = p->map->map(
+        p->map->handle,
         "https://github.com/tylorismusic-commits/suite-rack#state");
     p->chunkType = p->map->map(p->map->handle, LV2_ATOM__Chunk);
+    p->midiEventType = p->map->map(
+        p->map->handle, "http://lv2plug.in/ns/ext/midi#MidiEvent");
   }
   p->engine.prepare(p->sampleRate);
   pedal::initializeRack(p->shared);
@@ -118,7 +132,12 @@ void connectPort(LV2_Handle handle, uint32_t port, void* data) {
     case PORT_SLOT3_GR: p->slotGr[3] = static_cast<float*>(data); break;
     case PORT_SLOT4_GR: p->slotGr[4] = static_cast<float*>(data); break;
     case PORT_SLOT5_GR: p->slotGr[5] = static_cast<float*>(data); break;
+    case PORT_SLOT6_GR: p->slotGr[6] = static_cast<float*>(data); break;
+    case PORT_SLOT7_GR: p->slotGr[7] = static_cast<float*>(data); break;
     case PORT_LATENCY: p->latency = static_cast<float*>(data); break;
+    case PORT_MIDI_IN:
+      p->midiIn = static_cast<const LV2_Atom_Sequence*>(data);
+      break;
     default:
       if (port >= PORT_FIRST_PARAM &&
           port < PORT_FIRST_PARAM + pedal::P_COUNT) {
@@ -154,6 +173,29 @@ void run(LV2_Handle handle, uint32_t frames) {
     }
   }
   p->portsSeen = true;
+
+  if (p->midiIn && p->midiEventType) {
+    LV2_ATOM_SEQUENCE_FOREACH(p->midiIn, ev) {
+      if (!ev || ev->body.type != p->midiEventType || ev->body.size < 3) {
+        continue;
+      }
+      const uint8_t* msg = reinterpret_cast<const uint8_t*>(ev + 1);
+      const uint8_t status = msg[0] & 0xF0;
+      if (status == 0x90 && msg[2] > 0) {
+        const int slot = pedal::footswitchSlotForNote(msg[1] & 0x7F);
+        if (slot >= 0) pedal::toggleSlotBypass(p->shared, slot);
+      } else if (status == 0xB0) {
+        const int cc = msg[1] & 0x7F;
+        const bool now = (msg[2] & 0x7F) >= 64;
+        const bool was = p->lastCc[cc] >= 64;
+        p->lastCc[cc] = msg[2] & 0x7F;
+        if (now && !was) {
+          const int slot = pedal::footswitchSlotForCc(cc);
+          if (slot >= 0) pedal::toggleSlotBypass(p->shared, slot);
+        }
+      }
+    }
+  }
 
   p->engine.setControls(pedal::controlsFrom(p->shared));
 
@@ -220,6 +262,9 @@ LV2_State_Status stateRestore(LV2_Handle handle,
   uint32_t type = 0, flags = 0;
   size_t size = 0;
   const void* data = retrieve(state, p->stateKey, &size, &type, &flags);
+  if (!data && p->legacyStateKey) {
+    data = retrieve(state, p->legacyStateKey, &size, &type, &flags);
+  }
   if (!data) return LV2_STATE_SUCCESS;
   if (type != p->chunkType) return LV2_STATE_ERR_BAD_TYPE;
   if (!pedal::deserializeState(data, size, p->shared)) {

@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.3.3-alpha — 37 pedals, tuner and curated boards.**
+**Status: 0.3.4-alpha — 37 pedals, tuner, boards and MIDI footswitch.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -77,6 +77,9 @@ the LV2 `slotN_gr` ports. Delay and reverb tails keep ringing when bypassed.
 
 The **TUNER** button opens a monophonic tuner fed from the dry input, with
 note, octave, cents, frequency and confidence.
+
+**MIDI footswitch:** notes 36–43 or 60–67, and CC 20–27 or 80–87, toggle
+pedals 1–8. Both CLAP and LV2 accept the events.
 
 Twelve board presets ship ready to play, including Clean Platform, 808 Stack,
 Lead Lift, Ambient Wash, Gojira Drop, Bass Growl, Funk Wah, Pitch Lead,
