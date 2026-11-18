@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0-alpha — 2026-11-18
+
+- Completed the 37-pedal catalog.
+- Added FET Comp and Opto Comp.
+- Added Envelope Filter, Noise Gate and Tight Gate.
+- Added 3-Band EQ, Bass EQ, Lo-Fi and Tape Sat.
+- Added Bass Chorus, Vibrato and Octave.
+- Added Tape Echo, Digital Delay, Ping-Pong, Plate Reverb and Room Reverb.
+- New factory presets for every pedal; dynamics, gate and tone tests added.
+
 ## 0.2.0-alpha — 2026-11-18
 
 - Added Analog Delay and Spring Reverb, bringing the board to 21 pedal

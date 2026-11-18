@@ -63,6 +63,22 @@ int main(int argc, char** argv) {
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-time.png").c_str());
 
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::BassChorus));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Octave));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::TapeEcho));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::PlateReverb));
+  state.selectedSlot = 6;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-board-more.png").c_str());
+  state.selectedSlot = 4;
+
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::FetComp));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::TightGate));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::EnvFilter));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Eq3));
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-board-dyn.png").c_str());
+
   state.browserSlot = 4;
   state.browserCategory = 1;
   panel.draw(cr, s, state);

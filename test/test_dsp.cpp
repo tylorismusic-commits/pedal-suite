@@ -161,6 +161,39 @@ int main() {
           "Flanger is audible");
     check(std::fabs(run(ModuleId::Phaser, 3, 0.5) - dry) > dry * 0.02,
           "Phaser is audible");
+    check(std::fabs(run(ModuleId::BassChorus, 3, 0.5) - dry) > dry * 0.02,
+          "Bass Chorus is audible");
+    check(std::fabs(run(ModuleId::Vibrato, 2, 1.0) - dry) > dry * 0.02,
+          "Vibrato is audible");
+    check(std::fabs(run(ModuleId::Octave, 0, 0.9) - dry) > dry * 0.02,
+          "Octave is audible");
+    check(run(ModuleId::FetComp, 0, 1.0) < dry * 0.9,
+          "FET Comp reduces level");
+    check(std::fabs(run(ModuleId::Eq3, 0, 0.9) - dry) > dry * 0.02,
+          "3-Band EQ is audible");
+    check(std::fabs(run(ModuleId::LoFi, 3, 1.0) - dry) > dry * 0.02,
+          "Lo-Fi is audible");
+    check(std::fabs(run(ModuleId::TapeSat, 0, 0.8) - dry) > dry * 0.02,
+          "Tape Sat is audible");
+    auto gateTail = [&](ModuleId id, bool tight) {
+      Shared s;
+      initializeRack(s);
+      applyModuleDefaults(s, 0, static_cast<int>(id), false);
+      s.set(slotParam(0, kSlotOffsetC0 + 0), 0.95);
+      s.set(slotParam(0, kSlotOffsetC0 + 1), 0.05);
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      auto l = x, r = x;
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      (void)tight;
+      return rms(l, n * 3 / 4, n);
+    };
+    check(gateTail(ModuleId::NoiseGate, false) < dry * 0.3,
+          "Noise Gate closes");
+    check(gateTail(ModuleId::TightGate, true) < dry * 0.3,
+          "Tight Gate closes");
   }
   {
     const int n = 48000;
@@ -185,6 +218,16 @@ int main() {
           "Analog Delay produces a tail");
     check(tail(ModuleId::SpringReverb, 2) > 1.0e-4,
           "Spring Reverb produces a tail");
+    check(tail(ModuleId::TapeEcho, 4) > 1.0e-4,
+          "Tape Echo produces a tail");
+    check(tail(ModuleId::DigitalDelay, 3) > 1.0e-4,
+          "Digital Delay produces a tail");
+    check(tail(ModuleId::PingPongDelay, 3) > 1.0e-4,
+          "Ping-Pong Delay produces a tail");
+    check(tail(ModuleId::PlateReverb, 2) > 1.0e-4,
+          "Plate Reverb produces a tail");
+    check(tail(ModuleId::RoomReverb, 2) > 1.0e-4,
+          "Room Reverb produces a tail");
   }
   {
     const int n = 12000;

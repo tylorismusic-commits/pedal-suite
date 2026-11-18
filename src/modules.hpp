@@ -99,6 +99,8 @@ enum class ControlFormat {
   Cents,
   LowCut300,
   EchoTimeMs,
+  PedalDriveDb,
+  Ratio2To20,
 };
 
 struct ControlDesc {
@@ -197,6 +199,106 @@ inline constexpr ControlDesc kAnalogDelayControls[] = {
     {3, "MIX", "Mix", ControlFormat::Percent},
 };
 inline constexpr ControlDesc kSpringReverbControls[] = {
+    {0, "DECAY", "Decay", ControlFormat::SpaceDecayS},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "MIX", "Mix", ControlFormat::Percent},
+};
+
+inline constexpr ControlDesc kFetCompControls[] = {
+    {0, "INPUT", "Input", ControlFormat::PedalDriveDb},
+    {1, "RATIO", "Ratio", ControlFormat::Ratio2To20},
+    {2, "ATTACK", "Attack", ControlFormat::AttackShortMs},
+    {3, "RELEASE", "Release", ControlFormat::ReleaseMs},
+    {4, "OUTPUT", "Output", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kOptoCompControls[] = {
+    {0, "PEAK", "Peak", ControlFormat::Percent},
+    {1, "GAIN", "Gain", ControlFormat::PedalDriveDb},
+    {2, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kEnvFilterControls[] = {
+    {0, "SENS", "Sensitivity", ControlFormat::Percent},
+    {1, "Q", "Q", ControlFormat::QValue},
+    {2, "RANGE", "Range", ControlFormat::Percent},
+    {3, "BLEND", "Blend", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kNoiseGateControls[] = {
+    {0, "THRESH", "Threshold", ControlFormat::GateThresholdDb},
+    {1, "DECAY", "Decay", ControlFormat::GateReleaseMs},
+    {2, "RANGE", "Range", ControlFormat::RangeDb},
+};
+inline constexpr ControlDesc kTightGateControls[] = {
+    {0, "THRESH", "Threshold", ControlFormat::GateThresholdDb},
+    {1, "DECAY", "Decay", ControlFormat::GateReleaseMs},
+    {2, "RANGE", "Range", ControlFormat::RangeDb},
+    {3, "LINK", "Link", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kEq3Controls[] = {
+    {0, "LOW", "Low", ControlFormat::HybridGain15},
+    {1, "MID", "Mid", ControlFormat::HybridGain15},
+    {2, "HIGH", "High", ControlFormat::HybridGain15},
+    {3, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kBassEqControls[] = {
+    {0, "LOW", "Low", ControlFormat::HybridGain15},
+    {1, "MID", "Mid", ControlFormat::HybridGain15},
+    {2, "HIGH", "High", ControlFormat::HybridGain15},
+    {3, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kLoFiControls[] = {
+    {0, "BITS", "Bits", ControlFormat::CrushBits},
+    {1, "RATE", "Rate", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::CrushToneHz},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kTapeSatControls[] = {
+    {0, "DRIVE", "Drive", ControlFormat::Percent},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "MIX", "Mix", ControlFormat::Percent},
+};
+
+inline constexpr ControlDesc kBassChorusControls[] = {
+    {0, "RATE", "Rate", ControlFormat::LfoRateHz},
+    {1, "DEPTH", "Depth", ControlFormat::Percent},
+    {2, "LOW CUT", "Low Cut", ControlFormat::LowCut300},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kVibratoControls[] = {
+    {0, "RATE", "Rate", ControlFormat::LfoRateHz},
+    {1, "DEPTH", "Depth", ControlFormat::Percent},
+    {2, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kOctaveControls[] = {
+    {0, "DOWN", "Down", ControlFormat::Percent},
+    {1, "UP", "Up", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kTapeEchoControls[] = {
+    {0, "TIME", "Time", ControlFormat::EchoTimeMs},
+    {1, "FEEDBACK", "Feedback", ControlFormat::Percent},
+    {2, "WOW", "Wow", ControlFormat::Percent},
+    {3, "TONE", "Tone", ControlFormat::Percent},
+    {4, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kDigitalDelayControls[] = {
+    {0, "TIME", "Time", ControlFormat::EchoTimeMs},
+    {1, "FEEDBACK", "Feedback", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kPingPongControls[] = {
+    {0, "TIME", "Time", ControlFormat::EchoTimeMs},
+    {1, "FEEDBACK", "Feedback", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kPlateReverbControls[] = {
+    {0, "DECAY", "Decay", ControlFormat::SpaceDecayS},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kRoomReverbControls[] = {
     {0, "DECAY", "Decay", ControlFormat::SpaceDecayS},
     {1, "TONE", "Tone", ControlFormat::Percent},
     {2, "MIX", "Mix", ControlFormat::Percent},
@@ -343,12 +445,106 @@ inline constexpr ModuleDesc kModules[] = {
      static_cast<int>(sizeof(kSpringReverbControls) /
                       sizeof(kSpringReverbControls[0])),
      kSpringReverbControls},
+    {ModuleId::BassChorus, "Bass Chorus", "Mod",
+     "Chorus that keeps the low end clean", false, false, 0,
+     static_cast<int>(sizeof(kBassChorusControls) /
+                      sizeof(kBassChorusControls[0])),
+     kBassChorusControls},
+    {ModuleId::Vibrato, "Vibrato", "Mod", "Pitch vibrato", false, false, 0,
+     static_cast<int>(sizeof(kVibratoControls) /
+                      sizeof(kVibratoControls[0])),
+     kVibratoControls},
+    {ModuleId::Octave, "Octave", "Mod", "Monophonic sub and octave up", false,
+     false, 0,
+     static_cast<int>(sizeof(kOctaveControls) / sizeof(kOctaveControls[0])),
+     kOctaveControls},
+    {ModuleId::TapeEcho, "Tape Echo", "Time", "Tape echo with wow", false,
+     false, 0,
+     static_cast<int>(sizeof(kTapeEchoControls) /
+                      sizeof(kTapeEchoControls[0])),
+     kTapeEchoControls},
+    {ModuleId::DigitalDelay, "Digital Delay", "Time", "Clean digital delay",
+     false, false, 0,
+     static_cast<int>(sizeof(kDigitalDelayControls) /
+                      sizeof(kDigitalDelayControls[0])),
+     kDigitalDelayControls},
+    {ModuleId::PingPongDelay, "Ping-Pong", "Time",
+     "Alternating left/right delay", false, false, 0,
+     static_cast<int>(sizeof(kPingPongControls) /
+                      sizeof(kPingPongControls[0])),
+     kPingPongControls},
+    {ModuleId::PlateReverb, "Plate Reverb", "Time", "Bright plate reverb",
+     false, false, 0,
+     static_cast<int>(sizeof(kPlateReverbControls) /
+                      sizeof(kPlateReverbControls[0])),
+     kPlateReverbControls},
+    {ModuleId::RoomReverb, "Room Reverb", "Time", "Small room ambience",
+     false, false, 0,
+     static_cast<int>(sizeof(kRoomReverbControls) /
+                      sizeof(kRoomReverbControls[0])),
+     kRoomReverbControls},
+    {ModuleId::FetComp, "FET Comp", "Dyn", "1176-style FET compressor",
+     false, false, 0,
+     static_cast<int>(sizeof(kFetCompControls) /
+                      sizeof(kFetCompControls[0])),
+     kFetCompControls},
+    {ModuleId::OptoComp, "Opto Comp", "Dyn", "Optical compressor", false,
+     false, 0,
+     static_cast<int>(sizeof(kOptoCompControls) /
+                      sizeof(kOptoCompControls[0])),
+     kOptoCompControls},
+    {ModuleId::EnvFilter, "Envelope Filter", "Dyn", "Envelope auto-wah",
+     false, false, 0,
+     static_cast<int>(sizeof(kEnvFilterControls) /
+                      sizeof(kEnvFilterControls[0])),
+     kEnvFilterControls},
+    {ModuleId::NoiseGate, "Noise Gate", "Dyn", "Smooth noise gate", false,
+     false, 0,
+     static_cast<int>(sizeof(kNoiseGateControls) /
+                      sizeof(kNoiseGateControls[0])),
+     kNoiseGateControls},
+    {ModuleId::TightGate, "Tight Gate", "Dyn", "Fast linked metal gate",
+     false, false, 0,
+     static_cast<int>(sizeof(kTightGateControls) /
+                      sizeof(kTightGateControls[0])),
+     kTightGateControls},
+    {ModuleId::Eq3, "3-Band EQ", "Util", "Guitar tone shaper", false, false, 0,
+     static_cast<int>(sizeof(kEq3Controls) / sizeof(kEq3Controls[0])),
+     kEq3Controls},
+    {ModuleId::BassEq, "Bass EQ", "Util", "Bass tone shaper", false, false, 0,
+     static_cast<int>(sizeof(kBassEqControls) / sizeof(kBassEqControls[0])),
+     kBassEqControls},
+    {ModuleId::LoFi, "Lo-Fi", "Util", "Bit and sample reduction", false, false,
+     0,
+     static_cast<int>(sizeof(kLoFiControls) / sizeof(kLoFiControls[0])),
+     kLoFiControls},
+    {ModuleId::TapeSat, "Tape Sat", "Util", "Pedal tape saturation", false,
+     false, 0,
+     static_cast<int>(sizeof(kTapeSatControls) / sizeof(kTapeSatControls[0])),
+     kTapeSatControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

@@ -40,6 +40,23 @@ public:
     for (auto& p : tremolo_) p.prepare(sr_);
     for (auto& p : analogDelay_) p.prepare(sr_);
     for (auto& p : springReverb_) p.prepare(sr_);
+    for (auto& p : bassChorus_) p.prepare(sr_);
+    for (auto& p : vibrato_) p.prepare(sr_);
+    for (auto& p : octave_) p.prepare(sr_);
+    for (auto& p : tapeEcho_) p.prepare(sr_);
+    for (auto& p : digitalDelay_) p.prepare(sr_);
+    for (auto& p : pingPong_) p.prepare(sr_);
+    for (auto& p : plateReverb_) p.prepare(sr_);
+    for (auto& p : roomReverb_) p.prepare(sr_);
+    for (auto& p : fetComp_) p.prepare(sr_);
+    for (auto& p : optoComp_) p.prepare(sr_);
+    for (auto& p : envFilter_) p.prepare(sr_);
+    for (auto& p : noiseGate_) p.prepare(sr_);
+    for (auto& p : tightGate_) p.prepare(sr_);
+    for (auto& p : eq3_) p.prepare(sr_, 120.0f, 800.0f, 4000.0f);
+    for (auto& p : bassEq_) p.prepare(sr_);
+    for (auto& p : loFi_) p.prepare(sr_);
+    for (auto& p : tapeSat_) p.prepare(sr_);
     reset();
   }
 
@@ -69,6 +86,23 @@ public:
       tremolo_[i].setControls(tremoloControlsFrom(c.slot[i]));
       analogDelay_[i].setControls(analogDelayControlsFrom(c.slot[i]));
       springReverb_[i].setControls(springReverbControlsFrom(c.slot[i]));
+      bassChorus_[i].setControls(bassChorusControlsFrom(c.slot[i]));
+      vibrato_[i].setControls(vibratoControlsFrom(c.slot[i]));
+      octave_[i].setControls(octaveControlsFrom(c.slot[i]));
+      tapeEcho_[i].setControls(tapeEchoControlsFrom(c.slot[i]));
+      digitalDelay_[i].setControls(digitalDelayControlsFrom(c.slot[i]));
+      pingPong_[i].setControls(pingPongControlsFrom(c.slot[i]));
+      plateReverb_[i].setControls(plateReverbControlsFrom(c.slot[i]));
+      roomReverb_[i].setControls(roomReverbControlsFrom(c.slot[i]));
+      fetComp_[i].setControls(fetCompControlsFrom(c.slot[i]));
+      optoComp_[i].setControls(optoCompControlsFrom(c.slot[i]));
+      envFilter_[i].setControls(envFilterControlsFrom(c.slot[i]));
+      noiseGate_[i].setControls(gateControlsFrom(c.slot[i]));
+      tightGate_[i].setControls(tightGateControlsFrom(c.slot[i]));
+      eq3_[i].setControls(eq3ControlsFrom(c.slot[i]));
+      bassEq_[i].setControls(eq3ControlsFrom(c.slot[i]));
+      loFi_[i].setControls(loFiControlsFrom(c.slot[i]));
+      tapeSat_[i].setControls(tapeSatControlsFrom(c.slot[i]));
     }
   }
 
@@ -146,6 +180,57 @@ public:
           case ModuleId::SpringReverb:
             springReverb_[s].process(l, r);
             break;
+          case ModuleId::BassChorus:
+            bassChorus_[s].process(l, r);
+            break;
+          case ModuleId::Vibrato:
+            vibrato_[s].process(l, r);
+            break;
+          case ModuleId::Octave:
+            octave_[s].process(l, r);
+            break;
+          case ModuleId::TapeEcho:
+            tapeEcho_[s].process(l, r);
+            break;
+          case ModuleId::DigitalDelay:
+            digitalDelay_[s].process(l, r);
+            break;
+          case ModuleId::PingPongDelay:
+            pingPong_[s].process(l, r);
+            break;
+          case ModuleId::PlateReverb:
+            plateReverb_[s].process(l, r);
+            break;
+          case ModuleId::RoomReverb:
+            roomReverb_[s].process(l, r);
+            break;
+          case ModuleId::FetComp:
+            fetComp_[s].process(l, r);
+            break;
+          case ModuleId::OptoComp:
+            optoComp_[s].process(l, r);
+            break;
+          case ModuleId::EnvFilter:
+            envFilter_[s].process(l, r);
+            break;
+          case ModuleId::NoiseGate:
+            noiseGate_[s].process(l, r);
+            break;
+          case ModuleId::TightGate:
+            tightGate_[s].process(l, r);
+            break;
+          case ModuleId::Eq3:
+            eq3_[s].process(l, r);
+            break;
+          case ModuleId::BassEq:
+            bassEq_[s].process(l, r);
+            break;
+          case ModuleId::LoFi:
+            loFi_[s].process(l, r);
+            break;
+          case ModuleId::TapeSat:
+            tapeSat_[s].process(l, r);
+            break;
           case ModuleId::Off:
           case ModuleId::Count:
             continue;
@@ -204,6 +289,23 @@ public:
     for (auto& p : tremolo_) p.reset();
     for (auto& p : analogDelay_) p.reset();
     for (auto& p : springReverb_) p.reset();
+    for (auto& p : bassChorus_) p.reset();
+    for (auto& p : vibrato_) p.reset();
+    for (auto& p : octave_) p.reset();
+    for (auto& p : tapeEcho_) p.reset();
+    for (auto& p : digitalDelay_) p.reset();
+    for (auto& p : pingPong_) p.reset();
+    for (auto& p : plateReverb_) p.reset();
+    for (auto& p : roomReverb_) p.reset();
+    for (auto& p : fetComp_) p.reset();
+    for (auto& p : optoComp_) p.reset();
+    for (auto& p : envFilter_) p.reset();
+    for (auto& p : noiseGate_) p.reset();
+    for (auto& p : tightGate_) p.reset();
+    for (auto& p : eq3_) p.reset();
+    for (auto& p : bassEq_) p.reset();
+    for (auto& p : loFi_) p.reset();
+    for (auto& p : tapeSat_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -254,6 +356,23 @@ private:
   stomp::modules::Tremolo tremolo_[kSlotCount];
   stomp::modules::AnalogDelay analogDelay_[kSlotCount];
   stomp::modules::SpringReverb springReverb_[kSlotCount];
+  stomp::modules::BassChorus bassChorus_[kSlotCount];
+  stomp::modules::Vibrato vibrato_[kSlotCount];
+  stomp::modules::Octave octave_[kSlotCount];
+  stomp::modules::TapeEcho tapeEcho_[kSlotCount];
+  stomp::modules::DigitalDelay digitalDelay_[kSlotCount];
+  stomp::modules::PingPongDelay pingPong_[kSlotCount];
+  stomp::modules::PlateReverb plateReverb_[kSlotCount];
+  stomp::modules::RoomReverb roomReverb_[kSlotCount];
+  stomp::modules::FetComp fetComp_[kSlotCount];
+  stomp::modules::OptoComp optoComp_[kSlotCount];
+  stomp::modules::EnvFilter envFilter_[kSlotCount];
+  stomp::modules::NoiseGate noiseGate_[kSlotCount];
+  stomp::modules::TightGate tightGate_[kSlotCount];
+  stomp::modules::Eq3 eq3_[kSlotCount];
+  stomp::modules::BassEq bassEq_[kSlotCount];
+  stomp::modules::LoFi loFi_[kSlotCount];
+  stomp::modules::TapeSat tapeSat_[kSlotCount];
 };
 
 } // namespace pedal

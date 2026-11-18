@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.2.0-alpha — 21 pedals across drive, pitch, modulation and time.**
+**Status: 0.3.0-alpha — the full 37-pedal catalog.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -17,6 +17,10 @@ and full board visuals land in later milestones.
 ![Pedal Suite — pitch pedals](docs/pedal-board-pitch.png)
 
 ![Pedal Suite — time pedals](docs/pedal-board-time.png)
+
+![Pedal Suite — more modulation and time](docs/pedal-board-more.png)
+
+![Pedal Suite — dynamics and utility](docs/pedal-board-dyn.png)
 
 ## Current slice
 
@@ -48,6 +52,23 @@ and full board visuals land in later milestones.
 - **Tremolo** — Rate, Depth, Shape, Mix.
 - **Analog Delay** — Time, Feedback, Tone, Mix.
 - **Spring Reverb** — Decay, Tone, Mix.
+- **Bass Chorus** — Rate, Depth, Low Cut, Mix.
+- **Vibrato** — Rate, Depth, Mix.
+- **Octave** — Down, Up, Tone, Mix.
+- **Tape Echo** — Time, Feedback, Wow, Tone, Mix.
+- **Digital Delay** — Time, Feedback, Tone, Mix.
+- **Ping-Pong** — Time, Feedback, Tone, Mix.
+- **Plate Reverb** — Decay, Tone, Mix.
+- **Room Reverb** — Decay, Tone, Mix.
+- **FET Comp** — Input, Ratio, Attack, Release, Output.
+- **Opto Comp** — Peak, Gain, Mix.
+- **Envelope Filter** — Sens, Q, Range, Blend.
+- **Noise Gate** — Threshold, Decay, Range.
+- **Tight Gate** — Threshold, Decay, Range, Link.
+- **3-Band EQ** — Low, Mid, High, Level.
+- **Bass EQ** — Low, Mid, High, Level.
+- **Lo-Fi** — Bits, Rate, Tone, Mix.
+- **Tape Sat** — Drive, Tone, Mix.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.

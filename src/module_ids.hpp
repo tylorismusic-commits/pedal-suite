@@ -28,6 +28,23 @@ enum ModuleId : int {
   Tremolo,
   AnalogDelay,
   SpringReverb,
+  BassChorus,
+  Vibrato,
+  Octave,
+  TapeEcho,
+  DigitalDelay,
+  PingPongDelay,
+  PlateReverb,
+  RoomReverb,
+  FetComp,
+  OptoComp,
+  EnvFilter,
+  NoiseGate,
+  TightGate,
+  Eq3,
+  BassEq,
+  LoFi,
+  TapeSat,
   Count
 };
 
@@ -38,7 +55,10 @@ inline constexpr const char* kModuleLabels[] = {
     "Blues Drive", "Distortion", "Rat",     "Big Fuzz",   "Fuzz Face",
     "Tone Bender", "Bass Drive", "Bass Fuzz", "Pitch Drop", "Retune",
     "Chorus", "Flanger", "Phaser", "Tremolo", "Analog Delay",
-    "Spring Reverb"};
+    "Spring Reverb", "Bass Chorus", "Vibrato", "Octave", "Tape Echo",
+    "Digital Delay", "Ping-Pong", "Plate Reverb", "Room Reverb",
+    "FET Comp", "Opto Comp", "Envelope Filter", "Noise Gate", "Tight Gate",
+    "3-Band EQ", "Bass EQ", "Lo-Fi", "Tape Sat"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -212,6 +232,131 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 0: return 0.40;  // Decay
         case 1: return 0.50;  // Tone
         case 2: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::BassChorus:
+      switch (control) {
+        case 0: return 0.30;  // Rate
+        case 1: return 0.50;  // Depth
+        case 2: return 0.30;  // Low cut
+        case 3: return 0.45;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::Vibrato:
+      switch (control) {
+        case 0: return 0.45;  // Rate
+        case 1: return 0.50;  // Depth
+        case 2: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::Octave:
+      switch (control) {
+        case 0: return 0.55;  // Down
+        case 1: return 0.00;  // Up
+        case 2: return 0.50;  // Tone
+        case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::TapeEcho:
+      switch (control) {
+        case 0: return 0.38;  // Time
+        case 1: return 0.42;  // Feedback
+        case 2: return 0.20;  // Wow
+        case 3: return 0.40;  // Tone
+        case 4: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::DigitalDelay:
+      switch (control) {
+        case 0: return 0.40;  // Time
+        case 1: return 0.40;  // Feedback
+        case 2: return 0.60;  // Tone
+        case 3: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::PingPongDelay:
+      switch (control) {
+        case 0: return 0.35;  // Time
+        case 1: return 0.40;  // Feedback
+        case 2: return 0.60;  // Tone
+        case 3: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::PlateReverb:
+      switch (control) {
+        case 0: return 0.40;  // Decay
+        case 1: return 0.55;  // Tone
+        case 2: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::RoomReverb:
+      switch (control) {
+        case 0: return 0.30;  // Decay
+        case 1: return 0.50;  // Tone
+        case 2: return 0.30;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::FetComp:
+      switch (control) {
+        case 0: return 0.35;  // Input
+        case 1: return 0.45;  // Ratio
+        case 2: return 0.15;  // Attack
+        case 3: return 0.30;  // Release
+        case 4: return 0.50;  // Output
+        default: return 0.50;
+      }
+    case ModuleId::OptoComp:
+      switch (control) {
+        case 0: return 0.50;  // Peak
+        case 1: return 0.50;  // Gain
+        case 2: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::EnvFilter:
+      switch (control) {
+        case 0: return 0.55;  // Sens
+        case 1: return 0.40;  // Q
+        case 2: return 0.55;  // Range
+        case 3: return 0.60;  // Blend
+        default: return 0.50;
+      }
+    case ModuleId::NoiseGate:
+      switch (control) {
+        case 0: return 0.55;  // Threshold
+        case 1: return 0.35;  // Decay
+        case 2: return 0.60;  // Range
+        default: return 0.50;
+      }
+    case ModuleId::TightGate:
+      switch (control) {
+        case 0: return 0.55;  // Threshold
+        case 1: return 0.20;  // Decay
+        case 2: return 0.75;  // Range
+        case 3: return 1.00;  // Link
+        default: return 0.50;
+      }
+    case ModuleId::Eq3:
+    case ModuleId::BassEq:
+      switch (control) {
+        case 0: return 0.50;  // Low
+        case 1: return 0.50;  // Mid
+        case 2: return 0.50;  // High
+        case 3: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::LoFi:
+      switch (control) {
+        case 0: return 0.65;  // Bits
+        case 1: return 0.70;  // Rate
+        case 2: return 0.60;  // Tone
+        case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::TapeSat:
+      switch (control) {
+        case 0: return 0.50;  // Drive
+        case 1: return 0.50;  // Tone
+        case 2: return 0.70;  // Mix
         default: return 0.50;
       }
     default:

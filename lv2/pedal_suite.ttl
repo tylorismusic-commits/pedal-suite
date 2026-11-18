@@ -22,7 +22,7 @@
         foaf:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
-    lv2:minorVersion 2 ;
+    lv2:minorVersion 3 ;
     lv2:microVersion 0 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
@@ -95,7 +95,7 @@
         lv2:name "Module" ;
         lv2:default 1 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -117,7 +117,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot1> ;
     ] ,
     [
@@ -281,7 +298,7 @@
         lv2:name "Module" ;
         lv2:default 2 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -303,7 +320,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot2> ;
     ] ,
     [
@@ -467,7 +501,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -489,7 +523,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot3> ;
     ] ,
     [
@@ -653,7 +704,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -675,7 +726,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot4> ;
     ] ,
     [
@@ -839,7 +907,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -861,7 +929,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot5> ;
     ] ,
     [
@@ -1025,7 +1110,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1047,7 +1132,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot6> ;
     ] ,
     [
@@ -1211,7 +1313,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1233,7 +1335,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot7> ;
     ] ,
     [
@@ -1397,7 +1516,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 20 ;
+        lv2:maximum 37 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1419,7 +1538,24 @@
             [ rdf:value 17 ; rdfs:label "Phaser" ] ,
             [ rdf:value 18 ; rdfs:label "Tremolo" ] ,
             [ rdf:value 19 ; rdfs:label "Analog Delay" ] ,
-            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ;
+            [ rdf:value 20 ; rdfs:label "Spring Reverb" ] ,
+            [ rdf:value 21 ; rdfs:label "Bass Chorus" ] ,
+            [ rdf:value 22 ; rdfs:label "Vibrato" ] ,
+            [ rdf:value 23 ; rdfs:label "Octave" ] ,
+            [ rdf:value 24 ; rdfs:label "Tape Echo" ] ,
+            [ rdf:value 25 ; rdfs:label "Digital Delay" ] ,
+            [ rdf:value 26 ; rdfs:label "Ping-Pong" ] ,
+            [ rdf:value 27 ; rdfs:label "Plate Reverb" ] ,
+            [ rdf:value 28 ; rdfs:label "Room Reverb" ] ,
+            [ rdf:value 29 ; rdfs:label "FET Comp" ] ,
+            [ rdf:value 30 ; rdfs:label "Opto Comp" ] ,
+            [ rdf:value 31 ; rdfs:label "Envelope Filter" ] ,
+            [ rdf:value 32 ; rdfs:label "Noise Gate" ] ,
+            [ rdf:value 33 ; rdfs:label "Tight Gate" ] ,
+            [ rdf:value 34 ; rdfs:label "3-Band EQ" ] ,
+            [ rdf:value 35 ; rdfs:label "Bass EQ" ] ,
+            [ rdf:value 36 ; rdfs:label "Lo-Fi" ] ,
+            [ rdf:value 37 ; rdfs:label "Tape Sat" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot8> ;
     ] ,
     [

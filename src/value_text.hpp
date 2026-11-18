@@ -77,6 +77,12 @@ inline std::string formatControlValue(const ModuleDesc& module,
     case ControlFormat::EchoTimeMs:
       std::snprintf(buf, sizeof(buf), "%.0f ms", 20.0f + 980.0f * v);
       return buf;
+    case ControlFormat::PedalDriveDb:
+      std::snprintf(buf, sizeof(buf), "%+.1f dB", -12.0f + 36.0f * v);
+      return buf;
+    case ControlFormat::Ratio2To20:
+      std::snprintf(buf, sizeof(buf), "%.1f : 1", 2.0f + 18.0f * v);
+      return buf;
     case ControlFormat::ThresholdDb:
       std::snprintf(buf, sizeof(buf), "%+.1f dB", -40.0f + 40.0f * v);
       return buf;
@@ -710,6 +716,8 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
       case ControlFormat::Cents: v = (v + 50.0) / 100.0; break;
       case ControlFormat::LowCut300: v = (v - 40.0) / 260.0; break;
       case ControlFormat::EchoTimeMs: v = (v - 20.0) / 980.0; break;
+      case ControlFormat::PedalDriveDb: v = (v + 12.0) / 36.0; break;
+      case ControlFormat::Ratio2To20: v = (v - 2.0) / 18.0; break;
       case ControlFormat::ScHpfHz:
         v = std::log(std::max(v, 20.0) / 20.0) / std::log(20.0);
         break;
