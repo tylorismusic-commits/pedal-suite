@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pedal_suite VERSION 0.1.0 LANGUAGES CXX)
+project(pedal_suite VERSION 0.1.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -120,7 +120,7 @@ set(LV2_BUNDLE_DIR "${CMAKE_BINARY_DIR}/lv2/pedal-suite.lv2")
 
 add_library(pedal_suite_lv2 MODULE src/lv2/rack_lv2.cpp)
 target_include_directories(pedal_suite_lv2 PRIVATE "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(pedal_suite_lv2 PRIVATE PkgConfig::LV2)
+target_link_libraries(pedal_suite_lv2 PRIVATE pedal_dsp PkgConfig::LV2)
 target_compile_features(pedal_suite_lv2 PRIVATE cxx_std_17)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(pedal_suite_lv2 PRIVATE -Wall -Wextra -Werror=switch)

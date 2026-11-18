@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1-alpha — 2026-11-18
+
+- Link pedal-dsp into the LV2 module so 808 Drive resolves at load time.
+- Rebuild the release bundle.
+
 ## 0.1.0-alpha — 2026-11-18
 
 - Initial Pedal Suite container: eight slots across two pages of four.
