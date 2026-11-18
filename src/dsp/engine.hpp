@@ -36,10 +36,15 @@ public:
     inputTarget_ = hdsp::dbToGain(c.inputDb);
     outputTarget_ = hdsp::dbToGain(c.outputDb);
     int namRank = 0;
+    int cabRank = 0;
     for (int i = 0; i < kSlotCount; ++i) {
       const bool isNam = c.slot[i].type == static_cast<int>(ModuleId::Nam);
       namActive_[i] = isNam && namRank < kMaxNamSlots;
       if (isNam) ++namRank;
+      const bool isCab = c.slot[i].type == static_cast<int>(ModuleId::Cab);
+      cabActive_[i] =
+          isCab && !c.slot[i].bypass && cabRank < kMaxCabSlots;
+      if (isCab && !c.slot[i].bypass) ++cabRank;
     }
     for (int i = 0; i < kSlotCount; ++i) {
       const int type = c.slot[i].type;
@@ -88,6 +93,16 @@ public:
     return slot >= 0 && slot < kSlotCount && namActive_[slot];
   }
 
+  int activeCabSlots() const noexcept {
+    int count = 0;
+    for (bool active : cabActive_) count += active ? 1 : 0;
+    return count;
+  }
+
+  bool cabSlotActive(int slot) const noexcept {
+    return slot >= 0 && slot < kSlotCount && cabActive_[slot];
+  }
+
   void setCabIr(const float* h, int taps) noexcept {
     for (auto& c : cab_) c.setIR(h, taps);
   }
@@ -107,6 +122,7 @@ public:
         if (c.type == static_cast<int>(ModuleId::Off)) continue;
         const ModuleId id = static_cast<ModuleId>(c.type);
         if (id == ModuleId::Nam && !namActive_[s]) continue;
+        if (id == ModuleId::Cab && !cabActive_[s]) continue;
         if (c.bypass) {
           // Let delay and reverb tails ring out with the input muted.
           if (moduleHasTails(c.type)) {
@@ -242,6 +258,9 @@ public:
           break;
         case ModuleId::Nam:
           if (namActive_[s]) latency += nam_[s].latencySamples();
+          break;
+        case ModuleId::Cab:
+          if (cabActive_[s]) latency += cab_[s].latencySamples();
           break;
         default:
           break;
@@ -446,6 +465,7 @@ private:
   stomp::modules::Cabinet cab_[kSlotCount];
   stomp::modules::NamAmpPedal nam_[kSlotCount];
   bool namActive_[kSlotCount] = {};
+  bool cabActive_[kSlotCount] = {};
   std::string namPath_;
   stomp::modules::Tuner tuner_;
 };

@@ -74,6 +74,7 @@ constexpr int kRackControlCount = 12;
 // NAM models are expensive (memory and CPU). Keep at most two live in a
 // session; further NAM slots pass dry and show a limit warning.
 inline constexpr int kMaxNamSlots = 2;
+inline constexpr int kMaxCabSlots = 2;
 
 // Shared control indices used by the first pedal controls.
 constexpr int kCtlGain = 0;

@@ -99,13 +99,21 @@ later gain blocks.
 
 ## Cab / IR
 
-The Cab pedal uses zero-latency direct FIR convolution (up to 4096 taps) with
-the impulse owned by the plugin's IR bank. WAVs are averaged to mono,
-resampled to the host rate, normalised at 1 kHz and truncated to 4096 taps.
-The picker lists the same sorted files as the engine bank, so parameter
-indices and the UI agree. A unit-impulse test confirms the Cab is transparent
-within 10%. The redundant VERB browser tab was removed because all reverbs
-are already in TIME.
+The Cab pedal uses 256-sample FFT partitioned convolution (4096 taps) with
+overlap-add. A 4-cab IR bank measured 1.2% CPU for one cab, 2.0% for two and
+1.7% for eight slots (only two live). The IR is owned by the plugin's bank;
+an IR selected before lazy Cab preparation is retained. The picker lists the
+same sorted files as the engine bank. A unit-impulse test confirms the Cab is
+transparent within 10%. Cab adds 256 samples of reported latency (0 with no
+IR) and is limited to two live instances; extra cabs pass dry.
+
+## Interaction audit
+
+- 1,764 ordered pedal pairs: finite, worst peak 2.61.
+- 200 random eight-slot boards: finite, worst peak 13.1, sane latency.
+- State round-trips for every module and both resource indices.
+- Browser pages UTIL/AMP/PRESETS and the preset-gap click are covered.
+- Malformed and oversized NAM models are rejected; the NAM gate is tested.
 
 ## NAM amp
 

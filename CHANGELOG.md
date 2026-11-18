@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.7.0-alpha — 2026-11-18
+
+Big interaction and performance audit.
+
+- Cab now uses **FFT partitioned convolution** (256-sample blocks, 4096 taps).
+  A cab dropped from ~85% CPU to ~1.2%; two cabs are ~2%.
+- Cabs are now limited to **two live instances**, like NAM. Extra cabs pass
+  dry and show **2 CAB LIMIT**. Eight cabs no longer stack gain or burn the
+  CPU.
+- A Cab with no IR passes dry through its EQ instead of going silent.
+- An IR selected before the Cab is loaded is retained through lazy prepare.
+- Selecting an IR updates the reported latency (Cab adds 256 samples).
+- The CLAP wrapper now queues a latency change and notifies the host on the
+  main thread when NAM/Cab latency changes mid-session.
+- Clicking the gap between the last preset row and the footer no longer
+  selects a hidden preset.
+
+Audit coverage added
+
+- All 1,764 ordered pedal pairs stay finite and bounded.
+- 200 random eight-slot boards stay finite with sane latency.
+- State round-trips every module plus IR/NAM resource indices.
+- Browser page tests for UTIL, AMP and PRESETS.
+- Malformed and oversized NAM models are rejected safely.
+- NAM gate regression test.
+
 ## 0.6.3-alpha — 2026-11-18
 
 - NAM Amp now has a **Gate** control. The gate starts closed on load, mutes

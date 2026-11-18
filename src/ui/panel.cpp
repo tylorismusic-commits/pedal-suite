@@ -210,6 +210,18 @@ ModuleStyle styleFor(int type) {
   }
 }
 
+int cabRankForSlot(const Shared& shared, int slot) {
+  int rank = 0;
+  for (int s = 0; s < slot; ++s) {
+    if (static_cast<int>(shared.get(slotParam(s, kSlotOffsetType)) + 0.5) ==
+            static_cast<int>(ModuleId::Cab) &&
+        shared.get(slotParam(s, kSlotOffsetBypass)) <= 0.5) {
+      ++rank;
+    }
+  }
+  return rank;
+}
+
 int namRankForSlot(const Shared& shared, int slot) {
   int rank = 0;
   for (int s = 0; s < slot; ++s) {
@@ -377,7 +389,8 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
       foot.styleType = type;
       widgets_.push_back(foot);
 
-      if (type == static_cast<int>(ModuleId::Cab)) {
+      if (type == static_cast<int>(ModuleId::Cab) &&
+          cabRankForSlot(shared, slot) < kMaxCabSlots) {
         Widget ir{};
         ir.kind = Kind::CabIrButton;
         ir.param = slotParam(slot, kSlotOffsetType);
@@ -729,6 +742,11 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
       if (type == static_cast<int>(ModuleId::Nam) &&
           namRankForSlot(shared, slot) >= kMaxNamSlots) {
         text(cr, "2 AMP LIMIT", x + colW * 0.5, y + 58, 8, 1, 1.0, 0.45, 0.34);
+      }
+      if (type == static_cast<int>(ModuleId::Cab) &&
+          shared.get(slotParam(slot, kSlotOffsetBypass)) <= 0.5 &&
+          cabRankForSlot(shared, slot) >= kMaxCabSlots) {
+        text(cr, "2 CAB LIMIT", x + colW * 0.5, y + 58, 8, 1, 1.0, 0.45, 0.34);
       }
 
     }
@@ -1915,7 +1933,8 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
       return true;
     }
     if (x >= kPresetListX && x <= kPresetListX + kPresetListW &&
-        y >= kPresetListY + kPresetHeaderH && y < footerY - 4) {
+        y >= kPresetListY + kPresetHeaderH &&
+        y < kPresetListY + kPresetHeaderH + rows * kPresetRowH) {
       const int row = static_cast<int>((y - kPresetListY - kPresetHeaderH) /
                                        kPresetRowH);
       const int index = scroll + row;

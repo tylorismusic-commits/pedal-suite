@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.6.3-alpha — 42 pedals, NAM, Cab IR, tuner and MIDI.**
+**Status: 0.7.0-alpha — 42 pedals, FFT Cab, NAM, tuner and MIDI.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -84,7 +84,7 @@ and full board visuals land in later milestones.
 - **Precision Drive** — Gate, Drive, Attack, Level.
 - **Wah** — Pedal, Q, Range, Mix.
 - **Laser** — Pitch, Ring, Sens, Pedal, Mix.
-- **Cab** — Low Cut, High Cut, Level, Mix, with user WAV IRs.
+- **Cab** — Low Cut, High Cut, Level, Mix, with user WAV IRs. Two live cabs max; FFT convolution adds 256 samples of reported latency.
 - **NAM Amp** — Gain, Bass, Mid, Treble, Level, Gate, with Neural Amp Modeler `.nam` files. Find it under the **AMP** browser page. The gate mutes captured amp hiss so later gain blocks stay quiet.
 
 Compressors and gates report gain reduction to the pedals, the CLAP host and
@@ -106,7 +106,7 @@ reported latency.
 The browser now has **ALL · DRIVE · MOD · DYN · TIME · UTIL · AMP · PRESETS**:
 utility pedals and the Cab live in UTIL, the NAM Amp lives in AMP.
 
-**Cab IRs:** drop 16/24/32-bit or float WAV files in
+**Cab IRs:** up to two live Cab pedals. Drop 16/24/32-bit or float WAV files in
 `~/.local/share/pedal-suite/irs` (or `$XDG_DATA_HOME/pedal-suite/irs`), then
 use the **IR** button on the Cab pedal. IRs are rescanned when the plugin is
 loaded, so reload after adding files.

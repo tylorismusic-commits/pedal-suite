@@ -116,6 +116,43 @@ int main() {
   check(!state.presetOpen && state.presetIndex == 0,
         "preset browser loads a factory board");
 
+  // The gap between the last preset row and the footer must not select the
+  // next (hidden) preset when the list is scrollable.
+  panel.pointerDown(s, state, 150, 34, false);
+  panel.pointerUp(s, state);
+  panel.draw(cr, s, state);
+  const int beforeGap = state.presetIndex;
+  panel.pointerDown(s, state, 150, 342, false);
+  panel.pointerUp(s, state);
+  check(state.presetIndex == beforeGap,
+        "preset list gap does not select a hidden preset");
+
+  // Browser categories: UTIL, AMP and PRESETS.
+  state.browserSlot = 4;
+  state.browserCategory = 1;
+  panel.draw(cr, s, state);
+  check(clickLabel(panel, s, state, "UTIL"), "browser offers UTIL");
+  panel.draw(cr, s, state);
+  check(state.browserCategory == 5, "UTIL tab selects the util page");
+  bool hasCab = false;
+  for (const auto& r : panel.widgetRects()) {
+    if (std::string(r.label) == "Cab") hasCab = true;
+  }
+  check(hasCab, "Cab is listed on the UTIL page");
+  check(clickLabel(panel, s, state, "AMP"), "browser offers AMP");
+  panel.draw(cr, s, state);
+  check(state.browserCategory == 6, "AMP tab selects the amp page");
+  bool hasNam = false;
+  for (const auto& r : panel.widgetRects()) {
+    if (std::string(r.label) == "NAM Amp") hasNam = true;
+  }
+  check(hasNam, "NAM Amp is listed on the AMP page");
+  check(clickLabel(panel, s, state, "PRESETS"), "browser offers PRESETS");
+  panel.draw(cr, s, state);
+  check(state.browserCategory == 7, "PRESETS tab selects the preset page");
+  check(clickLabel(panel, s, state, "CANCEL"), "browser cancels");
+  state.browserSlot = -1;
+
   // About.
   panel.pointerDown(s, state, 966, 34, false);
   panel.pointerUp(s, state);

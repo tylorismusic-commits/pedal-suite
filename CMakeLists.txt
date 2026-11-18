@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pedal_suite VERSION 0.6.3 LANGUAGES CXX)
+project(pedal_suite VERSION 0.7.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -45,6 +45,7 @@ set_target_properties(nam_bridge PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(pedal_dsp STATIC "${PEDAL_DSP_DIR}/src/drive808.cpp"
   "${PEDAL_DSP_DIR}/src/pitch.cpp")
 target_link_libraries(pedal_dsp PRIVATE nam_bridge)
+target_link_libraries(pedal_dsp PUBLIC PkgConfig::FFTW3F)
 target_include_directories(pedal_dsp PUBLIC
   "${PEDAL_DSP_DIR}/include" "${HEARTH_DSP_DIR}/include")
 target_link_libraries(pedal_dsp PUBLIC PkgConfig::RUBBERBAND)
@@ -58,6 +59,7 @@ find_package(Threads REQUIRED)
 pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
 pkg_check_modules(FREETYPE REQUIRED IMPORTED_TARGET freetype2)
 pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
+pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 pkg_check_modules(RUBBERBAND REQUIRED IMPORTED_TARGET rubberband)
 
 set(RACK_UI_SOURCES src/ui/panel.cpp)

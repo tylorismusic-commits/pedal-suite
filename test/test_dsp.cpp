@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <random>
 #include <utility>
 #include <vector>
 
@@ -488,6 +489,131 @@ int main() {
     check(delayAudible && wahAudible, "slot type changes prepare new modules");
   }
 
+  {
+    Shared s;
+    initializeRack(s);
+    for (int slot = 0; slot < kSlotCount; ++slot) {
+      applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Cab), false);
+    }
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    std::vector<float> ir(2, 1.0f);
+    e.setCabIr(ir.data(), static_cast<int>(ir.size()));
+    check(e.activeCabSlots() == kMaxCabSlots,
+          "only two cab blocks are live");
+    check(e.cabSlotActive(0) && e.cabSlotActive(1) && !e.cabSlotActive(2),
+          "third cab block is limited");
+    const int n = 4800;
+    std::vector<float> l(n), r(n);
+    for (int i = 0; i < n; ++i) {
+      l[i] = r[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i /
+                                    48000.0f);
+    }
+    Meters m;
+    e.process(l.data(), r.data(), n, m);
+    bool finiteAll = true;
+    float peak = 0.0f;
+    for (float v : l) {
+      if (!std::isfinite(v)) finiteAll = false;
+      peak = std::max(peak, std::fabs(v));
+    }
+    check(finiteAll && peak < 10.0f, "eight cab blocks stay bounded");
+    s.set(slotParam(0, kSlotOffsetBypass), 1.0);
+    e.setControls(controlsFrom(s));
+    check(e.activeCabSlots() == kMaxCabSlots && e.cabSlotActive(2),
+          "cab limit follows bypassed blocks");
+  }
+  {
+    // Every ordered pair of pedal modules, short burst, finite and bounded.
+    bool finitePairs = true;
+    bool boundedPairs = true;
+    float worst = 0.0f;
+    int worstA = 0, worstB = 0;
+    const int n = 1200;
+    for (int a = 1; a < kModuleCount; ++a) {
+      for (int b = 1; b < kModuleCount; ++b) {
+        Shared s;
+        initializeRack(s);
+        for (int slot = 0; slot < kSlotCount; ++slot) {
+          applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Off), false);
+        }
+        applyModuleDefaults(s, 0, a, false);
+        applyModuleDefaults(s, 1, b, false);
+        Engine e;
+        e.prepare(48000.0f);
+        e.setControls(controlsFrom(s));
+        std::vector<float> l(n), r(n);
+        for (int i = 0; i < n; ++i) {
+          const float env = i < n / 2 ? 1.0f : 0.4f;
+          l[i] = r[i] = 0.25f * env *
+                        std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+        }
+        Meters m;
+        e.process(l.data(), r.data(), n, m);
+        for (float v : l) {
+          if (!std::isfinite(v)) finitePairs = false;
+          if (std::fabs(v) > worst) {
+            worst = std::fabs(v);
+            worstA = a;
+            worstB = b;
+          }
+        }
+      }
+    }
+    if (worst >= 50.0f) boundedPairs = false;
+    std::printf("pair sweep worst peak %.2f at %d/%d\n", worst, worstA,
+                worstB);
+    check(finitePairs, "every ordered pedal pair stays finite");
+    check(boundedPairs, "every ordered pedal pair stays bounded");
+  }
+  {
+    // Random eight-slot boards, including bypassed slots.
+    std::mt19937 rng(0xC0FFEE);
+    std::uniform_real_distribution<float> u01(0.0f, 1.0f);
+    bool finiteBoards = true;
+    bool boundedBoards = true;
+    float worst = 0.0f;
+    const int n = 4800;
+    for (int board = 0; board < 200; ++board) {
+      Shared s;
+      initializeRack(s);
+      for (int slot = 0; slot < kSlotCount; ++slot) {
+        const int type = 1 + static_cast<int>(rng() % (kModuleCount - 1));
+        applyModuleDefaults(s, slot, type, false);
+        for (int k = 0; k < kRackControlCount; ++k) {
+          s.setFromHost(slotParam(slot, kSlotOffsetC0 + k), u01(rng));
+        }
+        s.setFromHost(slotParam(slot, kSlotOffsetMix), 100.0 * u01(rng));
+        s.setFromHost(slotParam(slot, kSlotOffsetGain),
+                      -6.0 + 12.0 * u01(rng));
+        s.setFromHost(slotParam(slot, kSlotOffsetBypass),
+                      (board % 5 == 0 && (slot & 1)) ? 1.0 : 0.0);
+      }
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      std::vector<float> l(n), r(n);
+      for (int i = 0; i < n; ++i) {
+        const float env = i < 600 ? static_cast<float>(i) / 600.0f : 1.0f;
+        l[i] = r[i] = 0.15f * env *
+                      std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+      }
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      for (float v : l) {
+        if (!std::isfinite(v)) finiteBoards = false;
+        if (std::fabs(v) > worst) worst = std::fabs(v);
+      }
+      if (e.latencySamples() < 0 || e.latencySamples() > 48000) {
+        boundedBoards = false;
+      }
+    }
+    if (worst >= 500.0f) boundedBoards = false;
+    std::printf("random boards worst peak %.2f\n", worst);
+    check(finiteBoards, "random eight-slot boards stay finite");
+    check(boundedBoards, "random boards stay bounded with sane latency");
+  }
   std::printf("%d failure(s)\n", failures);
   return failures == 0 ? 0 : 1;
 }

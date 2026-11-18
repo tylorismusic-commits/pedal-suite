@@ -202,6 +202,46 @@ int main() {
           "IR bank loads a WAV file");
     fs::remove_all(dir, ec);
   }
+  {
+    bool ok = true;
+    for (int id = 1; id < kModuleCount; ++id) {
+      Shared a;
+      initializeRack(a);
+      applyModuleDefaults(a, 0, id, false);
+      const ModuleDesc* m = moduleDesc(id);
+      for (int k = 0; k < m->controlCount; ++k) {
+        a.set(slotParam(0, kSlotOffsetC0 + k),
+              0.05 + 0.9 * ((k + 1) / static_cast<double>(m->controlCount + 1)));
+      }
+      a.set(P_CAB_IR, 7.0);
+      a.set(P_NAM_MODEL, 3.0);
+      const auto blob = serializeState(a, 1.0);
+      Shared c;
+      if (!deserializeState(blob.data(), blob.size(), c)) {
+        ok = false;
+        continue;
+      }
+      if (static_cast<int>(c.get(slotParam(0, kSlotOffsetType)) + 0.5) !=
+          id) {
+        ok = false;
+        std::printf("state type mismatch for %s\n", m->name);
+      }
+      for (int k = 0; k < m->controlCount; ++k) {
+        const double av = a.get(slotParam(0, kSlotOffsetC0 + k));
+        const double cv = c.get(slotParam(0, kSlotOffsetC0 + k));
+        if (std::fabs(av - cv) > 1e-9) {
+          ok = false;
+          std::printf("state control mismatch %s %d\n", m->name, k);
+        }
+      }
+      if (std::fabs(c.get(P_CAB_IR) - 7.0) > 1e-9 ||
+          std::fabs(c.get(P_NAM_MODEL) - 3.0) > 1e-9) {
+        ok = false;
+        std::printf("state resource index mismatch\n");
+      }
+    }
+    check(ok, "state round-trips every module and resource index");
+  }
   check(static_cast<int>(b.get(slotParam(7, kSlotOffsetType)) + 0.5) ==
             static_cast<int>(ModuleId::Boost),
         "state restores page-2 pedal type");
