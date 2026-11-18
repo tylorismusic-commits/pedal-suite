@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pedal_suite VERSION 0.6.0 LANGUAGES CXX)
+project(pedal_suite VERSION 0.6.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,29 +22,8 @@ if(NOT EXISTS "${PEDAL_DSP_DIR}/include/stomp/modules/modules.hpp")
   message(FATAL_ERROR "pedal-dsp not found at ${PEDAL_DSP_DIR}")
 endif()
 include_directories("${PEDAL_DSP_DIR}/include")
-file(GLOB NAM_CORE_SOURCES
-  "${PEDAL_DSP_DIR}/third_party/nam/NAM/*.cpp"
-  "${PEDAL_DSP_DIR}/third_party/nam/NAM/wavenet/*.cpp")
-add_library(nam_core OBJECT ${NAM_CORE_SOURCES})
-target_include_directories(nam_core PUBLIC
-  "${PEDAL_DSP_DIR}/third_party/nam/NAM"
-  "${PEDAL_DSP_DIR}/third_party/nam"
-  "${PEDAL_DSP_DIR}/third_party/nam/eigen")
-target_compile_features(nam_core PUBLIC cxx_std_20)
-target_compile_definitions(nam_core PUBLIC NAM_SAMPLE_FLOAT)
-set_target_properties(nam_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_library(nam_bridge STATIC "${PEDAL_DSP_DIR}/src/nam.cpp")
-target_include_directories(nam_bridge PUBLIC "${PEDAL_DSP_DIR}/include")
-target_include_directories(nam_bridge PRIVATE "${HEARTH_DSP_DIR}/include")
-target_link_libraries(nam_bridge PRIVATE nam_core)
-target_compile_features(nam_bridge PUBLIC cxx_std_20)
-target_compile_definitions(nam_bridge PUBLIC NAM_SAMPLE_FLOAT)
-set_target_properties(nam_bridge PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
 add_library(pedal_dsp STATIC "${PEDAL_DSP_DIR}/src/drive808.cpp"
   "${PEDAL_DSP_DIR}/src/pitch.cpp")
-target_link_libraries(pedal_dsp PRIVATE nam_bridge)
 target_include_directories(pedal_dsp PUBLIC
   "${PEDAL_DSP_DIR}/include" "${HEARTH_DSP_DIR}/include")
 target_link_libraries(pedal_dsp PUBLIC PkgConfig::RUBBERBAND)
@@ -65,8 +44,6 @@ set(RACK_UI_SOURCES src/ui/panel.cpp)
 add_executable(rack_dsp_test test/test_dsp.cpp)
 target_include_directories(rack_dsp_test PRIVATE "${CMAKE_SOURCE_DIR}/src")
 target_link_libraries(rack_dsp_test PRIVATE pedal_dsp)
-target_compile_definitions(rack_dsp_test PRIVATE
-  PEDAL_NAM_TEST_MODEL="${PEDAL_DSP_DIR}/third_party/nam/test_wavenet.nam")
 target_compile_features(rack_dsp_test PRIVATE cxx_std_17)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(rack_dsp_test PRIVATE -Wall -Wextra -Werror=switch)

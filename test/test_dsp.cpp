@@ -67,42 +67,6 @@ int main() {
     }
     check(audible, "every factory board preset makes sound");
   }
-#ifdef PEDAL_NAM_TEST_MODEL
-  {
-    Shared s;
-    initializeRack(s);
-    for (int slot = 0; slot < kSlotCount; ++slot) {
-      applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Off), false);
-      applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Nam), false);
-    }
-    Engine e;
-    e.prepare(48000.0f);
-    e.setControls(controlsFrom(s));
-    e.setNamModel(PEDAL_NAM_TEST_MODEL);
-    check(e.activeNamSlots() == kMaxNamSlots,
-          "only two NAM blocks are live");
-    check(e.namSlotActive(0) && e.namSlotActive(1) &&
-              !e.namSlotActive(2),
-          "third NAM block is limited");
-    const int n = 24000;
-    std::vector<float> l(n), r(n);
-    for (int i = 0; i < n; ++i) {
-      l[i] = r[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i /
-                                    48000.0f);
-    }
-    Meters m;
-    e.process(l.data(), r.data(), n, m);
-    bool finiteAll = true;
-    for (float v : l) if (!std::isfinite(v)) finiteAll = false;
-    check(finiteAll, "eight NAM blocks stay finite");
-    check(e.latencySamples() >= 128, "two NAM blocks report latency");
-    // Removing the first NAM promotes the third slot.
-    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Off), false);
-    e.setControls(controlsFrom(s));
-    check(e.activeNamSlots() == kMaxNamSlots && e.namSlotActive(2),
-          "NAM limit follows the remaining blocks");
-  }
-#endif
   {
     bool stable = true;
     for (float sr : {48000.0f, 96000.0f}) {

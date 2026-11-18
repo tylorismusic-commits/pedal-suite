@@ -24,12 +24,6 @@ submodule. See `third_party/hearth-dsp/THIRD_PARTY_NOTICES.md`.
 Pedal-specific DSP is provided by pedal-dsp, GPL-3.0-or-later, as a git
 submodule. See `third_party/pedal-dsp/THIRD_PARTY_NOTICES.md`.
 
-## Neural Amp Modeler core
-
-The NAM amp pedal vendors NeuralAmpModelerCore (MIT), Eigen (MPL2) and
-nlohmann/json (MIT) under `third_party/pedal-dsp/third_party/nam`. See the
-`README.md` and `NAM_LICENSE` files there.
-
 ## Fonts and headers
 
 `assets/fonts/Jost-ExtraBold.ttf` is Jost, SIL Open Font License 1.1; the

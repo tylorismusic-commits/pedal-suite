@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1-alpha — 2026-11-18
+
+- Removed the NAM amp pedal and the vendored NAM runtime. The build is
+  lighter and faster again.
+- Added the missing **UTIL** browser page with the EQ, Lo-Fi and Tape Sat
+  pedals.
+- Moved the **Cab** pedal from DRIVE to UTIL.
+
 ## 0.6.0-alpha — 2026-11-18
 
 - Added **NAM Amp**, a Neural Amp Modeler player with Gain, Bass, Mid,

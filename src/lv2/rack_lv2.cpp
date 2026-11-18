@@ -82,8 +82,6 @@ struct Plugin {
   std::shared_ptr<const pedal::IrBank> irBank;
   int lastIrIndex = -2;
   bool irDirty = true;
-  std::vector<std::string> namNames;
-  int lastNamIndex = -2;
 
   const LV2_URID_Map* map = nullptr;
   LV2_URID stateKey = 0;
@@ -117,10 +115,6 @@ LV2_Handle instantiate(const LV2_Descriptor*, double rate, const char*,
   pedal::initializeRack(p->shared);
   p->irBank = pedal::loadIrBank(
       pedal::irDir(), static_cast<int>(std::lround(p->sampleRate)));
-  p->namNames = pedal::listNamFiles(pedal::namDir());
-  p->shared.namBankCount.store(
-      static_cast<int>(p->namNames.size()), std::memory_order_relaxed);
-  p->lastNamIndex = -2;
   p->shared.irBankCount.store(
       p->irBank ? static_cast<int>(p->irBank->entries.size()) : 0,
       std::memory_order_relaxed);
@@ -167,10 +161,6 @@ void activate(LV2_Handle handle) {
   p->engine.reset();
   p->irBank = pedal::loadIrBank(
       pedal::irDir(), static_cast<int>(std::lround(p->sampleRate)));
-  p->namNames = pedal::listNamFiles(pedal::namDir());
-  p->shared.namBankCount.store(
-      static_cast<int>(p->namNames.size()), std::memory_order_relaxed);
-  p->lastNamIndex = -2;
   p->shared.irBankCount.store(
       p->irBank ? static_cast<int>(p->irBank->entries.size()) : 0,
       std::memory_order_relaxed);
@@ -243,19 +233,6 @@ void run(LV2_Handle handle, uint32_t frames) {
     } else {
       p->engine.setCabIr(nullptr, 0);
     }
-  }
-
-  const int namIndex =
-      static_cast<int>(std::lround(p->shared.get(pedal::P_NAM_MODEL)));
-  if (namIndex != p->lastNamIndex) {
-    p->lastNamIndex = namIndex;
-    std::string namPath;
-    if (namIndex > 0 &&
-        namIndex <= static_cast<int>(p->namNames.size())) {
-      namPath = pedal::namDir() + "/" +
-                p->namNames[static_cast<size_t>(namIndex - 1)];
-    }
-    p->engine.setNamModel(namPath);
   }
 
   if (p->audioOutL != p->audioInL) {
