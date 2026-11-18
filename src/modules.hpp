@@ -1,0 +1,210 @@
+// Pedal Suite — pedal registry
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
+#include <cstring>
+
+#include <hdsp/modules/eq.hpp>
+
+#include "module_ids.hpp"
+#include "params.hpp"
+
+namespace pedal {
+
+enum class ControlFormat {
+  Percent,
+  ThresholdDb,
+  GainDb,
+  Ratio,
+  AttackMs,
+  ReleaseMs,
+  ScHpfHz,
+  EqHpfHz,
+  EqLpfHz,
+  AirFreqHz,
+  TiltDb,
+  AirDb,
+  GateThresholdDb,
+  RangeDb,
+  GateAttackMs,
+  GateReleaseMs,
+  HoldMs,
+  BipolarPercent,
+  ClipDriveDb,
+  ClipCeilingDb,
+  ClipMode,
+  DeEssFreqHz,
+  DeEssRangeDb,
+  LimiterCeilingDb,
+  LimiterReleaseMs,
+  WidthPercent,
+  MonoHz,
+  CrushBits,
+  CrushToneHz,
+  FilterCutoffHz,
+  LfoRateHz,
+  FilterMode,
+  MotionMode,
+  SubFreqHz,
+  DelayMs,
+  DetuneMs,
+  QValue,
+  DynRangeDb,
+  DynRatio,
+  MakeupDb,
+  RiderTargetDb,
+  RiderSpeedMs,
+  SpaceDecayS,
+  SpacePreDelayMs,
+  SpaceDelayMs,
+  CompDistortion,
+  BoostDb,
+  ClassicThresholdDb,
+  TrimDb,
+  DaTubeOutputDb,
+  FattenerGainDb,
+  TapeColor,
+  WideGainDb,
+  CompAmount,
+  AttackShortMs,
+  AC1Mode,
+  Threshold48Db,
+  Threshold18Db,
+  CurveBipolar,
+  BloomInputDb,
+  BloomOutputDb,
+  RsInputDb,
+  RsOutputDb,
+  Ratio2To10,
+  ThresholdM40P10Db,
+  Unit10,
+  Output24Db,
+  TapeGainDb,
+  Comp48Db,
+  Threshold30Db,
+  L2ReleaseMs,
+  Threshold20Db,
+  Margin6Db,
+  HybridLowCut,
+  HybridLowFreq,
+  HybridBoost15,
+  HybridMidFreq,
+  HybridGain15,
+  HybridHighFreq,
+  HybridHighBoost,
+  HybridHighAtten,
+  PedalGainDb,
+  PedalLevelDb,
+};
+
+struct ControlDesc {
+  int param = 0;
+  const char* label = "";
+  const char* name = "";
+  ControlFormat format = ControlFormat::Percent;
+  bool stepped = false;
+  Labels labels{};
+  bool toggled = false;
+};
+
+using hdsp::modules::airFreqHz;
+using hdsp::modules::eqHpfHz;
+using hdsp::modules::eqLpfHz;
+
+struct ModuleDesc {
+  ModuleId id = ModuleId::Off;
+  const char* name = "Off";
+  const char* category = "Off";
+  const char* description = "Empty pedal slot";
+  bool isEq = false;
+  bool isComp = false;
+  int model = 0;
+  int controlCount = 0;
+  const ControlDesc* controls = nullptr;
+};
+
+namespace detail {
+
+inline constexpr ControlDesc kBoostControls[] = {
+    {0, "GAIN", "Gain", ControlFormat::PedalGainDb},
+    {1, "TONE", "Tone", ControlFormat::TiltDb},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+
+inline constexpr ControlDesc kDrive808Controls[] = {
+    {0, "DRIVE", "Drive", ControlFormat::Percent},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::Percent},
+};
+
+inline constexpr ModuleDesc kModules[] = {
+    {ModuleId::Off, "Off", "Off", "Empty pedal slot", false, false, 0, 0,
+     nullptr},
+    {ModuleId::Boost, "Boost", "Drive", "Clean FET-style boost pedal", false,
+     false, 0,
+     static_cast<int>(sizeof(kBoostControls) / sizeof(kBoostControls[0])),
+     kBoostControls},
+    {ModuleId::Drive808, "808 Drive", "Drive", "Retuned TS9/808 overdrive",
+     false, false, 0,
+     static_cast<int>(sizeof(kDrive808Controls) / sizeof(kDrive808Controls[0])),
+     kDrive808Controls},
+};
+
+inline constexpr const char* kModuleSources[] = {
+    "\u2014",
+    "Pedal Suite exclusive",
+    "Amp Suite",
+};
+
+constexpr bool moduleSourcesComplete() noexcept {
+  for (int i = 0; i < kModuleCount; ++i) {
+    if (!kModuleSources[i]) return false;
+  }
+  return true;
+}
+static_assert(moduleSourcesComplete(),
+              "kModuleSources must fill every module id");
+static_assert(sizeof(kModuleSources) / sizeof(kModuleSources[0]) == kModuleCount,
+              "kModuleSources must cover every module id");
+
+} // namespace detail
+
+inline const ModuleDesc* moduleDesc(int id) noexcept {
+  return validModule(id) ? &detail::kModules[id] : &detail::kModules[0];
+}
+
+inline const char* moduleName(int id) noexcept { return moduleDesc(id)->name; }
+
+inline const char* moduleSource(int id) noexcept {
+  return validModule(id) ? detail::kModuleSources[id] : "\u2014";
+}
+
+inline void applyModuleDefaults(Shared& shared, int slot, int type,
+                                bool markDirty = true) {
+  const ModuleDesc* d = moduleDesc(type);
+  const ModuleId id = d->id;
+  auto set = [&](uint32_t param, double value) {
+    if (markDirty) {
+      shared.set(param, value);
+    } else {
+      shared.setFromHost(param, value);
+    }
+  };
+  set(slotParam(slot, kSlotOffsetType), static_cast<double>(type));
+  set(slotParam(slot, kSlotOffsetBypass), 0.0);
+  set(slotParam(slot, kSlotOffsetMix), 100.0);
+  set(slotParam(slot, kSlotOffsetGain), 0.0);
+  for (int i = 0; i < kRackControlCount; ++i) {
+    set(slotParam(slot, kSlotOffsetC0 + i), defaultControlValue(id, i));
+  }
+}
+
+inline void initializeRack(Shared& shared) {
+  for (int slot = 0; slot < kSlotCount; ++slot) {
+    applyModuleDefaults(shared, slot, static_cast<int>(ModuleId::Off), false);
+  }
+  applyModuleDefaults(shared, 0, static_cast<int>(ModuleId::Boost), false);
+  applyModuleDefaults(shared, 1, static_cast<int>(ModuleId::Drive808), false);
+}
+
+} // namespace pedal

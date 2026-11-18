@@ -1,0 +1,6 @@
+[submodule "third_party/hearth-dsp"]
+	path = third_party/hearth-dsp
+	url = https://github.com/tylorismusic-commits/hearth-dsp.git
+[submodule "third_party/pedal-dsp"]
+	path = third_party/pedal-dsp
+	url = https://github.com/tylorismusic-commits/pedal-dsp.git
