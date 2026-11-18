@@ -25,6 +25,7 @@
 #include <thread>
 
 #include "dsp/engine.hpp"
+#include "dsp/ir_bank.hpp"
 #include "midi_map.hpp"
 #include "modules.hpp"
 #include "params.hpp"
@@ -372,6 +373,9 @@ struct Plugin {
   // main-thread callback.
   std::atomic<uint32_t> reportedLatency{0xffffffffu};
   std::atomic<bool> rescanQueued{false};
+  std::shared_ptr<const pedal::IrBank> irBank;
+  int lastIrIndex = -2;
+  bool irDirty = true;
   std::atomic<bool> active{false};
   int reportedTypes[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
   uint8_t lastCc[128] = {};
@@ -443,7 +447,8 @@ bool paramsInfo(const clap_plugin_t* p, uint32_t index,
   info->max_value = s.max;
   info->default_value = s.def;
 
-  if (index >= P_SLOT0_TYPE) {
+  if (index >= P_SLOT0_TYPE &&
+      index < P_SLOT0_TYPE + kSlotStride * kSlotCount) {
     const int slot =
         static_cast<int>((index - P_SLOT0_TYPE) / kSlotStride);
     const int offset =
@@ -787,6 +792,12 @@ bool pluginActivate(const clap_plugin_t* p, double sampleRate, uint32_t,
   Plugin* s = self(p);
   s->sampleRate = sampleRate;
   s->engine.prepare(static_cast<float>(sampleRate));
+  s->irBank = pedal::loadIrBank(
+      pedal::irDir(), static_cast<int>(std::lround(sampleRate)));
+  s->shared.irBankCount.store(
+      s->irBank ? static_cast<int>(s->irBank->entries.size()) : 0,
+      std::memory_order_relaxed);
+  s->irDirty = true;
   s->engine.setControls(controlsFrom(s->shared), s->shared.revision());
   for (int i = 0; i < kSlotCount; ++i) {
     s->reportedTypes[i] = static_cast<int>(
@@ -879,6 +890,23 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
   }
 
   s->engine.setControls(controlsFrom(s->shared), s->shared.revision());
+
+  const int irIndex =
+      static_cast<int>(std::lround(s->shared.get(P_CAB_IR)));
+  if (irIndex != s->lastIrIndex || s->irDirty) {
+    s->lastIrIndex = irIndex;
+    s->irDirty = false;
+    const pedal::IrEntry* entry = nullptr;
+    if (s->irBank && irIndex > 0 &&
+        irIndex <= static_cast<int>(s->irBank->entries.size())) {
+      entry = &s->irBank->entries[static_cast<size_t>(irIndex - 1)];
+    }
+    if (entry && !entry->h.empty()) {
+      s->engine.setCabIr(entry->h.data(), static_cast<int>(entry->h.size()));
+    } else {
+      s->engine.setCabIr(nullptr, 0);
+    }
+  }
 
   bool typesChanged = false;
   for (int i = 0; i < kSlotCount; ++i) {
@@ -983,6 +1011,10 @@ Plugin* createPlugin(const clap_host_t* host) {
   s->plugin.on_main_thread = pluginOnMainThread;
   s->engine.prepare(48000.0f);
   initializeRack(s->shared);
+  s->irBank = pedal::loadIrBank(pedal::irDir(), 48000);
+  s->shared.irBankCount.store(
+      s->irBank ? static_cast<int>(s->irBank->entries.size()) : 0,
+      std::memory_order_relaxed);
   // Latency may only change while the plugin is being activated, so the
   // oversampling switch is applied on the host's restart, not mid-block.
   s->editor.requestFlush = [s] {

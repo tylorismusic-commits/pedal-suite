@@ -1,6 +1,7 @@
 // Pedal Suite — panel.cpp
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "ui/panel.hpp"
+#include "dsp/ir_bank.hpp"
 
 #include "factory_module_presets.hpp"
 #include "modules.hpp"
@@ -199,6 +200,9 @@ ModuleStyle styleFor(int type) {
     case ModuleId::Laser:
       return {{0.12, 0.06, 0.30}, {0.04, 0.02, 0.12},
               {0.46, 0.98, 1.00}, {0.84, 0.99, 1.00}};
+    case ModuleId::Cab:
+      return {{0.16, 0.13, 0.09}, {0.06, 0.05, 0.03},
+              {0.90, 0.74, 0.46}, {0.98, 0.93, 0.80}};
     default:
       return {{0.105, 0.10, 0.095}, {0.24, 0.22, 0.19},
               {0.55, 0.50, 0.44}, {0.72, 0.70, 0.66}};
@@ -211,7 +215,6 @@ bool browserCategoryMatches(int id, int category) {
   if (category == 2) return std::strcmp(d->category, "Mod") == 0;
   if (category == 3) return std::strcmp(d->category, "Dyn") == 0;
   if (category == 4) return std::strcmp(d->category, "Time") == 0;
-  if (category == 5) return std::strcmp(d->category, "Verb") == 0;
   return true;
 }
 
@@ -425,7 +428,7 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
         browserHeight(state.browserCategory, state.browserQuery, filterType);
     const double by =
         browserY(state.browserCategory, state.browserQuery, filterType);
-    for (int tab = 0; tab < 7; ++tab) {
+    for (int tab = 0; tab < 6; ++tab) {
       Widget t{};
       t.kind = Kind::BrowserTab;
       t.param = slotParam(state.browserSlot, kSlotOffsetType);
@@ -434,8 +437,8 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
       t.y = by + 46;
       t.w = 70.0;
       t.h = 24.0;
-      static const char* labels[7] = {"ALL", "DRIVE", "MOD",  "DYN",
-                                      "TIME", "VERB", "PRESETS"};
+      static const char* labels[6] = {"ALL", "DRIVE", "MOD",
+                                      "DYN", "TIME", "PRESETS"};
       t.label = labels[tab];
       widgets_.push_back(t);
     }
@@ -447,7 +450,7 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
       const char* subLabel = nullptr;
     };
     std::vector<BEntry> entries;
-    if (state.browserCategory == 6) {
+    if (state.browserCategory == 5) {
       const std::string needle = lowerText(state.browserQuery);
       for (int i = 0; i < kFactoryModulePresetCount; ++i) {
         const FactoryModulePreset& p = kFactoryModulePresets[i];
@@ -667,6 +670,17 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
       if (moduleHasGr(type)) {
         drawGrMeter(cr, x + 28, y + 54, colW - 56, 6, state.slotGrDb[slot]);
       }
+      if (type == static_cast<int>(ModuleId::Cab)) {
+        const double bx = x + colW - 108, by = y + 8;
+        roundRect(cr, bx, by, 32, 15, 3);
+        setRgb(cr, state.irPickerSlot == slot ? st.accent
+                                              : Rgb{0.20, 0.17, 0.14});
+        cairo_fill(cr);
+        text(cr, "IR", bx + 16, by + 11, 7.5, 1,
+             state.irPickerSlot == slot ? 0.10 : 0.72,
+             state.irPickerSlot == slot ? 0.08 : 0.68,
+             state.irPickerSlot == slot ? 0.05 : 0.62);
+      }
     }
   }
 
@@ -686,7 +700,7 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
 
 int Panel::browserOptionCount(int category, const std::string& query,
                               int presetFilterType) const {
-  if (category == 6) {
+  if (category == 5) {
     const std::string needle = lowerText(query);
     int count = 0;
     for (int i = 0; i < kFactoryModulePresetCount; ++i) {
@@ -748,13 +762,13 @@ void Panel::drawBrowser(cairo_t* cr, const Shared& shared,
                 state.browserSlot + 1);
   text(cr, title, bx + bw * 0.5, by + 30, 14, 1, kText.r, kText.g, kText.b);
   const char* subtitle =
-      state.browserCategory == 6
+      state.browserCategory == 5
           ? (state.browserPresetFilter
                  ? "Presets for the loaded module · click one to load"
                  : "Factory and user module presets · click one to load")
           : "One job per pedal · 3–6 controls · no deep pages";
   text(cr, subtitle, bx + bw * 0.5, by + 86, 8.5, 1, kDim.r, kDim.g, kDim.b);
-  if (state.browserCategory == 6 &&
+  if (state.browserCategory == 5 &&
       browserOptionCount(6, state.browserQuery,
                          presetFilterTypeFor(shared, state)) == 0) {
     text(cr, "No presets for this module yet", bx + bw * 0.5, by + 160, 10, 1,
@@ -1110,6 +1124,67 @@ void Panel::drawTuner(cairo_t* cr, const Shared& shared,
   text(cr, "CLOSE", 760, 565, 9, 1, 0.10, 0.08, 0.05);
 }
 
+
+void Panel::drawIrPicker(cairo_t* cr, const Shared& shared,
+                         const PanelState& state) const {
+  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.72);
+  cairo_paint(cr);
+  const double bx = 260, by = 140, bw = 520, bh = 430;
+  roundRect(cr, bx, by, bw, bh, 7);
+  setRgb(cr, {0.12, 0.105, 0.09});
+  cairo_fill(cr);
+  setRgb(cr, kAccent, 0.9);
+  cairo_set_line_width(cr, 1.5);
+  roundRect(cr, bx + 0.5, by + 0.5, bw - 1, bh - 1, 7);
+  cairo_stroke(cr);
+
+  char title[64];
+  std::snprintf(title, sizeof(title), "CABINET IMPULSE \u00b7 PEDAL %d",
+                state.irPickerSlot + 1);
+  text(cr, title, bx + bw * 0.5, by + 34, 14, 1, kText.r, kText.g, kText.b);
+  text(cr, "WAV files from the IR folder", bx + bw * 0.5, by + 54, 8, 1,
+       kDim.r, kDim.g, kDim.b);
+
+  const int selected =
+      static_cast<int>(std::lround(shared.get(P_CAB_IR)));
+  const int visible = 11;
+  const int count = static_cast<int>(state.irNames.size()) + 1;
+  const int maxScroll = std::max(0, count - visible);
+  const int scroll = std::clamp(state.irScroll, 0, maxScroll);
+  const double rowStart = by + 70;
+  for (int row = 0; row < visible; ++row) {
+    const int index = scroll + row;
+    if (index >= count) break;
+    const double ry = rowStart + row * 26.0;
+    const bool isSelected = index == selected;
+    roundRect(cr, bx + 20, ry, bw - 40, 22, 3);
+    setRgb(cr, isSelected ? Rgb{0.30, 0.24, 0.14} : Rgb{0.16, 0.145, 0.125});
+    cairo_fill(cr);
+    const std::string label =
+        index == 0 ? std::string("NONE (bypass the cabinet)")
+                   : state.irNames[static_cast<size_t>(index - 1)];
+    text(cr, label.c_str(), bx + 34, ry + 15, 9, 0,
+         isSelected ? kAccent.r : kText.r, isSelected ? kAccent.g : kText.g,
+         isSelected ? kAccent.b : kText.b);
+  }
+
+  text(cr, irDir().c_str(), bx + bw * 0.5, by + 384, 6.5, 1, kDim.r, kDim.g,
+       kDim.b);
+  roundRect(cr, bx + 20, by + 396, 58, 26, 4);
+  setRgb(cr, scroll > 0 ? Rgb{0.20, 0.17, 0.14} : Rgb{0.12, 0.11, 0.10});
+  cairo_fill(cr);
+  text(cr, "UP", bx + 49, by + 413, 8, 1, kText.r, kText.g, kText.b);
+  roundRect(cr, bx + 86, by + 396, 58, 26, 4);
+  setRgb(cr, scroll < maxScroll ? Rgb{0.20, 0.17, 0.14}
+                                : Rgb{0.12, 0.11, 0.10});
+  cairo_fill(cr);
+  text(cr, "DOWN", bx + 115, by + 413, 8, 1, kText.r, kText.g, kText.b);
+  roundRect(cr, bx + bw - 100, by + 396, 80, 26, 4);
+  setRgb(cr, kAccent);
+  cairo_fill(cr);
+  text(cr, "CLOSE", bx + bw - 60, by + 413, 9, 1, 0.10, 0.08, 0.05);
+}
+
 void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   layout(shared, state);
   cairo_set_source_rgb(cr, 0.07, 0.065, 0.06);
@@ -1148,6 +1223,7 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   if (state.presetOpen) drawPresetList(cr, shared, state);
   if (state.aboutOpen) drawAbout(cr, shared, state);
   if (state.tunerOpen) drawTuner(cr, shared, state);
+  if (state.irPickerSlot >= 0) drawIrPicker(cr, shared, state);
   drawTextEntry(cr, state);
 }
 
@@ -1600,6 +1676,63 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.browserSlot = -1;
     return true;
   }
+  if (state.irPickerSlot >= 0) {
+    const double bx = 260, by = 140, bw = 520, bh = 430;
+    const double rowStart = by + 70;
+    const int visible = 11;
+    if (x >= bx && x <= bx + bw && y >= rowStart &&
+        y < rowStart + visible * 26.0) {
+      const int index =
+          state.irScroll + static_cast<int>((y - rowStart) / 26.0);
+      if (index >= 0 && index <= static_cast<int>(state.irNames.size())) {
+        shared.set(P_CAB_IR, index);
+      }
+      state.irPickerSlot = -1;
+      return true;
+    }
+    if (x >= bx + 20 && x <= bx + 78 && y >= by + 396 && y <= by + 422) {
+      state.irScroll = std::max(0, state.irScroll - 1);
+      return true;
+    }
+    if (x >= bx + 86 && x <= bx + 144 && y >= by + 396 && y <= by + 422) {
+      const int maxScroll =
+          std::max(0, static_cast<int>(state.irNames.size()) + 1 - visible);
+      state.irScroll = std::min(maxScroll, state.irScroll + 1);
+      return true;
+    }
+    if ((x >= bx + bw - 100 && x <= bx + bw - 20 && y >= by + 396 &&
+         y <= by + 422) ||
+        x < bx || x > bx + bw || y < by || y > by + bh) {
+      state.irPickerSlot = -1;
+    }
+    return true;
+  }
+  if (y >= 150 && y <= 173) {
+    const int base = state.boardPage * 4;
+    for (int i = 0; i < 4; ++i) {
+      const int slot = base + i;
+      const double cx = 32.0 + i * (236.0 + 14.0);
+      const int type = static_cast<int>(
+          shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
+      if (type == static_cast<int>(ModuleId::Cab) && x >= cx + 128 &&
+          x <= cx + 160 && y >= 158 && y <= 173) {
+        state.irPickerSlot = slot;
+        state.irScroll = 0;
+        state.irNames = listIrFiles(irDir());
+        const int bankCount =
+            shared.irBankCount.load(std::memory_order_relaxed);
+        if (bankCount >= 0 &&
+            static_cast<int>(state.irNames.size()) > bankCount) {
+          state.irNames.resize(static_cast<size_t>(bankCount));
+        }
+        state.aboutOpen = false;
+        state.tunerOpen = false;
+        state.presetOpen = 0;
+        state.browserSlot = -1;
+        return true;
+      }
+    }
+  }
   if (state.aboutOpen) {
     if (x >= 120 && x <= 178 && y >= 604 && y <= 630) {
       state.aboutScroll = std::max(0, state.aboutScroll - 1);
@@ -1632,6 +1765,7 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.aboutScroll = 0;
     state.presetOpen = 0;
     state.tunerOpen = false;
+    state.irPickerSlot = -1;
     return true;
   }
   if (x >= 706 && x <= 802 && y >= 20 && y <= 48) {
@@ -1851,7 +1985,7 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
         return true;
       case Kind::ModulePresetButton:
         state.browserSlot = static_cast<int>(w.value);
-        state.browserCategory = 6;
+        state.browserCategory = 5;
         state.browserScroll = 0;
         state.browserQuery.clear();
         state.browserSearch = false;
@@ -1998,6 +2132,13 @@ void Panel::pointerUp(Shared& shared, PanelState& state) {
 }
 
 bool Panel::wheel(Shared& shared, PanelState& state, double x, double y, double dy) {
+  if (state.irPickerSlot >= 0) {
+    const int maxScroll =
+        std::max(0, static_cast<int>(state.irNames.size()) + 1 - 11);
+    state.irScroll = std::clamp(
+        state.irScroll - (dy > 0 ? 1 : -1), 0, maxScroll);
+    return true;
+  }
   if (state.presetOpen) {
     const int maxScroll =
         std::max(0, presetCount() - presetRowsFor(presetCount()));

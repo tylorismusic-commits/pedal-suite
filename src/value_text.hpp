@@ -393,7 +393,8 @@ inline std::string formatParamValue(const Shared& shared, uint32_t id,
   if (s.toggled) return value > 0.5 ? "On" : "Off";
 
   // Slot generic controls are formatted by the active module.
-  if (id >= P_SLOT0_TYPE) {
+  if (id >= P_SLOT0_TYPE &&
+      id < P_SLOT0_TYPE + kSlotStride * kSlotCount) {
     const int slot = static_cast<int>((id - P_SLOT0_TYPE) / kSlotStride);
     const int offset = static_cast<int>((id - P_SLOT0_TYPE) % kSlotStride);
     if (slot >= 0 && slot < kSlotCount) {
@@ -667,7 +668,8 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
 
   const ModuleDesc* module = nullptr;
   const ControlDesc* desc = nullptr;
-  if (id >= P_SLOT0_TYPE) {
+  if (id >= P_SLOT0_TYPE &&
+      id < P_SLOT0_TYPE + kSlotStride * kSlotCount) {
     const int slot = static_cast<int>((id - P_SLOT0_TYPE) / kSlotStride);
     const int offset = static_cast<int>((id - P_SLOT0_TYPE) % kSlotStride);
     if (slot >= 0 && slot < kSlotCount && offset >= kSlotOffsetC0) {

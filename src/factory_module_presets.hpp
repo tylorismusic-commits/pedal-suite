@@ -200,6 +200,12 @@ inline constexpr FactoryModulePreset kFactoryModulePresets[] = {
      {0.75f, 0.30f, 0.20f, 0.40f, 0.85f}},
     {"Laser Sweep", "Pedal Suite exclusive", ModuleId::Laser,
      {0.50f, 0.50f, 0.80f, 0.30f, 0.80f}},
+    {"V30 Tight", "Pedal Suite exclusive", ModuleId::Cab,
+     {0.22f, 0.58f, 0.50f, 1.00f}},
+    {"Greenback", "Pedal Suite exclusive", ModuleId::Cab,
+     {0.18f, 0.50f, 0.50f, 1.00f}},
+    {"Bass Cab", "Pedal Suite exclusive", ModuleId::Cab,
+     {0.10f, 0.40f, 0.50f, 1.00f}},
 };
 
 inline constexpr int kFactoryModulePresetCount =

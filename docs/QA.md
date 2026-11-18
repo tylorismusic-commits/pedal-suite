@@ -22,8 +22,10 @@ fixed everything the measurements exposed. The automated equivalents live in
 | Precision Drive | Gate 90%, quiet input | 80 dB reduction |
 | Wah | 700 Hz, Pedal 0 → 50% | +23.2 dB through the band-pass |
 | Laser | Pitch +12, 220 Hz input | 440.0 Hz (55 ms reported latency) |
-| All 40 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
-| All 40 pedals | default settings | audible output |
+| Cab | unit IR, 220 Hz | transparent within 10% |
+| IR bank | 16-bit WAV load | 1 entry, normalised |
+| All 41 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
+| All 41 pedals | default settings | audible output |
 | All values | display → parse round-trip | within one display step |
 
 ## Fixes made
@@ -73,6 +75,16 @@ blends in the metallic carrier. It reports its Rubber Band latency.
 
 The Wah is a band-pass state-variable filter with a 1.8–3 octave sweep and
 Q up to 12. MIDI CC 4 or 11 moves the first Wah in the chain.
+
+## Cab / IR
+
+The Cab pedal uses zero-latency direct FIR convolution (up to 4096 taps) with
+the impulse owned by the plugin's IR bank. WAVs are averaged to mono,
+resampled to the host rate, normalised at 1 kHz and truncated to 4096 taps.
+The picker lists the same sorted files as the engine bank, so parameter
+indices and the UI agree. A unit-impulse test confirms the Cab is transparent
+within 10%. The redundant VERB browser tab was removed because all reverbs
+are already in TIME.
 
 ## NAM / amp / cab preparation
 

@@ -23,7 +23,7 @@
         foaf:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
-    lv2:minorVersion 4 ;
+    lv2:minorVersion 5 ;
     lv2:microVersion 0 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
@@ -96,7 +96,7 @@
         lv2:name "Module" ;
         lv2:default 1 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -138,7 +138,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot1> ;
     ] ,
     [
@@ -302,7 +303,7 @@
         lv2:name "Module" ;
         lv2:default 2 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -344,7 +345,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot2> ;
     ] ,
     [
@@ -508,7 +510,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -550,7 +552,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot3> ;
     ] ,
     [
@@ -714,7 +717,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -756,7 +759,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot4> ;
     ] ,
     [
@@ -920,7 +924,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -962,7 +966,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot5> ;
     ] ,
     [
@@ -1126,7 +1131,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1168,7 +1173,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot6> ;
     ] ,
     [
@@ -1332,7 +1338,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1374,7 +1380,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot7> ;
     ] ,
     [
@@ -1538,7 +1545,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 40 ;
+        lv2:maximum 41 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1580,7 +1587,8 @@
             [ rdf:value 37 ; rdfs:label "Tape Sat" ] ,
             [ rdf:value 38 ; rdfs:label "Precision Drive" ] ,
             [ rdf:value 39 ; rdfs:label "Wah" ] ,
-            [ rdf:value 40 ; rdfs:label "Laser" ] ;
+            [ rdf:value 40 ; rdfs:label "Laser" ] ,
+            [ rdf:value 41 ; rdfs:label "Cab" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot8> ;
     ] ,
     [
@@ -1738,8 +1746,19 @@
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot8> ;
     ] ,
     [
-        a lv2:OutputPort , lv2:ControlPort ;
+        a lv2:InputPort , lv2:ControlPort ;
         lv2:index 135 ;
+        lv2:symbol "cab_ir" ;
+        lv2:name "Cabinet IR" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 64 ;
+        lv2:portProperty lv2:integer ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#cabinet> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 136 ;
         lv2:symbol "in_peak_l" ;
         lv2:name "Input Peak Left" ;
         lv2:default 0 ;
@@ -1751,7 +1770,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 136 ;
+        lv2:index 137 ;
         lv2:symbol "in_peak_r" ;
         lv2:name "Input Peak Right" ;
         lv2:default 0 ;
@@ -1763,7 +1782,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 137 ;
+        lv2:index 138 ;
         lv2:symbol "out_peak_l" ;
         lv2:name "Output Peak Left" ;
         lv2:default 0 ;
@@ -1775,7 +1794,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 138 ;
+        lv2:index 139 ;
         lv2:symbol "out_peak_r" ;
         lv2:name "Output Peak Right" ;
         lv2:default 0 ;
@@ -1787,7 +1806,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 139 ;
+        lv2:index 140 ;
         lv2:symbol "in_peak" ;
         lv2:name "Input Peak" ;
         lv2:default 0 ;
@@ -1799,7 +1818,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 140 ;
+        lv2:index 141 ;
         lv2:symbol "out_peak" ;
         lv2:name "Output Peak" ;
         lv2:default 0 ;
@@ -1811,7 +1830,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 141 ;
+        lv2:index 142 ;
         lv2:symbol "slot1_gr" ;
         lv2:name "Slot 1 Gain Reduction" ;
         lv2:default 0 ;
@@ -1822,7 +1841,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 142 ;
+        lv2:index 143 ;
         lv2:symbol "slot2_gr" ;
         lv2:name "Slot 2 Gain Reduction" ;
         lv2:default 0 ;
@@ -1833,7 +1852,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 143 ;
+        lv2:index 144 ;
         lv2:symbol "slot3_gr" ;
         lv2:name "Slot 3 Gain Reduction" ;
         lv2:default 0 ;
@@ -1844,7 +1863,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 144 ;
+        lv2:index 145 ;
         lv2:symbol "slot4_gr" ;
         lv2:name "Slot 4 Gain Reduction" ;
         lv2:default 0 ;
@@ -1855,7 +1874,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 145 ;
+        lv2:index 146 ;
         lv2:symbol "slot5_gr" ;
         lv2:name "Slot 5 Gain Reduction" ;
         lv2:default 0 ;
@@ -1866,7 +1885,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 146 ;
+        lv2:index 147 ;
         lv2:symbol "slot6_gr" ;
         lv2:name "Slot 6 Gain Reduction" ;
         lv2:default 0 ;
@@ -1877,7 +1896,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 147 ;
+        lv2:index 148 ;
         lv2:symbol "slot7_gr" ;
         lv2:name "Slot 7 Gain Reduction" ;
         lv2:default 0 ;
@@ -1888,7 +1907,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 148 ;
+        lv2:index 149 ;
         lv2:symbol "slot8_gr" ;
         lv2:name "Slot 8 Gain Reduction" ;
         lv2:default 0 ;
@@ -1899,7 +1918,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 149 ;
+        lv2:index 150 ;
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:default 0 ;
@@ -1911,7 +1930,7 @@
     ] ,
     [
         a lv2:InputPort , atom:AtomPort ;
-        lv2:index 150 ;
+        lv2:index 151 ;
         lv2:symbol "midi_in" ;
         lv2:name "MIDI In" ;
         atom:bufferType atom:Sequence ;
@@ -1936,6 +1955,8 @@
 <https://github.com/tylorismusic-commits/pedal-suite#slot7> a pg:Group ; lv2:symbol "slot7" ; lv2:name "Slot 7" .
 
 <https://github.com/tylorismusic-commits/pedal-suite#slot8> a pg:Group ; lv2:symbol "slot8" ; lv2:name "Slot 8" .
+
+<https://github.com/tylorismusic-commits/pedal-suite#cabinet> a pg:Group ; lv2:symbol "cabinet" ; lv2:name "Cabinet" .
 
 <https://github.com/tylorismusic-commits/pedal-suite#meter> a pg:Group ; lv2:symbol "meter" ; lv2:name "Meter" .
 

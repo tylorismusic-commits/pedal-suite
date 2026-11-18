@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0-alpha — 2026-11-18
+
+- Added **Cab**, an impulse-response cabinet pedal with Low Cut, High Cut,
+  Level and Mix. Load WAV IRs from the folder picker on the pedal card.
+- IRs are resampled to the host rate, normalised at 1 kHz and convolved
+  with a zero-latency 4096-tap FIR.
+- Removed the redundant VERB browser tab; reverbs already live under TIME.
+- The loaded IR list is shared with the engine so host and UI indices agree.
+
 ## 0.4.0-alpha — 2026-11-18
 
 - Added Horizon Devices-style **Precision Drive** with Gate, Drive, Attack

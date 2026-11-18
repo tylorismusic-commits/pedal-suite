@@ -242,6 +242,16 @@ inline stomp::modules::RoomReverbControls roomReverbControlsFrom(
   return out;
 }
 
+inline stomp::modules::CabControls cabControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::CabControls out;
+  out.lowCut = c.c[0];
+  out.highCut = c.c[1];
+  out.level = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
 inline stomp::modules::PrecisionDriveControls precisionDriveControlsFrom(
     const SlotControls& c) noexcept {
   stomp::modules::PrecisionDriveControls out;

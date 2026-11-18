@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "dsp/engine.hpp"
+#include "dsp/ir_bank.hpp"
 #include "midi_map.hpp"
 #include "modules.hpp"
 #include "params.hpp"
@@ -78,6 +79,9 @@ struct Plugin {
   float* latency = nullptr;
   const LV2_Atom_Sequence* midiIn = nullptr;
   uint8_t lastCc[128] = {};
+  std::shared_ptr<const pedal::IrBank> irBank;
+  int lastIrIndex = -2;
+  bool irDirty = true;
 
   const LV2_URID_Map* map = nullptr;
   LV2_URID stateKey = 0;
@@ -109,6 +113,11 @@ LV2_Handle instantiate(const LV2_Descriptor*, double rate, const char*,
   }
   p->engine.prepare(p->sampleRate);
   pedal::initializeRack(p->shared);
+  p->irBank = pedal::loadIrBank(
+      pedal::irDir(), static_cast<int>(std::lround(p->sampleRate)));
+  p->shared.irBankCount.store(
+      p->irBank ? static_cast<int>(p->irBank->entries.size()) : 0,
+      std::memory_order_relaxed);
   p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
   return p;
 }
@@ -150,6 +159,12 @@ void connectPort(LV2_Handle handle, uint32_t port, void* data) {
 void activate(LV2_Handle handle) {
   auto* p = static_cast<Plugin*>(handle);
   p->engine.reset();
+  p->irBank = pedal::loadIrBank(
+      pedal::irDir(), static_cast<int>(std::lround(p->sampleRate)));
+  p->shared.irBankCount.store(
+      p->irBank ? static_cast<int>(p->irBank->entries.size()) : 0,
+      std::memory_order_relaxed);
+  p->irDirty = true;
   p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
   if (p->latency) {
     *p->latency = static_cast<float>(p->engine.latencySamples());
@@ -202,6 +217,23 @@ void run(LV2_Handle handle, uint32_t frames) {
   }
 
   p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
+
+  const int irIndex =
+      static_cast<int>(std::lround(p->shared.get(pedal::P_CAB_IR)));
+  if (irIndex != p->lastIrIndex || p->irDirty) {
+    p->lastIrIndex = irIndex;
+    p->irDirty = false;
+    const pedal::IrEntry* entry = nullptr;
+    if (p->irBank && irIndex > 0 &&
+        irIndex <= static_cast<int>(p->irBank->entries.size())) {
+      entry = &p->irBank->entries[static_cast<size_t>(irIndex - 1)];
+    }
+    if (entry && !entry->h.empty()) {
+      p->engine.setCabIr(entry->h.data(), static_cast<int>(entry->h.size()));
+    } else {
+      p->engine.setCabIr(nullptr, 0);
+    }
+  }
 
   if (p->audioOutL != p->audioInL) {
     std::memcpy(p->audioOutL, p->audioInL, frames * sizeof(float));

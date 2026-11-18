@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include <cmath>
 #include <cstdio>
+#include <filesystem>
+#include <fstream>
 #include <vector>
 
 #include "midi_map.hpp"
@@ -9,6 +11,7 @@
 #include "modules.hpp"
 #include "params.hpp"
 #include "presets.hpp"
+#include "dsp/ir_bank.hpp"
 #include "factory_module_presets.hpp"
 #include "state.hpp"
 #include "value_text.hpp"
@@ -149,6 +152,55 @@ int main() {
       }
     }
     check(ok, "factory board presets are well formed");
+  }
+  {
+    namespace fs = std::filesystem;
+    const fs::path dir = fs::temp_directory_path() / "pedal-suite-ir-test";
+    std::error_code ec;
+    fs::remove_all(dir, ec);
+    fs::create_directories(dir, ec);
+    const fs::path wav = dir / "test.wav";
+    const int frames = 64;
+    std::vector<unsigned char> bytes;
+    auto u32 = [&](uint32_t v) {
+      bytes.push_back(static_cast<unsigned char>(v & 0xFF));
+      bytes.push_back(static_cast<unsigned char>((v >> 8) & 0xFF));
+      bytes.push_back(static_cast<unsigned char>((v >> 16) & 0xFF));
+      bytes.push_back(static_cast<unsigned char>((v >> 24) & 0xFF));
+    };
+    auto u16 = [&](uint16_t v) {
+      bytes.push_back(static_cast<unsigned char>(v & 0xFF));
+      bytes.push_back(static_cast<unsigned char>((v >> 8) & 0xFF));
+    };
+    const uint32_t dataBytes = static_cast<uint32_t>(frames) * 2;
+    bytes.insert(bytes.end(), {'R', 'I', 'F', 'F'});
+    u32(36 + dataBytes);
+    bytes.insert(bytes.end(), {'W', 'A', 'V', 'E'});
+    bytes.insert(bytes.end(), {'f', 'm', 't', ' '});
+    u32(16);
+    u16(1);
+    u16(1);
+    u32(48000);
+    u32(96000);
+    u16(2);
+    u16(16);
+    bytes.insert(bytes.end(), {'d', 'a', 't', 'a'});
+    u32(dataBytes);
+    for (int i = 0; i < frames; ++i) {
+      const int16_t v = i == 0 ? 16384 : 0;
+      u16(static_cast<uint16_t>(v));
+    }
+    {
+      std::ofstream out(wav, std::ios::binary | std::ios::trunc);
+      out.write(reinterpret_cast<const char*>(bytes.data()),
+                static_cast<std::streamsize>(bytes.size()));
+    }
+    const auto bank = loadIrBank(dir.string(), 48000);
+    check(bank && bank->entries.size() == 1 &&
+              bank->entries[0].name == "test.wav" &&
+              !bank->entries[0].h.empty(),
+          "IR bank loads a WAV file");
+    fs::remove_all(dir, ec);
   }
   check(static_cast<int>(b.get(slotParam(7, kSlotOffsetType)) + 0.5) ==
             static_cast<int>(ModuleId::Boost),

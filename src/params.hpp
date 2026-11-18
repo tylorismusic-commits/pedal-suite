@@ -33,6 +33,7 @@ enum ParamId : uint32_t {
   SLOT_PARAMS(6)
   SLOT_PARAMS(7)
 #undef SLOT_PARAMS
+  P_CAB_IR,
   P_COUNT
 };
 
@@ -114,6 +115,8 @@ struct ParamSpec {
       {"slot" #n "_c11", "Module Control 12", "Slot " #display, 0.0, 1.0,                  \
        SLOT_DEFAULT_CTL(n, 11), false, false, false, nullptr, {}}
 
+constexpr int kMaxCabIr = 64;
+
 inline constexpr ParamSpec kParamSpecs[P_COUNT] = {
     {"power", "Power", "Global", 0.0, 1.0, 1.0, true, false, true, nullptr, {}},
     {"input", "Input", "Global", -18.0, 18.0, 0.0, false, false, false, "dB", {}},
@@ -126,6 +129,8 @@ inline constexpr ParamSpec kParamSpecs[P_COUNT] = {
     SLOT_SPECS(5, 6),
     SLOT_SPECS(6, 7),
     SLOT_SPECS(7, 8),
+    {"cab_ir", "Cabinet IR", "Cabinet", 0.0,
+     static_cast<double>(kMaxCabIr), 0.0, true, true, false, nullptr, {}},
 };
 
 #undef SLOT_SPECS
@@ -203,6 +208,7 @@ public:
   std::atomic<float> slotGrDb[kSlotCount];
   std::atomic<float> tunerHz, tunerCents, tunerConfidence;
   std::atomic<int> tunerNote;
+  std::atomic<int> irBankCount{0};
 
   uint64_t revision() const noexcept {
     return revision_.load(std::memory_order_relaxed);

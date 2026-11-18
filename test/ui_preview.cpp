@@ -84,12 +84,22 @@ int main(int argc, char** argv) {
   applyModuleDefaults(s, 4, static_cast<int>(ModuleId::PrecisionDrive));
   applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Wah));
   applyModuleDefaults(s, 6, static_cast<int>(ModuleId::Laser));
-  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::EnvFilter));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Cab));
   for (float& gr : state.slotGrDb) gr = 0.0f;
   state.slotGrDb[4] = 3.5f;
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf,
                             (out + "/pedal-board-signature.png").c_str());
+
+  state.irNames = {"Greenback SM57.wav", "V30 121.wav", "Recto 57.wav",
+                   "Bass 52.wav"};
+  state.irScroll = 0;
+  state.irPickerSlot = 7;
+  s.set(P_CAB_IR, 2);
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-cab-ir.png").c_str());
+  state.irPickerSlot = -1;
+  s.set(P_CAB_IR, 0);
 
   state.browserSlot = 4;
   state.browserCategory = 1;

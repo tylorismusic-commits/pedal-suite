@@ -206,6 +206,13 @@ inline constexpr ControlDesc kSpringReverbControls[] = {
     {2, "MIX", "Mix", ControlFormat::Percent},
 };
 
+inline constexpr ControlDesc kCabControls[] = {
+    {0, "LOW CUT", "Low Cut", ControlFormat::EqHpfHz},
+    {1, "HIGH CUT", "High Cut", ControlFormat::EqLpfHz},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+
 inline constexpr ControlDesc kPrecisionDriveControls[] = {
     {0, "GATE", "Gate", ControlFormat::Percent},
     {1, "DRIVE", "Drive", ControlFormat::Percent},
@@ -556,12 +563,17 @@ inline constexpr ModuleDesc kModules[] = {
      "Expression pitch and ring-mod laser", false, false, 0,
      static_cast<int>(sizeof(kLaserControls) / sizeof(kLaserControls[0])),
      kLaserControls},
+    {ModuleId::Cab, "Cab", "Drive", "Impulse-response cabinet", false, false,
+     0,
+     static_cast<int>(sizeof(kCabControls) / sizeof(kCabControls[0])),
+     kCabControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

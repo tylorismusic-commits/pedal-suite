@@ -399,6 +399,33 @@ int main() {
     for (int slot = 0; slot < kSlotCount; ++slot) {
       applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Off), false);
     }
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Cab), false);
+    s.set(slotParam(0, kSlotOffsetC0 + 0), 0.0);
+    s.set(slotParam(0, kSlotOffsetC0 + 1), 1.0);
+    s.set(slotParam(0, kSlotOffsetC0 + 2), 0.5);
+    s.set(slotParam(0, kSlotOffsetC0 + 3), 1.0);
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    std::vector<float> ir(1, 1.0f);
+    e.setCabIr(ir.data(), 1);
+    const int n = 24000;
+    std::vector<float> in(n), r(n);
+    for (int i = 0; i < n; ++i) {
+      in[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+    }
+    auto out = in;
+    Meters m;
+    e.process(out.data(), r.data(), n, m);
+    check(std::fabs(rms(out, 1000, n) / rms(in, 1000, n) - 1.0) < 0.1,
+          "Cab with a unit IR is transparent");
+  }
+  {
+    Shared s;
+    initializeRack(s);
+    for (int slot = 0; slot < kSlotCount; ++slot) {
+      applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Off), false);
+    }
     Engine e;
     e.prepare(48000.0f);
     e.setControls(controlsFrom(s));

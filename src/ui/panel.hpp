@@ -33,6 +33,9 @@ struct PanelState {
   bool browserPresetFilter = false;
   bool aboutOpen = false;
   bool tunerOpen = false;
+  int irPickerSlot = -1;
+  int irScroll = 0;
+  std::vector<std::string> irNames;
   int aboutScroll = 0;
   int textParam = -1;
   std::string textBuffer;
@@ -130,6 +133,8 @@ private:
                  const PanelState& state) const;
   void drawTuner(cairo_t* cr, const Shared& shared,
                  const PanelState& state) const;
+  void drawIrPicker(cairo_t* cr, const Shared& shared,
+                    const PanelState& state) const;
   void drawPresetList(cairo_t* cr, const Shared& shared,
                       const PanelState& state) const;
   void drawBrowserMenu(cairo_t* cr, const PanelState& state) const;

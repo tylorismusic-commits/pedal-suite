@@ -45,6 +45,10 @@ public:
     }
   }
 
+  void setCabIr(const float* h, int taps) noexcept {
+    for (auto& c : cab_) c.setIR(h, taps);
+  }
+
   void process(float* left, float* right, int n, Meters& meters) noexcept {
     if (!left || !right || n <= 0) return;
     float inL = 0.0f, inR = 0.0f, outL = 0.0f, outR = 0.0f;
@@ -170,6 +174,7 @@ public:
     for (auto& p : precisionDrive_) p.reset();
     for (auto& p : wah_) p.reset();
     for (auto& p : laser_) p.reset();
+    for (auto& p : cab_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -240,6 +245,7 @@ private:
       case ModuleId::PrecisionDrive: precisionDrive_[s].prepare(sr_); break;
       case ModuleId::Wah: wah_[s].prepare(sr_); break;
       case ModuleId::Laser: laser_[s].prepare(sr_); break;
+      case ModuleId::Cab: cab_[s].prepare(sr_); break;
       default: break;
     }
   }
@@ -286,6 +292,7 @@ private:
       case ModuleId::PrecisionDrive: precisionDrive_[s].setControls(precisionDriveControlsFrom(c)); break;
       case ModuleId::Wah: wah_[s].setControls(wahControlsFrom(c)); break;
       case ModuleId::Laser: laser_[s].setControls(laserControlsFrom(c)); break;
+      case ModuleId::Cab: cab_[s].setControls(cabControlsFrom(c)); break;
       default: break;
     }
   }
@@ -332,6 +339,7 @@ private:
       case ModuleId::PrecisionDrive: precisionDrive_[s].process(l, r); break;
       case ModuleId::Wah: wah_[s].process(l, r); break;
       case ModuleId::Laser: laser_[s].process(l, r); break;
+      case ModuleId::Cab: cab_[s].process(l, r); break;
       default: break;
     }
   }
@@ -384,6 +392,7 @@ private:
   stomp::modules::PrecisionDrive precisionDrive_[kSlotCount];
   stomp::modules::Wah wah_[kSlotCount];
   stomp::modules::Laser laser_[kSlotCount];
+  stomp::modules::Cabinet cab_[kSlotCount];
   stomp::modules::Tuner tuner_;
 };
 
