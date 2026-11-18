@@ -78,7 +78,32 @@ inline constexpr bool validModule(int id) noexcept {
 
 inline constexpr bool moduleIsEq(int) noexcept { return false; }
 inline constexpr bool moduleIsComp(int) noexcept { return false; }
-inline constexpr bool moduleHasGr(int) noexcept { return false; }
+inline constexpr bool moduleHasTails(int type) noexcept {
+  switch (static_cast<ModuleId>(type)) {
+    case ModuleId::AnalogDelay:
+    case ModuleId::TapeEcho:
+    case ModuleId::DigitalDelay:
+    case ModuleId::PingPongDelay:
+    case ModuleId::SpringReverb:
+    case ModuleId::PlateReverb:
+    case ModuleId::RoomReverb:
+      return true;
+    default:
+      return false;
+  }
+}
+
+inline constexpr bool moduleHasGr(int type) noexcept {
+  switch (static_cast<ModuleId>(type)) {
+    case ModuleId::FetComp:
+    case ModuleId::OptoComp:
+    case ModuleId::NoiseGate:
+    case ModuleId::TightGate:
+      return true;
+    default:
+      return false;
+  }
+}
 
 // All controls are normalised to 0..1.
 constexpr double defaultControlValue(ModuleId id, int control) noexcept {
@@ -172,7 +197,7 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
       }
     case ModuleId::PitchDrop:
       switch (control) {
-        case 0: return 0.50;  // Pitch
+        case 0: return 0.00;  // Pitch (unison)
         case 1: return 0.00;  // Whammy Up
         case 2: return 0.20;  // Glide
         case 3: return 0.50;  // Tone

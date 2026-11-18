@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.3.0-alpha — the full 37-pedal catalog.**
+**Status: 0.3.1-alpha — 37 pedals, calibrated and metered.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -69,6 +69,9 @@ and full board visuals land in later milestones.
 - **Bass EQ** — Low, Mid, High, Level.
 - **Lo-Fi** — Bits, Rate, Tone, Mix.
 - **Tape Sat** — Drive, Tone, Mix.
+
+Compressors and gates report gain reduction to the pedals, the CLAP host and
+the LV2 `slotN_gr` ports. Delay and reverb tails keep ringing when bypassed.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.

@@ -27,6 +27,96 @@ double rms(const std::vector<float>& x, int a, int b) {
 } // namespace
 
 int main() {
+  {
+    bool stable = true;
+    for (float sr : {48000.0f, 96000.0f}) {
+      const int n = static_cast<int>(sr * 0.25f);
+      std::vector<float> x(n);
+      for (int i = 0; i < n; ++i) {
+        x[i] = 0.3f * std::sin(2.0f * 3.14159265f * 220.0f * i / sr);
+      }
+      for (double extreme : {0.0, 1.0}) {
+        for (int id = 1; id < kModuleCount; ++id) {
+          Shared s;
+          initializeRack(s);
+          applyModuleDefaults(s, 0, id, false);
+          for (int k = 0; k < kRackControlCount; ++k) {
+            s.set(slotParam(0, kSlotOffsetC0 + k), extreme);
+          }
+          Engine e;
+          e.prepare(sr);
+          e.setControls(controlsFrom(s));
+          auto l = x, r = x;
+          Meters m;
+          e.process(l.data(), r.data(), n, m);
+          for (float v : l) {
+            if (!std::isfinite(v)) {
+              stable = false;
+              std::printf("unstable module %d at %.0f Hz extreme %.0f\n",
+                          id, sr, extreme);
+              break;
+            }
+          }
+        }
+      }
+    }
+    check(stable, "every pedal stays finite at 48/96 kHz extremes");
+  }
+  {
+    const int n = 24000;
+    Shared s;
+    initializeRack(s);
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::PlateReverb), false);
+    s.set(slotParam(0, kSlotOffsetC0 + 0), 0.65);
+    s.set(slotParam(0, kSlotOffsetC0 + 2), 1.0);
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    std::vector<float> l(n), r(n);
+    for (int i = 0; i < n; ++i) {
+      l[i] = r[i] = 0.3f * std::sin(2.0f * 3.14159265f * 330.0f * i /
+                                    48000.0f);
+    }
+    Meters m;
+    e.process(l.data(), r.data(), n, m);
+    s.set(slotParam(0, kSlotOffsetBypass), 1.0);
+    e.setControls(controlsFrom(s));
+    std::vector<float> tl(n, 0.0f), tr(n, 0.0f);
+    e.process(tl.data(), tr.data(), n, m);
+    check(rms(tl, 0, n) > 1.0e-4, "bypassed reverb lets its tail ring");
+
+    Shared b;
+    initializeRack(b);
+    applyModuleDefaults(b, 0, static_cast<int>(ModuleId::Boost), false);
+    b.set(slotParam(0, kSlotOffsetBypass), 1.0);
+    Engine be;
+    be.prepare(48000.0f);
+    be.setControls(controlsFrom(b));
+    std::vector<float> bl(n, 0.0f), br(n, 0.0f);
+    be.process(bl.data(), br.data(), n, m);
+    check(rms(bl, 0, n) < 1.0e-9, "bypassed pedal without tails is silent");
+  }
+  {
+    Shared s;
+    initializeRack(s);
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::FetComp), false);
+    for (int k = 0; k < kRackControlCount; ++k) {
+      s.set(slotParam(0, kSlotOffsetC0 + k), 0.9);
+    }
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    const int n = 24000;
+    std::vector<float> l(n), r(n);
+    for (int i = 0; i < n; ++i) {
+      l[i] = r[i] = 0.4f * std::sin(2.0f * 3.14159265f * 220.0f * i /
+                                    48000.0f);
+    }
+    Meters m;
+    e.process(l.data(), r.data(), n, m);
+    check(m.slotGrDb[0] > 1.0f, "FET Comp reports gain reduction");
+    check(e.latencySamples() == 0, "compressor adds no latency");
+  }
   for (float sr : {48000.0f, 96000.0f}) {
     const int n = static_cast<int>(sr * 0.25f);
     std::vector<float> x(n);
@@ -123,7 +213,7 @@ int main() {
       const double seconds = (n - start) / 48000.0;
       return std::make_pair(crossings * 0.5 / seconds, latency);
     };
-    const auto pitch = shifted(ModuleId::PitchDrop, 0, 0.75);
+    const auto pitch = shifted(ModuleId::PitchDrop, 0, 0.5);
     check(std::fabs(pitch.first - 440.0) < 30.0,
           "Pitch Drop shifts up an octave");
     check(pitch.second > 0, "Pitch Drop reports latency");

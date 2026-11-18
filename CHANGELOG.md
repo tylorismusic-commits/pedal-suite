@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1-alpha — 2026-11-18
+
+- QA pass across all 37 pedals with measurement-based tests.
+- Pitch Drop modes now use the full knob and show the effective pitch.
+- FET Comp soft knee; gate envelope follower; calibrated reverb decay.
+- Delay timing is sample-accurate on the first echo.
+- Real gain-reduction meters for the compressor and gate pedals.
+- Bypass tails for the delays and reverbs.
+- Typed kHz values, FET release and EQ mid gain now parse/format correctly.
+
 ## 0.3.0-alpha — 2026-11-18
 
 - Completed the 37-pedal catalog.

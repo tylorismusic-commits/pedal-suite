@@ -7,7 +7,9 @@
 #include "module_ids.hpp"
 #include "modules.hpp"
 #include "params.hpp"
+#include "factory_module_presets.hpp"
 #include "state.hpp"
+#include "value_text.hpp"
 
 using namespace pedal;
 
@@ -37,6 +39,55 @@ int main() {
         "state restores pedal control");
   check(std::fabs(b.get(P_OUTPUT) + 3.5) < 1e-9,
         "state restores global output");
+  {
+    Shared s;
+    initializeRack(s);
+    bool ok = true;
+    for (int id = 1; id < kModuleCount; ++id) {
+      const ModuleDesc* m = moduleDesc(id);
+      applyModuleDefaults(s, 0, id, false);
+      for (int k = 0; k < m->controlCount; ++k) {
+        const uint32_t p =
+            slotParam(0, kSlotOffsetC0 + m->controls[k].param);
+        for (double v : {0.0, 0.25, 0.5, 0.75, 1.0}) {
+          const std::string text = formatParamValue(s, p, v);
+          double out = -1.0;
+          if (!parseParamValue(s, p, text, &out)) {
+            ok = false;
+            std::printf("parse failed: %s / %s -> '%s'\n", m->name,
+                        m->controls[k].name, text.c_str());
+            continue;
+          }
+          if (std::fabs(out - v) > 0.04) {
+            ok = false;
+            std::printf("round-trip drift: %s / %s %.3f -> '%s' -> %.3f\n",
+                        m->name, m->controls[k].name, v, text.c_str(), out);
+          }
+        }
+      }
+    }
+    check(ok, "every typed value round-trips");
+  }
+  {
+    bool ok = true;
+    for (int i = 0; i < kFactoryModulePresetCount; ++i) {
+      const auto& p = kFactoryModulePresets[i];
+      const ModuleDesc* m = moduleDesc(static_cast<int>(p.type));
+      if (!m || m->id == ModuleId::Off) {
+        ok = false;
+        std::printf("preset '%s' has no module\n", p.name);
+        continue;
+      }
+      for (int k = 0; k < m->controlCount; ++k) {
+        if (p.controls[static_cast<size_t>(k)] < -0.001f ||
+            p.controls[static_cast<size_t>(k)] > 1.001f) {
+          ok = false;
+          std::printf("preset '%s' control %d out of range\n", p.name, k);
+        }
+      }
+    }
+    check(ok, "factory pedal presets are valid");
+  }
   check(static_cast<int>(b.get(slotParam(7, kSlotOffsetType)) + 0.5) ==
             static_cast<int>(ModuleId::Boost),
         "state restores page-2 pedal type");

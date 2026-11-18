@@ -117,124 +117,20 @@ public:
       const float dryL = l, dryR = r;
       for (int s = 0; s < kSlotCount; ++s) {
         const SlotControls& c = slot_[s];
-        if (c.type == static_cast<int>(ModuleId::Off) || c.bypass) continue;
-        const float sl = l, sr = r;
-        switch (static_cast<ModuleId>(c.type)) {
-          case ModuleId::Boost:
-            boost_[s].process(l, r);
-            break;
-          case ModuleId::Drive808:
-            drive_[s].process(l, r);
-            break;
-          case ModuleId::TrebleBoost:
-            treble_[s].process(l, r);
-            break;
-          case ModuleId::Overdrive:
-            overdrive_[s].process(l, r);
-            break;
-          case ModuleId::BluesDrive:
-            blues_[s].process(l, r);
-            break;
-          case ModuleId::Distortion:
-            distortion_[s].process(l, r);
-            break;
-          case ModuleId::Rat:
-            rat_[s].process(l, r);
-            break;
-          case ModuleId::BigFuzz:
-            bigFuzz_[s].process(l, r);
-            break;
-          case ModuleId::FuzzFace:
-            fuzzFace_[s].process(l, r);
-            break;
-          case ModuleId::ToneBender:
-            toneBender_[s].process(l, r);
-            break;
-          case ModuleId::BassDrive:
-            bassDrive_[s].process(l, r);
-            break;
-          case ModuleId::BassFuzz:
-            bassFuzz_[s].process(l, r);
-            break;
-          case ModuleId::PitchDrop:
-            pitchDrop_[s].process(l, r);
-            break;
-          case ModuleId::Retune:
-            retune_[s].process(l, r);
-            break;
-          case ModuleId::Chorus:
-            chorus_[s].process(l, r);
-            break;
-          case ModuleId::Flanger:
-            flanger_[s].process(l, r);
-            break;
-          case ModuleId::Phaser:
-            phaser_[s].process(l, r);
-            break;
-          case ModuleId::Tremolo:
-            tremolo_[s].process(l, r);
-            break;
-          case ModuleId::AnalogDelay:
-            analogDelay_[s].process(l, r);
-            break;
-          case ModuleId::SpringReverb:
-            springReverb_[s].process(l, r);
-            break;
-          case ModuleId::BassChorus:
-            bassChorus_[s].process(l, r);
-            break;
-          case ModuleId::Vibrato:
-            vibrato_[s].process(l, r);
-            break;
-          case ModuleId::Octave:
-            octave_[s].process(l, r);
-            break;
-          case ModuleId::TapeEcho:
-            tapeEcho_[s].process(l, r);
-            break;
-          case ModuleId::DigitalDelay:
-            digitalDelay_[s].process(l, r);
-            break;
-          case ModuleId::PingPongDelay:
-            pingPong_[s].process(l, r);
-            break;
-          case ModuleId::PlateReverb:
-            plateReverb_[s].process(l, r);
-            break;
-          case ModuleId::RoomReverb:
-            roomReverb_[s].process(l, r);
-            break;
-          case ModuleId::FetComp:
-            fetComp_[s].process(l, r);
-            break;
-          case ModuleId::OptoComp:
-            optoComp_[s].process(l, r);
-            break;
-          case ModuleId::EnvFilter:
-            envFilter_[s].process(l, r);
-            break;
-          case ModuleId::NoiseGate:
-            noiseGate_[s].process(l, r);
-            break;
-          case ModuleId::TightGate:
-            tightGate_[s].process(l, r);
-            break;
-          case ModuleId::Eq3:
-            eq3_[s].process(l, r);
-            break;
-          case ModuleId::BassEq:
-            bassEq_[s].process(l, r);
-            break;
-          case ModuleId::LoFi:
-            loFi_[s].process(l, r);
-            break;
-          case ModuleId::TapeSat:
-            tapeSat_[s].process(l, r);
-            break;
-          case ModuleId::Off:
-          case ModuleId::Count:
-            continue;
+        if (c.type == static_cast<int>(ModuleId::Off)) continue;
+        const ModuleId id = static_cast<ModuleId>(c.type);
+        if (c.bypass) {
+          // Let delay and reverb tails ring out with the input muted.
+          if (moduleHasTails(c.type)) {
+            float tailL = 0.0f, tailR = 0.0f;
+            processSlot(s, id, tailL, tailR);
+            l += tailL;
+            r += tailR;
+          }
+          continue;
         }
+        const float sl = l, sr = r;
+        processSlot(s, id, l, r);
         const float mix = std::clamp(c.mix, 0.0f, 1.0f);
         l = sl + (l - sl) * mix;
         r = sr + (r - sr) * mix;
@@ -265,7 +161,27 @@ public:
     meters.outPeakLDb = hdsp::gainToDb(outL);
     meters.outPeakRDb = hdsp::gainToDb(outR);
     meters.outPeakDb = std::max(meters.outPeakLDb, meters.outPeakRDb);
-    for (int s = 0; s < kSlotCount; ++s) meters.slotGrDb[s] = 0.0f;
+    for (int s = 0; s < kSlotCount; ++s) {
+      meters.slotGrDb[s] = 0.0f;
+      const SlotControls& c = slot_[s];
+      if (c.bypass) continue;
+      switch (static_cast<ModuleId>(c.type)) {
+        case ModuleId::FetComp:
+          meters.slotGrDb[s] = fetComp_[s].gainReductionDb();
+          break;
+        case ModuleId::OptoComp:
+          meters.slotGrDb[s] = optoComp_[s].gainReductionDb();
+          break;
+        case ModuleId::NoiseGate:
+          meters.slotGrDb[s] = noiseGate_[s].gainReductionDb();
+          break;
+        case ModuleId::TightGate:
+          meters.slotGrDb[s] = tightGate_[s].gainReductionDb();
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   void reset() noexcept {
@@ -328,6 +244,50 @@ public:
       }
     }
     return latency;
+  }
+
+private:
+  inline void processSlot(int s, ModuleId id, float& l, float& r) noexcept {
+    switch (id) {
+      case ModuleId::Boost: boost_[s].process(l, r); break;
+      case ModuleId::Drive808: drive_[s].process(l, r); break;
+      case ModuleId::TrebleBoost: treble_[s].process(l, r); break;
+      case ModuleId::Overdrive: overdrive_[s].process(l, r); break;
+      case ModuleId::BluesDrive: blues_[s].process(l, r); break;
+      case ModuleId::Distortion: distortion_[s].process(l, r); break;
+      case ModuleId::Rat: rat_[s].process(l, r); break;
+      case ModuleId::BigFuzz: bigFuzz_[s].process(l, r); break;
+      case ModuleId::FuzzFace: fuzzFace_[s].process(l, r); break;
+      case ModuleId::ToneBender: toneBender_[s].process(l, r); break;
+      case ModuleId::BassDrive: bassDrive_[s].process(l, r); break;
+      case ModuleId::BassFuzz: bassFuzz_[s].process(l, r); break;
+      case ModuleId::PitchDrop: pitchDrop_[s].process(l, r); break;
+      case ModuleId::Retune: retune_[s].process(l, r); break;
+      case ModuleId::Chorus: chorus_[s].process(l, r); break;
+      case ModuleId::Flanger: flanger_[s].process(l, r); break;
+      case ModuleId::Phaser: phaser_[s].process(l, r); break;
+      case ModuleId::Tremolo: tremolo_[s].process(l, r); break;
+      case ModuleId::AnalogDelay: analogDelay_[s].process(l, r); break;
+      case ModuleId::SpringReverb: springReverb_[s].process(l, r); break;
+      case ModuleId::BassChorus: bassChorus_[s].process(l, r); break;
+      case ModuleId::Vibrato: vibrato_[s].process(l, r); break;
+      case ModuleId::Octave: octave_[s].process(l, r); break;
+      case ModuleId::TapeEcho: tapeEcho_[s].process(l, r); break;
+      case ModuleId::DigitalDelay: digitalDelay_[s].process(l, r); break;
+      case ModuleId::PingPongDelay: pingPong_[s].process(l, r); break;
+      case ModuleId::PlateReverb: plateReverb_[s].process(l, r); break;
+      case ModuleId::RoomReverb: roomReverb_[s].process(l, r); break;
+      case ModuleId::FetComp: fetComp_[s].process(l, r); break;
+      case ModuleId::OptoComp: optoComp_[s].process(l, r); break;
+      case ModuleId::EnvFilter: envFilter_[s].process(l, r); break;
+      case ModuleId::NoiseGate: noiseGate_[s].process(l, r); break;
+      case ModuleId::TightGate: tightGate_[s].process(l, r); break;
+      case ModuleId::Eq3: eq3_[s].process(l, r); break;
+      case ModuleId::BassEq: bassEq_[s].process(l, r); break;
+      case ModuleId::LoFi: loFi_[s].process(l, r); break;
+      case ModuleId::TapeSat: tapeSat_[s].process(l, r); break;
+      default: break;
+    }
   }
 
 private:

@@ -101,6 +101,8 @@ enum class ControlFormat {
   EchoTimeMs,
   PedalDriveDb,
   Ratio2To20,
+  PitchSemis,
+  TightReleaseMs,
 };
 
 struct ControlDesc {
@@ -178,7 +180,7 @@ inline constexpr const char* kPitchModeLabels[] = {
     "Whammy Up", "Whammy Down", "Drop", "Harmony", "Detune"};
 
 inline constexpr ControlDesc kPitchDropControls[] = {
-    {0, "PITCH", "Pitch", ControlFormat::Percent},
+    {0, "PITCH", "Pitch", ControlFormat::PitchSemis},
     {1, "MODE", "Mode", ControlFormat::Percent, true,
      labels(kPitchModeLabels)},
     {2, "GLIDE", "Glide", ControlFormat::Percent},
@@ -229,7 +231,7 @@ inline constexpr ControlDesc kNoiseGateControls[] = {
 };
 inline constexpr ControlDesc kTightGateControls[] = {
     {0, "THRESH", "Threshold", ControlFormat::GateThresholdDb},
-    {1, "DECAY", "Decay", ControlFormat::GateReleaseMs},
+    {1, "DECAY", "Decay", ControlFormat::TightReleaseMs},
     {2, "RANGE", "Range", ControlFormat::RangeDb},
     {3, "LINK", "Link", ControlFormat::Percent},
 };

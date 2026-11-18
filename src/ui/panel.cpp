@@ -655,6 +655,9 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
     } else {
       text(cr, slotModuleName(type), x + colW * 0.5, y + 38, 15, 1, 0.95,
            0.95, 0.92);
+      if (moduleHasGr(type)) {
+        drawGrMeter(cr, x + 28, y + 54, colW - 56, 6, state.slotGrDb[slot]);
+      }
     }
   }
 

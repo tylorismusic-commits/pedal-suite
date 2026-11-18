@@ -76,6 +76,8 @@ int main(int argc, char** argv) {
   applyModuleDefaults(s, 5, static_cast<int>(ModuleId::TightGate));
   applyModuleDefaults(s, 6, static_cast<int>(ModuleId::EnvFilter));
   applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Eq3));
+  state.slotGrDb[4] = 5.0f;
+  state.slotGrDb[5] = 2.0f;
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-dyn.png").c_str());
 

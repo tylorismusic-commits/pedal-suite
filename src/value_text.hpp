@@ -83,6 +83,15 @@ inline std::string formatControlValue(const ModuleDesc& module,
     case ControlFormat::Ratio2To20:
       std::snprintf(buf, sizeof(buf), "%.1f : 1", 2.0f + 18.0f * v);
       return buf;
+    case ControlFormat::PitchSemis: {
+      const int semis = static_cast<int>(std::lround(v * 48.0f)) - 24;
+      if (semis == 0) return "0 st";
+      std::snprintf(buf, sizeof(buf), "%+d st", semis);
+      return buf;
+    }
+    case ControlFormat::TightReleaseMs:
+      std::snprintf(buf, sizeof(buf), "%.0f ms", 1.0f + 199.0f * v);
+      return buf;
     case ControlFormat::ThresholdDb:
       std::snprintf(buf, sizeof(buf), "%+.1f dB", -40.0f + 40.0f * v);
       return buf;
@@ -106,13 +115,7 @@ inline std::string formatControlValue(const ModuleDesc& module,
       return buf;
     }
     case ControlFormat::ReleaseMs: {
-      float ms = 0.0f;
-      if (module.model == 0 || module.model == 1) {
-        const float step = std::round(v * 6.0f) / 6.0f;
-        ms = 50.0f * std::pow(22.0f, step);
-      } else {
-        ms = 100.0f * std::pow(12.0f, v);
-      }
+      const float ms = 100.0f * std::pow(12.0f, v);
       if (ms < 10.0f) std::snprintf(buf, sizeof(buf), "%.1f ms", ms);
       else std::snprintf(buf, sizeof(buf), "%.0f ms", ms);
       return buf;
@@ -233,9 +236,13 @@ inline std::string formatControlValue(const ModuleDesc& module,
     case ControlFormat::RiderSpeedMs:
       std::snprintf(buf, sizeof(buf), "%.0f ms", 20.0f * std::pow(50.0f, v));
       return buf;
-    case ControlFormat::SpaceDecayS:
-      std::snprintf(buf, sizeof(buf), "%.2f s", 0.3f + 11.7f * v);
+    case ControlFormat::SpaceDecayS: {
+      float span = 11.7f;
+      if (module.id == ModuleId::SpringReverb) span = 5.7f;
+      else if (module.id == ModuleId::RoomReverb) span = 9.7f;
+      std::snprintf(buf, sizeof(buf), "%.2f s", 0.3f + span * v);
       return buf;
+    }
     case ControlFormat::SpacePreDelayMs:
       std::snprintf(buf, sizeof(buf), "%.0f ms", v * 200.0f);
       return buf;
@@ -406,7 +413,40 @@ inline std::string formatParamValue(const Shared& shared, uint32_t id,
             shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
         const ModuleDesc* module = moduleDesc(type);
         const ControlDesc* desc = controlFor(*module, control);
-        if (desc) return formatControlValue(*module, *desc, value);
+        if (desc) {
+          if (module->id == ModuleId::PitchDrop && control == 0) {
+            const int mode = std::clamp(
+                static_cast<int>(std::lround(
+                    shared.get(slotParam(slot, kSlotOffsetC0 + 1)) * 4.0)),
+                0, 4);
+            const double v = std::clamp(value, 0.0, 1.0);
+            char buf[32];
+            switch (mode) {
+              case 0:
+              case 1: {
+                const double semis = (mode == 0 ? 24.0 : -24.0) * v;
+                if (std::lround(semis) == 0) return "0 st";
+                std::snprintf(buf, sizeof(buf), "%+.0f st", semis);
+                return buf;
+              }
+              case 2: {
+                const double semis = -std::round(24.0 * v);
+                if (std::lround(semis) == 0) return "0 st";
+                std::snprintf(buf, sizeof(buf), "%.0f st", semis);
+                return buf;
+              }
+              case 3:
+                std::snprintf(buf, sizeof(buf), "%+.0f st",
+                              std::round(-24.0 + 48.0 * v) + 7.0);
+                return buf;
+              default:
+                std::snprintf(buf, sizeof(buf), "±%.0f ct",
+                              2.0 + 28.0 * v);
+                return buf;
+            }
+          }
+          return formatControlValue(*module, *desc, value);
+        }
       }
     }
   }
@@ -566,6 +606,7 @@ inline bool isMillisecondFormat(ControlFormat format) {
     case ControlFormat::SpaceDelayMs:
     case ControlFormat::DelayMs:
     case ControlFormat::DetuneMs:
+    case ControlFormat::TightReleaseMs:
     case ControlFormat::EchoTimeMs:
     case ControlFormat::AttackMs:
     case ControlFormat::ReleaseMs:
@@ -654,6 +695,25 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
   }
 
   if (desc) {
+    if (module && module->id == ModuleId::PitchDrop && desc->param == 0 &&
+        desc->format == ControlFormat::PitchSemis) {
+      const int slot =
+          static_cast<int>((id - P_SLOT0_TYPE) / kSlotStride);
+      const int mode = std::clamp(
+          static_cast<int>(std::lround(
+              shared.get(slotParam(slot, kSlotOffsetC0 + 1)) * 4.0)),
+          0, 4);
+      switch (mode) {
+        case 0: v = v / 24.0; break;
+        case 1: v = -v / 24.0; break;
+        case 2: v = -v / 24.0; break;
+        case 3: v = (v - 7.0 + 24.0) / 48.0; break;
+        default: v = (std::fabs(v) - 2.0) / 28.0; break;
+      }
+      v = std::min(std::max(v, 0.0), 1.0);
+      *out = v;
+      return true;
+    }
     if (desc->labels.count > 0) {
       const int choice = choiceIndexForText(
           desc->labels.names, desc->labels.count, text, desc->toggled);
@@ -696,16 +756,9 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
         }
         break;
       }
-      case ControlFormat::ReleaseMs: {
-        if (module && (module->model == 0 || module->model == 1)) {
-          const double step =
-              std::log(std::max(v, 50.0) / 50.0) / std::log(22.0);
-          v = std::round(step * 6.0) / 6.0;
-        } else {
-          v = std::log(std::max(v, 100.0) / 100.0) / std::log(12.0);
-        }
+      case ControlFormat::ReleaseMs:
+        v = std::log(std::max(v, 100.0) / 100.0) / std::log(12.0);
         break;
-      }
       case ControlFormat::Percent: v = v / 100.0; break;
       case ControlFormat::PedalGainDb: v = v / 24.0; break;
       case ControlFormat::PedalLevelDb: v = (v + 12.0) / 24.0; break;
@@ -718,6 +771,11 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
       case ControlFormat::EchoTimeMs: v = (v - 20.0) / 980.0; break;
       case ControlFormat::PedalDriveDb: v = (v + 12.0) / 36.0; break;
       case ControlFormat::Ratio2To20: v = (v - 2.0) / 18.0; break;
+      case ControlFormat::PitchSemis:
+        v = (v + 24.0) / 48.0;
+        v = std::round(v * 48.0) / 48.0;
+        break;
+      case ControlFormat::TightReleaseMs: v = (v - 1.0) / 199.0; break;
       case ControlFormat::ScHpfHz:
         v = std::log(std::max(v, 20.0) / 20.0) / std::log(20.0);
         break;
@@ -745,7 +803,8 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
       case ControlFormat::ClipDriveDb: v = v / 24.0; break;
       case ControlFormat::ClipCeilingDb: v = (v + 12.0) / 12.0; break;
       case ControlFormat::DeEssFreqHz:
-        v = std::log(std::max(v, 4.0) / 4.0) / std::log(3.0);
+        // Displayed in kHz; typed input is converted to Hz first.
+        v = std::log(std::max(v / 1000.0, 4.0) / 4.0) / std::log(3.0);
         break;
       case ControlFormat::DeEssRangeDb: v = v / 24.0; break;
       case ControlFormat::LimiterCeilingDb: v = (v + 6.0) / 6.0; break;
@@ -758,7 +817,8 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
         break;
       case ControlFormat::CrushBits: v = (v - 1.0) / 15.0; break;
       case ControlFormat::CrushToneHz:
-        v = std::log(std::max(v, 1.0) / 1.0) / std::log(20.0);
+        // Displayed in kHz; typed input is converted to Hz first.
+        v = std::log(std::max(v / 1000.0, 1.0) / 1.0) / std::log(20.0);
         break;
       case ControlFormat::FilterCutoffHz:
         v = std::log(std::max(v, 20.0) / 20.0) / std::log(1000.0);
@@ -781,7 +841,13 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
       case ControlFormat::RiderSpeedMs:
         v = std::log(std::max(v, 20.0) / 20.0) / std::log(50.0);
         break;
-      case ControlFormat::SpaceDecayS: v = (v - 0.3) / 11.7; break;
+      case ControlFormat::SpaceDecayS: {
+        float span = 11.7f;
+        if (module && module->id == ModuleId::SpringReverb) span = 5.7f;
+        else if (module && module->id == ModuleId::RoomReverb) span = 9.7f;
+        v = (v - 0.3) / span;
+        break;
+      }
       case ControlFormat::SpacePreDelayMs: v = v / 200.0; break;
       case ControlFormat::SpaceDelayMs: v = (v - 1.0) / 1999.0; break;
       case ControlFormat::BoostDb: v = v / 12.0; break;
