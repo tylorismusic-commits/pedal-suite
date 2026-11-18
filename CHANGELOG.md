@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3-alpha — 2026-11-18
+
+- Eight new curated board presets: Ambient Wash, Gojira Drop, Bass Growl,
+  Funk Wah, Pitch Lead, Spring Surf, Lo-Fi Tape and Modern Metal.
+- Factory boards now reset to empty slots and neutral input/output before
+  loading, so every preset is absolute and repeatable.
+- Added validation and audio tests for every factory board.
+
 ## 0.3.2-alpha — 2026-11-18
 
 - Added a built-in monophonic tuner with a YIN pitch detector.

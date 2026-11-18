@@ -10,6 +10,7 @@
 #include "module_ids.hpp"
 #include "modules.hpp"
 #include "params.hpp"
+#include "presets.hpp"
 
 using namespace pedal;
 
@@ -27,6 +28,45 @@ double rms(const std::vector<float>& x, int a, int b) {
 } // namespace
 
 int main() {
+  {
+    bool audible = true;
+    const int n = 24000;
+    std::vector<float> in(n);
+    for (int i = 0; i < n; ++i) {
+      in[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+    }
+    for (int i = 0; i < kPresetCount; ++i) {
+      Shared s;
+      initializeRack(s);
+      for (int slot = 0; slot < kSlotCount; ++slot) {
+        applyModuleDefaults(s, slot, static_cast<int>(ModuleId::Off), false);
+      }
+      s.set(P_INPUT, 0.0);
+      s.set(P_OUTPUT, 0.0);
+      const Preset& p = kPresets[i];
+      for (int v = 0; v < p.count; ++v) {
+        s.set(static_cast<uint32_t>(p.values[v].param), p.values[v].value);
+      }
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      auto l = in, r = in;
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      if (rms(l, n / 2, n) < 1.0e-5) {
+        audible = false;
+        std::printf("preset '%s' is silent\n", p.name);
+      }
+      for (float v : l) {
+        if (!std::isfinite(v)) {
+          audible = false;
+          std::printf("preset '%s' is not finite\n", p.name);
+          break;
+        }
+      }
+    }
+    check(audible, "every factory board preset makes sound");
+  }
   {
     bool stable = true;
     for (float sr : {48000.0f, 96000.0f}) {

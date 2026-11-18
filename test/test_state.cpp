@@ -7,6 +7,7 @@
 #include "module_ids.hpp"
 #include "modules.hpp"
 #include "params.hpp"
+#include "presets.hpp"
 #include "factory_module_presets.hpp"
 #include "state.hpp"
 #include "value_text.hpp"
@@ -87,6 +88,39 @@ int main() {
       }
     }
     check(ok, "factory pedal presets are valid");
+  }
+  {
+    bool ok = true;
+    for (int i = 0; i < kPresetCount; ++i) {
+      const Preset& p = kPresets[i];
+      int types = 0;
+      for (int v = 0; v < p.count; ++v) {
+        const PresetValue& value = p.values[v];
+        if (value.param < 0 || value.param >= static_cast<int>(P_COUNT)) {
+          ok = false;
+          std::printf("preset '%s' has invalid parameter %d\n", p.name,
+                      value.param);
+          continue;
+        }
+        const ParamSpec& spec = kParamSpecs[value.param];
+        if (value.value < spec.min - 1e-9 || value.value > spec.max + 1e-9) {
+          ok = false;
+          std::printf("preset '%s' value out of range at %d\n", p.name,
+                      value.param);
+        }
+        if (value.param >= P_SLOT0_TYPE) {
+          const int offset =
+              (value.param - P_SLOT0_TYPE) % kSlotStride;
+          if (offset == kSlotOffsetType) ++types;
+        }
+      }
+      if (types != kSlotCount) {
+        ok = false;
+        std::printf("preset '%s' does not define all %d slots\n", p.name,
+                    kSlotCount);
+      }
+    }
+    check(ok, "factory board presets are well formed");
   }
   check(static_cast<int>(b.get(slotParam(7, kSlotOffsetType)) + 0.5) ==
             static_cast<int>(ModuleId::Boost),

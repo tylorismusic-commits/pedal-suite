@@ -2075,11 +2075,13 @@ const char* Panel::presetName(int index) const {
 void Panel::applyPreset(Shared& shared, PanelState& state, int index) const {
   if (index < 0 || index >= presetCount()) return;
   if (index < kPresetCount) {
+    // Factory boards are absolute: start from empty slots and neutral globals
+    // so every preset sounds the same regardless of the previous board.
     for (int slot = 0; slot < kSlotCount; ++slot) {
-      shared.set(slotParam(slot, kSlotOffsetBypass), 0.0);
-      shared.set(slotParam(slot, kSlotOffsetMix), 100.0);
-      shared.set(slotParam(slot, kSlotOffsetGain), 0.0);
+      applyModuleDefaults(shared, slot, static_cast<int>(ModuleId::Off));
     }
+    shared.set(P_INPUT, 0.0);
+    shared.set(P_OUTPUT, 0.0);
     const Preset& p = kPresets[index];
     for (int i = 0; i < p.count; ++i) {
       const PresetValue& v = p.values[i];

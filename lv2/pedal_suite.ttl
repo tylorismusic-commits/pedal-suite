@@ -23,7 +23,7 @@
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     lv2:minorVersion 3 ;
-    lv2:microVersion 2 ;
+    lv2:microVersion 3 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
     ui:ui <https://github.com/tylorismusic-commits/pedal-suite#ui> ;

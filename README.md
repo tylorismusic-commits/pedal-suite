@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.3.2-alpha — 37 pedals plus a built-in tuner.**
+**Status: 0.3.3-alpha — 37 pedals, tuner and curated boards.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -77,6 +77,10 @@ the LV2 `slotN_gr` ports. Delay and reverb tails keep ringing when bypassed.
 
 The **TUNER** button opens a monophonic tuner fed from the dry input, with
 note, octave, cents, frequency and confidence.
+
+Twelve board presets ship ready to play, including Clean Platform, 808 Stack,
+Lead Lift, Ambient Wash, Gojira Drop, Bass Growl, Funk Wah, Pitch Lead,
+Spring Surf, Lo-Fi Tape and Modern Metal.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.
