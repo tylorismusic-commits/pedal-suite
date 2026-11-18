@@ -166,6 +166,14 @@ void run(LV2_Handle handle, uint32_t frames) {
 
   p->engine.process(p->audioOutL, p->audioOutR, static_cast<int>(frames),
                     p->meters);
+  p->shared.tunerHz.store(p->engine.tuner().frequency(),
+                          std::memory_order_relaxed);
+  p->shared.tunerCents.store(p->engine.tuner().cents(),
+                             std::memory_order_relaxed);
+  p->shared.tunerConfidence.store(p->engine.tuner().confidence(),
+                                  std::memory_order_relaxed);
+  p->shared.tunerNote.store(p->engine.tuner().midiNote(),
+                            std::memory_order_relaxed);
 
   if (p->inPeakL) *p->inPeakL = p->meters.inPeakLDb;
   if (p->inPeakR) *p->inPeakR = p->meters.inPeakRDb;

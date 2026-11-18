@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.3.1-alpha — 37 pedals, calibrated and metered.**
+**Status: 0.3.2-alpha — 37 pedals plus a built-in tuner.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -21,6 +21,8 @@ and full board visuals land in later milestones.
 ![Pedal Suite — more modulation and time](docs/pedal-board-more.png)
 
 ![Pedal Suite — dynamics and utility](docs/pedal-board-dyn.png)
+
+![Pedal Suite — tuner](docs/pedal-tuner.png)
 
 ## Current slice
 
@@ -72,6 +74,9 @@ and full board visuals land in later milestones.
 
 Compressors and gates report gain reduction to the pedals, the CLAP host and
 the LV2 `slotN_gr` ports. Delay and reverb tails keep ringing when bypassed.
+
+The **TUNER** button opens a monophonic tuner fed from the dry input, with
+note, octave, cents, frequency and confidence.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.

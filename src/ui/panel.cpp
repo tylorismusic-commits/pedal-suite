@@ -1004,6 +1004,99 @@ void Panel::drawAbout(cairo_t* cr, const Shared& /*shared*/,
   text(cr, "CLOSE", 860, 672, 9, 1, 0.10, 0.08, 0.05);
 }
 
+
+void Panel::drawTuner(cairo_t* cr, const Shared& shared,
+                      const PanelState& /*state*/) const {
+  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.72);
+  cairo_paint(cr);
+  const double bx = 200, by = 120, bw = 640, bh = 480;
+  roundRect(cr, bx, by, bw, bh, 8);
+  setRgb(cr, {0.10, 0.095, 0.085});
+  cairo_fill(cr);
+  setRgb(cr, kAccent, 0.85);
+  cairo_set_line_width(cr, 1.5);
+  roundRect(cr, bx + 0.5, by + 0.5, bw - 1, bh - 1, 8);
+  cairo_stroke(cr);
+
+  text(cr, "TUNER", 520, by + 42, 22, 1, kText.r, kText.g, kText.b);
+  text(cr, "A4 = 440 Hz  ·  monophonic", 520, by + 62, 8, 1, kDim.r,
+       kDim.g, kDim.b);
+
+  const float hz = shared.tunerHz.load(std::memory_order_relaxed);
+  const float cents = shared.tunerCents.load(std::memory_order_relaxed);
+  const float conf =
+      shared.tunerConfidence.load(std::memory_order_relaxed);
+  const int note = shared.tunerNote.load(std::memory_order_relaxed);
+  const bool tuned = note >= 0 && conf > 0.6f;
+
+  if (!tuned) {
+    text(cr, "PLAY A NOTE", 520, by + 190, 34, 1, 0.55, 0.54, 0.50);
+    text(cr, "Waiting for a stable pitch", 520, by + 220, 9, 1, kDim.r,
+         kDim.g, kDim.b);
+  } else {
+    static const char* kNames[12] = {"C",  "C#", "D",  "D#", "E",  "F",
+                                     "F#", "G",  "G#", "A",  "A#", "B"};
+    const int pc = ((note % 12) + 12) % 12;
+    const int octave = note / 12 - 1;
+    char noteBuf[16];
+    std::snprintf(noteBuf, sizeof(noteBuf), "%d", octave);
+    setRgb(cr, std::fabs(cents) < 5.0f ? Rgb{0.40, 0.92, 0.50}
+                                       : Rgb{0.98, 0.78, 0.34});
+    text(cr, kNames[pc], 512, by + 180, 96, 2, kText.r, kText.g, kText.b);
+    text(cr, noteBuf, 600, by + 180, 26, 0, kDim.r, kDim.g, kDim.b);
+  }
+
+  const double cx = 520.0, cy = by + 250.0, half = 240.0;
+  setRgb(cr, kEdge, 0.8);
+  cairo_set_line_width(cr, 1.2);
+  cairo_move_to(cr, cx - half, cy);
+  cairo_line_to(cr, cx + half, cy);
+  cairo_stroke(cr);
+  for (int tick = -5; tick <= 5; ++tick) {
+    const double tx = cx + half * (tick / 5.0);
+    const bool major = tick == 0 || std::abs(tick) == 5;
+    setRgb(cr, tick == 0 ? kAccent : kEdge, tick == 0 ? 1.0 : 0.7);
+    cairo_set_line_width(cr, tick == 0 ? 2.0 : 1.0);
+    cairo_move_to(cr, tx, cy - (major ? 14.0 : 8.0));
+    cairo_line_to(cr, tx, cy + (major ? 14.0 : 8.0));
+    cairo_stroke(cr);
+  }
+  setRgb(cr, {0.30, 0.85, 0.45}, 0.18);
+  cairo_rectangle(cr, cx - half * 0.10, cy - 18, half * 0.20, 36);
+  cairo_fill(cr);
+
+  const double clamped = std::clamp(static_cast<double>(cents), -50.0, 50.0);
+  const double mx = cx + half * (clamped / 50.0);
+  setRgb(cr, std::fabs(cents) < 5.0f ? Rgb{0.40, 0.92, 0.50}
+                                     : Rgb{0.98, 0.70, 0.30});
+  cairo_arc(cr, mx, cy, 7.0, 0, 2 * kPi);
+  cairo_fill(cr);
+
+  char buf[64];
+  if (tuned) {
+    std::snprintf(buf, sizeof(buf), "%+.1f cents", cents);
+    text(cr, buf, 520, by + 300, 18, 1, kText.r, kText.g, kText.b);
+    std::snprintf(buf, sizeof(buf), "%.1f Hz", hz);
+    text(cr, buf, 520, by + 326, 11, 1, kDim.r, kDim.g, kDim.b);
+  } else {
+    text(cr, "—", 520, by + 306, 22, 1, kDim.r, kDim.g, kDim.b);
+  }
+
+  // Confidence bar.
+  roundRect(cr, 370, by + 360, 300, 8, 3);
+  setRgb(cr, {0.16, 0.15, 0.13});
+  cairo_fill(cr);
+  roundRect(cr, 371, by + 361, 298 * std::clamp(conf, 0.0f, 1.0f), 6, 3);
+  setRgb(cr, conf > 0.6f ? Rgb{0.40, 0.90, 0.50} : Rgb{0.80, 0.55, 0.25});
+  cairo_fill(cr);
+  text(cr, "CONFIDENCE", 370, by + 353, 6.5, 0, kDim.r, kDim.g, kDim.b);
+
+  roundRect(cr, 720, 548, 80, 26, 4);
+  setRgb(cr, kAccent);
+  cairo_fill(cr);
+  text(cr, "CLOSE", 760, 565, 9, 1, 0.10, 0.08, 0.05);
+}
+
 void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   layout(shared, state);
   cairo_set_source_rgb(cr, 0.07, 0.065, 0.06);
@@ -1027,6 +1120,12 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   if (slotDragging_) drawDragGhost(cr, shared);
   drawLevelMeter(cr, 20, 100, 14, 520, state.inLevelL, state.inLevelR);
   drawLevelMeter(cr, 1006, 100, 14, 520, state.outLevelL, state.outLevelR);
+  roundRect(cr, 42, 632, 80, 22, 4);
+  setRgb(cr, state.tunerOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
+  cairo_fill(cr);
+  text(cr, "TUNER", 82, 647, 8.5, 1,
+       state.tunerOpen ? 0.10 : kDim.r, state.tunerOpen ? 0.08 : kDim.g,
+       state.tunerOpen ? 0.05 : kDim.b);
   text(cr, "IN", 27, 640, 8, 1, kDim.r, kDim.g, kDim.b);
   text(cr, "OUT", 1013, 640, 8, 1, kDim.r, kDim.g, kDim.b);
   text(cr, "INPUT", 96, 681, 7.5, 2, kDim.r, kDim.g, kDim.b);
@@ -1035,6 +1134,7 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
        kText.r, kText.g, kText.b);
   if (state.presetOpen) drawPresetList(cr, shared, state);
   if (state.aboutOpen) drawAbout(cr, shared, state);
+  if (state.tunerOpen) drawTuner(cr, shared, state);
   drawTextEntry(cr, state);
 }
 
@@ -1473,6 +1573,20 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
   } else if (state.textParam >= 0) {
     textKey(shared, state, kTextEnter, 0);
   }
+  if (state.tunerOpen) {
+    if ((x >= 720 && x <= 800 && y >= 548 && y <= 574) ||
+        x < 200 || x > 840 || y < 120 || y > 600) {
+      state.tunerOpen = false;
+    }
+    return true;
+  }
+  if (x >= 42 && x <= 122 && y >= 632 && y <= 654) {
+    state.tunerOpen = !state.tunerOpen;
+    state.aboutOpen = false;
+    state.presetOpen = 0;
+    state.browserSlot = -1;
+    return true;
+  }
   if (state.aboutOpen) {
     if (x >= 120 && x <= 178 && y >= 604 && y <= 630) {
       state.aboutScroll = std::max(0, state.aboutScroll - 1);
@@ -1504,6 +1618,7 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.aboutOpen = true;
     state.aboutScroll = 0;
     state.presetOpen = 0;
+    state.tunerOpen = false;
     return true;
   }
   if (x >= 706 && x <= 802 && y >= 20 && y <= 48) {

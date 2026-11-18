@@ -57,6 +57,7 @@ public:
     for (auto& p : bassEq_) p.prepare(sr_);
     for (auto& p : loFi_) p.prepare(sr_);
     for (auto& p : tapeSat_) p.prepare(sr_);
+    tuner_.prepare(sr_);
     reset();
   }
 
@@ -112,6 +113,7 @@ public:
 
     for (int i = 0; i < n; ++i) {
       const float inSampleL = left[i], inSampleR = right[i];
+      tuner_.process(inSampleL, inSampleR);
       float l = inSampleL * input_;
       float r = inSampleR * input_;
       const float dryL = l, dryR = r;
@@ -183,6 +185,8 @@ public:
       }
     }
   }
+
+  const stomp::modules::Tuner& tuner() const noexcept { return tuner_; }
 
   void reset() noexcept {
     for (auto& boost : boost_) boost.reset();
@@ -333,6 +337,7 @@ private:
   stomp::modules::BassEq bassEq_[kSlotCount];
   stomp::modules::LoFi loFi_[kSlotCount];
   stomp::modules::TapeSat tapeSat_[kSlotCount];
+  stomp::modules::Tuner tuner_;
 };
 
 } // namespace pedal

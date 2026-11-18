@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2-alpha — 2026-11-18
+
+- Added a built-in monophonic tuner with a YIN pitch detector.
+- The tuner shows note, octave, cents, frequency and confidence, and reads
+  the dry input before the pedalboard.
+- Open it from the TUNER button below the input meter.
+
 ## 0.3.1-alpha — 2026-11-18
 
 - QA pass across all 37 pedals with measurement-based tests.

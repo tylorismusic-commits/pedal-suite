@@ -32,6 +32,7 @@ struct PanelState {
   bool browserFresh = true;
   bool browserPresetFilter = false;
   bool aboutOpen = false;
+  bool tunerOpen = false;
   int aboutScroll = 0;
   int textParam = -1;
   std::string textBuffer;
@@ -126,6 +127,8 @@ private:
   void beginSlotDrag(PanelState& state, int slot, double x, double y);
   void drawDragGhost(cairo_t* cr, const Shared& shared) const;
   void drawAbout(cairo_t* cr, const Shared& shared,
+                 const PanelState& state) const;
+  void drawTuner(cairo_t* cr, const Shared& shared,
                  const PanelState& state) const;
   void drawPresetList(cairo_t* cr, const Shared& shared,
                       const PanelState& state) const;

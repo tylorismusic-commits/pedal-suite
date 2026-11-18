@@ -865,6 +865,14 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
   }
 
   s->engine.process(left, right, static_cast<int>(frames), s->meters);
+  s->shared.tunerHz.store(s->engine.tuner().frequency(),
+                          std::memory_order_relaxed);
+  s->shared.tunerCents.store(s->engine.tuner().cents(),
+                             std::memory_order_relaxed);
+  s->shared.tunerConfidence.store(s->engine.tuner().confidence(),
+                                  std::memory_order_relaxed);
+  s->shared.tunerNote.store(s->engine.tuner().midiNote(),
+                            std::memory_order_relaxed);
   emitGr(s, proc->out_events);
 
   s->shared.inPeakDb.store(s->meters.inPeakDb, std::memory_order_relaxed);

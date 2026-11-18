@@ -149,6 +149,10 @@ public:
     outPeakLDb.store(-120.0f);
     outPeakRDb.store(-120.0f);
     for (auto& g : slotGrDb) g.store(0.0f);
+    tunerHz.store(0.0f);
+    tunerCents.store(0.0f);
+    tunerConfidence.store(0.0f);
+    tunerNote.store(-1);
   }
 
   double get(uint32_t p) const noexcept {
@@ -189,6 +193,8 @@ public:
   std::atomic<float> inPeakLDb, inPeakRDb;
   std::atomic<float> outPeakLDb, outPeakRDb;
   std::atomic<float> slotGrDb[kSlotCount];
+  std::atomic<float> tunerHz, tunerCents, tunerConfidence;
+  std::atomic<int> tunerNote;
 
 private:
   std::atomic<double> values_[P_COUNT];

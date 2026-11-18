@@ -93,6 +93,15 @@ int main(int argc, char** argv) {
   cairo_surface_write_to_png(surf, (out + "/pedal-presets.png").c_str());
   state.presetOpen = 0;
 
+  state.tunerOpen = true;
+  s.tunerHz.store(440.0f);
+  s.tunerCents.store(3.2f);
+  s.tunerConfidence.store(0.93f);
+  s.tunerNote.store(69);
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-tuner.png").c_str());
+  state.tunerOpen = false;
+
   state.aboutOpen = true;
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-about.png").c_str());
