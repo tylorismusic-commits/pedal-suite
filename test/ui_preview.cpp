@@ -29,10 +29,20 @@ int main(int argc, char** argv) {
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board.png").c_str());
 
+  applyModuleDefaults(s, 0, static_cast<int>(ModuleId::TrebleBoost));
+  applyModuleDefaults(s, 1, static_cast<int>(ModuleId::Overdrive));
+  applyModuleDefaults(s, 2, static_cast<int>(ModuleId::BluesDrive));
+  applyModuleDefaults(s, 3, static_cast<int>(ModuleId::Distortion));
+  state.selectedSlot = 1;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-board-drive.png").c_str());
+
   state.boardPage = 1;
   state.selectedSlot = 4;
-  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::Boost));
-  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::Drive808));
+  applyModuleDefaults(s, 4, static_cast<int>(ModuleId::Rat));
+  applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BigFuzz));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::FuzzFace));
+  applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Drive808));
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-board-page2.png").c_str());
 

@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.1.2-alpha — pedalboard cards, footswitches and page 2.**
+**Status: 0.1.3-alpha — drive/fuzz family.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -24,6 +24,13 @@ and full board visuals land in later milestones.
 - Browser with **ALL / DRIVE / MOD / DYN / TIME / VERB / PRESETS**.
 - **Boost** — Gain, Tone, Level.
 - **808 Drive** — Drive, Tone, Level; retuned TS9/808 from Amp Suite.
+- **Treble Boost** — Boost, Range, Level.
+- **Overdrive** — Drive, Tone, Level, Mix.
+- **Blues Drive** — Drive, Tone, Level.
+- **Distortion** — Dist, Filter, Level.
+- **Rat** — Dist, Filter, Level.
+- **Big Fuzz** — Sustain, Tone, Level.
+- **Fuzz Face** — Fuzz, Bias, Volume.
 - Factory board presets: Clean Platform, 808 Stack, Lead Lift.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.

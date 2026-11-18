@@ -137,6 +137,43 @@ inline constexpr ControlDesc kDrive808Controls[] = {
     {2, "LEVEL", "Level", ControlFormat::Percent},
 };
 
+inline constexpr ControlDesc kTrebleBoostControls[] = {
+    {0, "BOOST", "Boost", ControlFormat::Percent},
+    {1, "RANGE", "Range", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kOverdriveControls[] = {
+    {0, "DRIVE", "Drive", ControlFormat::Percent},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kBluesDriveControls[] = {
+    {0, "DRIVE", "Drive", ControlFormat::Percent},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kDistortionControls[] = {
+    {0, "DIST", "Distortion", ControlFormat::Percent},
+    {1, "FILTER", "Filter", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kRatControls[] = {
+    {0, "DIST", "Distortion", ControlFormat::Percent},
+    {1, "FILTER", "Filter", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kBigFuzzControls[] = {
+    {0, "SUSTAIN", "Sustain", ControlFormat::Percent},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
+};
+inline constexpr ControlDesc kFuzzFaceControls[] = {
+    {0, "FUZZ", "Fuzz", ControlFormat::Percent},
+    {1, "BIAS", "Bias", ControlFormat::Percent},
+    {2, "VOLUME", "Volume", ControlFormat::Percent},
+};
+
 inline constexpr ModuleDesc kModules[] = {
     {ModuleId::Off, "Off", "Off", "Empty pedal slot", false, false, 0, 0,
      nullptr},
@@ -148,12 +185,51 @@ inline constexpr ModuleDesc kModules[] = {
      false, false, 0,
      static_cast<int>(sizeof(kDrive808Controls) / sizeof(kDrive808Controls[0])),
      kDrive808Controls},
+    {ModuleId::TrebleBoost, "Treble Boost", "Drive",
+     "Rangemaster-style treble booster", false, false, 0,
+     static_cast<int>(sizeof(kTrebleBoostControls) /
+                      sizeof(kTrebleBoostControls[0])),
+     kTrebleBoostControls},
+    {ModuleId::Overdrive, "Overdrive", "Drive", "Transparent soft-clip overdrive",
+     false, false, 0,
+     static_cast<int>(sizeof(kOverdriveControls) /
+                      sizeof(kOverdriveControls[0])),
+     kOverdriveControls},
+    {ModuleId::BluesDrive, "Blues Drive", "Drive", "Low-gain blues overdrive",
+     false, false, 0,
+     static_cast<int>(sizeof(kBluesDriveControls) /
+                      sizeof(kBluesDriveControls[0])),
+     kBluesDriveControls},
+    {ModuleId::Distortion, "Distortion", "Drive", "Hard-clip distortion", false,
+     false, 0,
+     static_cast<int>(sizeof(kDistortionControls) /
+                      sizeof(kDistortionControls[0])),
+     kDistortionControls},
+    {ModuleId::Rat, "Rat", "Drive", "Rat-style hard-clipping distortion", false,
+     false, 0,
+     static_cast<int>(sizeof(kRatControls) / sizeof(kRatControls[0])),
+     kRatControls},
+    {ModuleId::BigFuzz, "Big Fuzz", "Drive", "Sustaining muff-style fuzz", false,
+     false, 0,
+     static_cast<int>(sizeof(kBigFuzzControls) / sizeof(kBigFuzzControls[0])),
+     kBigFuzzControls},
+    {ModuleId::FuzzFace, "Fuzz Face", "Drive", "Germanium-style fuzz", false,
+     false, 0,
+     static_cast<int>(sizeof(kFuzzFaceControls) / sizeof(kFuzzFaceControls[0])),
+     kFuzzFaceControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
+    "Pedal Suite exclusive",
 };
 
 constexpr bool moduleSourcesComplete() noexcept {

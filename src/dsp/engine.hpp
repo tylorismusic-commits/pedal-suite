@@ -22,6 +22,13 @@ public:
     smooth_ = smooth;
     for (auto& boost : boost_) boost.prepare(sr_);
     for (auto& drive : drive_) drive.prepare(sr_);
+    for (auto& p : treble_) p.prepare(sr_);
+    for (auto& p : overdrive_) p.prepare(sr_);
+    for (auto& p : blues_) p.prepare(sr_);
+    for (auto& p : distortion_) p.prepare(sr_);
+    for (auto& p : rat_) p.prepare(sr_);
+    for (auto& p : bigFuzz_) p.prepare(sr_);
+    for (auto& p : fuzzFace_) p.prepare(sr_);
     reset();
   }
 
@@ -33,6 +40,13 @@ public:
       slot_[i] = c.slot[i];
       boost_[i].setControls(boostControlsFrom(c.slot[i]));
       drive_[i].setControls(drive808ControlsFrom(c.slot[i]));
+      treble_[i].setControls(trebleBoostControlsFrom(c.slot[i]));
+      overdrive_[i].setControls(overdriveControlsFrom(c.slot[i]));
+      blues_[i].setControls(bluesDriveControlsFrom(c.slot[i]));
+      distortion_[i].setControls(distortionControlsFrom(c.slot[i]));
+      rat_[i].setControls(ratControlsFrom(c.slot[i]));
+      bigFuzz_[i].setControls(bigFuzzControlsFrom(c.slot[i]));
+      fuzzFace_[i].setControls(fuzzFaceControlsFrom(c.slot[i]));
     }
   }
 
@@ -55,6 +69,27 @@ public:
             break;
           case ModuleId::Drive808:
             drive_[s].process(l, r);
+            break;
+          case ModuleId::TrebleBoost:
+            treble_[s].process(l, r);
+            break;
+          case ModuleId::Overdrive:
+            overdrive_[s].process(l, r);
+            break;
+          case ModuleId::BluesDrive:
+            blues_[s].process(l, r);
+            break;
+          case ModuleId::Distortion:
+            distortion_[s].process(l, r);
+            break;
+          case ModuleId::Rat:
+            rat_[s].process(l, r);
+            break;
+          case ModuleId::BigFuzz:
+            bigFuzz_[s].process(l, r);
+            break;
+          case ModuleId::FuzzFace:
+            fuzzFace_[s].process(l, r);
             break;
           case ModuleId::Off:
           case ModuleId::Count:
@@ -96,6 +131,13 @@ public:
   void reset() noexcept {
     for (auto& boost : boost_) boost.reset();
     for (auto& drive : drive_) drive.reset();
+    for (auto& p : treble_) p.reset();
+    for (auto& p : overdrive_) p.reset();
+    for (auto& p : blues_) p.reset();
+    for (auto& p : distortion_) p.reset();
+    for (auto& p : rat_) p.reset();
+    for (auto& p : bigFuzz_) p.reset();
+    for (auto& p : fuzzFace_) p.reset();
     input_ = inputTarget_;
     output_ = outputTarget_;
     power_ = powerTarget_;
@@ -111,6 +153,13 @@ private:
   SlotControls slot_[kSlotCount];
   stomp::modules::Boost boost_[kSlotCount];
   stomp::modules::Drive808 drive_[kSlotCount];
+  stomp::modules::TrebleBoost treble_[kSlotCount];
+  stomp::modules::Overdrive overdrive_[kSlotCount];
+  stomp::modules::BluesDrive blues_[kSlotCount];
+  stomp::modules::Distortion distortion_[kSlotCount];
+  stomp::modules::Rat rat_[kSlotCount];
+  stomp::modules::BigFuzz bigFuzz_[kSlotCount];
+  stomp::modules::FuzzFace fuzzFace_[kSlotCount];
 };
 
 } // namespace pedal

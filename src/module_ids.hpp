@@ -10,12 +10,21 @@ enum ModuleId : int {
   Off = 0,
   Boost,
   Drive808,
+  TrebleBoost,
+  Overdrive,
+  BluesDrive,
+  Distortion,
+  Rat,
+  BigFuzz,
+  FuzzFace,
   Count
 };
 
 constexpr int kModuleCount = static_cast<int>(ModuleId::Count);
 
-inline constexpr const char* kModuleLabels[] = {"Off", "Boost", "808 Drive"};
+inline constexpr const char* kModuleLabels[] = {
+    "Off",       "Boost",     "808 Drive",  "Treble Boost", "Overdrive",
+    "Blues Drive", "Distortion", "Rat",     "Big Fuzz",   "Fuzz Face"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -52,6 +61,56 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 0: return 0.28;  // Drive
         case 1: return 0.50;  // Tone
         case 2: return 0.55;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::TrebleBoost:
+      switch (control) {
+        case 0: return 0.50;  // Boost
+        case 1: return 0.50;  // Range
+        case 2: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::Overdrive:
+      switch (control) {
+        case 0: return 0.40;  // Drive
+        case 1: return 0.50;  // Tone
+        case 2: return 0.50;  // Level
+        case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::BluesDrive:
+      switch (control) {
+        case 0: return 0.35;  // Drive
+        case 1: return 0.50;  // Tone
+        case 2: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::Distortion:
+      switch (control) {
+        case 0: return 0.50;  // Dist
+        case 1: return 0.50;  // Filter
+        case 2: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::Rat:
+      switch (control) {
+        case 0: return 0.50;  // Dist
+        case 1: return 0.50;  // Filter
+        case 2: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::BigFuzz:
+      switch (control) {
+        case 0: return 0.50;  // Sustain
+        case 1: return 0.50;  // Tone
+        case 2: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::FuzzFace:
+      switch (control) {
+        case 0: return 0.60;  // Fuzz
+        case 1: return 0.50;  // Bias
+        case 2: return 0.50;  // Volume
         default: return 0.50;
       }
     default:

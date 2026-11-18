@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.3-alpha — 2026-11-18
+
+- Added the first drive/fuzz family: Treble Boost, Overdrive, Blues Drive,
+  Distortion, Rat, Big Fuzz and Fuzz Face.
+- Each pedal has its own faceplate color, 3–4 controls and footswitch.
+- Added factory pedal presets for the new family.
+- Added a full pedal-module finite sweep.
+- Fixed Fuzz Face bias so the ADAA clipper advances once per sample.
+
 ## 0.1.2-alpha — 2026-11-18
 
 - Matched the Amp Suite pedal card shape: 236×380 vertical stompboxes with

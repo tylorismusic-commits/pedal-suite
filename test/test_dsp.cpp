@@ -88,6 +88,35 @@ int main() {
       check(e.latencySamples() == 0, "pedalboard reports zero latency");
     }
   }
+  {
+    const int n = 12000;
+    std::vector<float> x(n);
+    for (int i = 0; i < n; ++i) {
+      x[i] = 0.2f * std::sin(2.0f * 3.14159265f * 330.0f * i / 48000.0f);
+    }
+    bool allFinite = true;
+    for (int id = 1; id < kModuleCount; ++id) {
+      Shared s;
+      initializeRack(s);
+      for (int slot = 0; slot < kSlotCount; ++slot) {
+        s.set(slotParam(slot, kSlotOffsetType), 0.0);
+      }
+      s.set(slotParam(0, kSlotOffsetType), static_cast<double>(id));
+      for (int k = 0; k < kRackControlCount; ++k) {
+        s.set(slotParam(0, kSlotOffsetC0 + k),
+              defaultControlValue(static_cast<ModuleId>(id), k));
+      }
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      auto l = x, r = x;
+      Meters m;
+      e.process(l.data(), r.data(), n, m);
+      for (float v : l) if (!std::isfinite(v)) allFinite = false;
+    }
+    check(allFinite, "every pedal module stays finite");
+  }
+
   std::printf("%d failure(s)\n", failures);
   return failures == 0 ? 0 : 1;
 }
