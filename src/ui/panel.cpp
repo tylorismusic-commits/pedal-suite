@@ -80,11 +80,11 @@ struct ModuleStyle {
 ModuleStyle styleFor(int type) {
   switch (static_cast<ModuleId>(type)) {
     case ModuleId::Boost:
-      return {{0.18, 0.14, 0.08}, {0.38, 0.30, 0.16},
-              {0.98, 0.78, 0.36}, {0.96, 0.90, 0.78}};
+      return {{0.34, 0.26, 0.08}, {0.46, 0.35, 0.11},
+              {0.98, 0.80, 0.38}, {0.96, 0.90, 0.78}};
     case ModuleId::Drive808:
-      return {{0.10, 0.16, 0.10}, {0.20, 0.36, 0.20},
-              {0.54, 0.92, 0.46}, {0.86, 0.95, 0.84}};
+      return {{0.18, 0.42, 0.20}, {0.10, 0.24, 0.12},
+              {0.62, 0.95, 0.50}, {0.86, 0.95, 0.84}};
     default:
       return {{0.105, 0.10, 0.095}, {0.24, 0.22, 0.19},
               {0.55, 0.50, 0.44}, {0.72, 0.70, 0.66}};
@@ -201,13 +201,14 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
   knob(P_INPUT, 140, 675, 16, "", -1, true);
   knob(P_OUTPUT, 860, 675, 16, "", -1, true);
 
-  const double colW = 220.0;
-  const double gap = 16.0;
+  const double colW = 236.0;
+  const double gap = 14.0;
+  const double y = 150.0;
+  const double h = 380.0;
   const int base = state.boardPage * 4;
   for (int i = 0; i < 4; ++i) {
     const int slot = base + i;
-    const double x = 48.0 + i * (colW + gap);
-    const double y = 92.0;
+    const double x = 32.0 + i * (colW + gap);
     const int type = static_cast<int>(
         shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
 
@@ -215,7 +216,7 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
     name.kind = Kind::ModuleName;
     name.param = static_cast<uint32_t>(slot);
     name.value = slot;
-    name.x = x + 10; name.y = y + 28; name.w = colW - 20; name.h = 28;
+    name.x = x + 12; name.y = y + 12; name.w = colW - 24; name.h = 32;
     name.styleSlot = slot;
     name.styleType = type;
     widgets_.push_back(name);
@@ -225,7 +226,7 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
       presets.kind = Kind::ModulePresetButton;
       presets.param = static_cast<uint32_t>(slot);
       presets.value = slot;
-      presets.x = x + colW - 70;
+      presets.x = x + colW - 72;
       presets.y = y + 8;
       presets.w = 60;
       presets.h = 15;
@@ -233,67 +234,57 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
       presets.styleSlot = slot;
       presets.styleType = type;
       widgets_.push_back(presets);
+
+      Widget foot{};
+      foot.kind = Kind::Footswitch;
+      foot.param = slotParam(slot, kSlotOffsetBypass);
+      foot.x = x + colW * 0.5;
+      foot.y = y + 326;
+      foot.r = 16;
+      foot.label = "FOOTSWITCH";
+      foot.styleSlot = slot;
+      foot.styleType = type;
+      widgets_.push_back(foot);
     }
 
     Widget handle{};
     handle.kind = Kind::ModuleDragHandle;
     handle.param = static_cast<uint32_t>(slot);
     handle.value = slot;
-    handle.x = x + 4; handle.y = y + 8; handle.w = colW - 8; handle.h = 52;
+    handle.x = x + 4; handle.y = y + 4; handle.w = colW - 8; handle.h = 46;
     handle.styleSlot = slot;
     handle.styleType = type;
     widgets_.push_back(handle);
 
-    Widget byp{};
-    byp.kind = Kind::Pill;
-    byp.param = slotParam(slot, kSlotOffsetBypass);
-    byp.x = x + 10; byp.y = y + 64; byp.w = colW - 20; byp.h = 22;
-    byp.label = "FOOTSWITCH";
-    byp.styleSlot = slot;
-    byp.styleType = type;
-    widgets_.push_back(byp);
-
     const ModuleDesc* module = moduleDesc(type);
-    const double cx1 = x + 58, cx2 = x + 162;
+    const double cx1 = x + 60, cx2 = x + 176;
     if (module->controlCount > 0) {
-      const int rows = (module->controlCount + 1) / 2;
-      const double rowH = rows >= 5 ? 68.0 : (rows >= 4 ? 82.0 : 96.0);
-      int toggleSlot = 0;
       for (int k = 0; k < module->controlCount; ++k) {
         const ControlDesc& control = module->controls[k];
-        if (control.toggled) {
-          Widget t{};
-          t.kind = Kind::ModuleToggle;
-          t.param = slotParam(slot, kSlotOffsetC0 + control.param);
-          t.x = x + 10;
-          t.y = y + 452.0 - toggleSlot * 30.0;
-          t.w = colW - 20;
-          t.h = 22;
-          t.label = control.label;
-          t.styleSlot = slot;
-          t.styleType = type;
-          widgets_.push_back(t);
-          ++toggleSlot;
-          continue;
+        double kx = (k & 1) ? cx2 : cx1;
+        double ky = y + 132.0 + (k / 2) * 86.0;
+        if (module->controlCount == 3 && k == 2) {
+          kx = x + colW * 0.5;
+          ky = y + 232.0;
         }
-        const double kx = (k & 1) ? cx2 : cx1;
-        const double ky = y + 165.0 + (k / 2) * rowH;
         knob(slotParam(slot, kSlotOffsetC0 + control.param), kx, ky, 22,
              control.label, slot, true, control.param,
              control.stepped ? control.labels.count : 0);
       }
     }
 
-    knob(slotParam(slot, kSlotOffsetMix), x + colW * 0.30, y + 512, 14,
-         "MIX", slot);
-    knob(slotParam(slot, kSlotOffsetGain), x + colW * 0.70, y + 512, 14,
-         "GAIN", slot);
+    if (type != static_cast<int>(ModuleId::Off)) {
+      knob(slotParam(slot, kSlotOffsetMix), x + colW * 0.34, 568, 14,
+           "MIX", slot);
+      knob(slotParam(slot, kSlotOffsetGain), x + colW * 0.66, 568, 14,
+           "GAIN", slot);
+    }
 
     Widget card{};
     card.kind = Kind::ModuleDragHandle;
     card.param = static_cast<uint32_t>(slot);
     card.value = slot;
-    card.x = x; card.y = y; card.w = colW; card.h = 556.0;
+    card.x = x; card.y = y; card.w = colW; card.h = h;
     card.styleSlot = slot;
     card.styleType = type;
     widgets_.push_back(card);
@@ -480,43 +471,86 @@ void Panel::drawHeader(cairo_t* cr, const Shared& shared, const PanelState& stat
 
 void Panel::drawRack(cairo_t* cr, const Shared& shared,
                      const PanelState& state) const {
-  const double colW = 220.0, gap = 16.0, y = 92.0, h = 556.0;
+  char pageLabel[48];
+  std::snprintf(pageLabel, sizeof(pageLabel), "PEDALBOARD  ·  PAGE %d",
+                state.boardPage + 1);
+  text(cr, pageLabel, 520, 118, 15, 1, kText.r, kText.g, kText.b);
+
+  const double colW = 236.0, gap = 14.0, y = 150.0, h = 380.0;
   const int base = state.boardPage * 4;
+
+  // Patch cables run through the gaps between pedals.
+  for (int i = 0; i < 3; ++i) {
+    const double x1 = 32.0 + i * (colW + gap) + colW + 1.0;
+    const double x2 = x1 + gap - 2.0;
+    const double yj = y + 300.0;
+    cairo_move_to(cr, x1, yj);
+    cairo_curve_to(cr, x1 + 5.0, yj + 11.0, x2 - 5.0, yj + 11.0, x2, yj);
+    cairo_set_source_rgba(cr, 0.015, 0.015, 0.018, 0.95);
+    cairo_set_line_width(cr, 4.5);
+    cairo_stroke_preserve(cr);
+    cairo_set_source_rgba(cr, 0.20, 0.21, 0.23, 0.55);
+    cairo_set_line_width(cr, 1.2);
+    cairo_stroke(cr);
+  }
+
   for (int i = 0; i < 4; ++i) {
     const int slot = base + i;
-    const double x = 48.0 + i * (colW + gap);
+    const double x = 32.0 + i * (colW + gap);
     const int type = static_cast<int>(
         shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
     const ModuleStyle st = styleFor(type);
-    roundRect(cr, x, y, colW, h, 6);
-    setRgb(cr, st.body); cairo_fill(cr);
+
+    roundRect(cr, x, y, colW, h, 8);
+    cairo_pattern_t* pat = cairo_pattern_create_linear(0, y, 0, y + h);
+    cairo_pattern_add_color_stop_rgb(pat, 0.0, st.body.r * 1.35,
+                                     st.body.g * 1.35, st.body.b * 1.35);
+    cairo_pattern_add_color_stop_rgb(pat, 1.0, st.body.r * 0.55,
+                                     st.body.g * 0.55, st.body.b * 0.55);
+    cairo_set_source(cr, pat);
+    cairo_fill(cr);
+    cairo_pattern_destroy(pat);
+    setRgb(cr, {0, 0, 0}, 0.38);
+    cairo_set_line_width(cr, 1.0);
+    roundRect(cr, x + 0.5, y + 0.5, colW - 1, h - 1, 8);
+    cairo_stroke(cr);
+
     const bool dropTarget = slotDragging_ && dropSlot_ == slot;
     cairo_set_line_width(
         cr, dropTarget ? 2.5 : (state.browserSlot == slot ? 2.0 : 1.0));
     setRgb(cr,
            dropTarget ? st.accent
                       : (state.browserSlot == slot ? st.accent : st.edge),
-           dropTarget ? 1.0 : (state.browserSlot == slot ? 1.0 : 0.75));
-    roundRect(cr, x + 0.5, y + 0.5, colW - 1, h - 1, 6); cairo_stroke(cr);
-    roundRect(cr, x + 1, y + 1, colW - 2, 7, 4);
-    setRgb(cr, st.accent, 0.95); cairo_fill(cr);
+           dropTarget ? 1.0 : (state.browserSlot == slot ? 1.0 : 0.65));
+    roundRect(cr, x + 0.5, y + 0.5, colW - 1, h - 1, 8);
+    cairo_stroke(cr);
+
     char num[24];
     std::snprintf(num, sizeof(num), "PEDAL %d", slot + 1);
-    text(cr, num, x + 10, y + 22, 8, 0, st.accent.r, st.accent.g, st.accent.b);
-    if (moduleHasGr(type)) {
-      drawGrMeter(cr, x + 10, y + 96, colW - 20, 8, state.slotGrDb[slot]);
-    }
+    text(cr, num, x + 12, y + 22, 7.5, 0, 0.90, 0.90, 0.86);
+
     if (type == static_cast<int>(ModuleId::Off)) {
-      text(cr, "EMPTY", x + colW * 0.5, y + 205, 15, 1, st.accent.r,
-           st.accent.g, st.accent.b);
-      text(cr, "CHOOSE A", x + colW * 0.5, y + 232, 7, 1, st.accent.r,
-           st.accent.g, st.accent.b);
-      text(cr, "PEDAL", x + colW * 0.5, y + 245, 7, 1, st.accent.r,
-           st.accent.g, st.accent.b);
+      text(cr, "EMPTY", x + colW * 0.5, y + 190, 15, 1, 0.92, 0.92, 0.88);
+      text(cr, "CHOOSE A", x + colW * 0.5, y + 216, 7, 1, 0.86, 0.86, 0.82);
+      text(cr, "PEDAL", x + colW * 0.5, y + 229, 7, 1, 0.86, 0.86, 0.82);
+    } else {
+      text(cr, slotModuleName(type), x + colW * 0.5, y + 38, 15, 1, 0.95,
+           0.95, 0.92);
     }
   }
-  text(cr, "VIRTUAL GUITAR & BASS PEDALBOARD", 520, 88.5, 8.5, 1, kDim.r,
-       kDim.g, kDim.b);
+
+  for (int i = 0; i < 4; ++i) {
+    const double x = 32.0 + i * (colW + gap);
+    const double yj = y + 300.0;
+    for (double jx : {x + 1.5, x + colW - 1.5}) {
+      cairo_arc(cr, jx, yj, 5.0, 0, 2 * kPi);
+      setRgb(cr, {0.12, 0.12, 0.13});
+      cairo_fill(cr);
+      cairo_arc(cr, jx, yj, 3.2, 0, 2 * kPi);
+      setRgb(cr, {0.42, 0.44, 0.46});
+      cairo_fill(cr);
+    }
+  }
 }
 
 int Panel::browserOptionCount(int category, const std::string& query,
@@ -949,6 +983,31 @@ void Panel::drawWidget(cairo_t* cr, const Widget& w, const Shared& shared,
       cairo_stroke(cr);
       text(cr, w.label, w.x + w.w * 0.5, w.y + w.h * 0.5 + 4, 9, 1,
            kText.r, kText.g, kText.b);
+      break;
+    }
+    case Kind::Footswitch: {
+      const bool on = shared.get(w.param) <= 0.5;
+      cairo_arc(cr, w.x, w.y, w.r + 4, 0, 2 * kPi);
+      setRgb(cr, {0.03, 0.03, 0.03}, 0.55);
+      cairo_fill(cr);
+      cairo_pattern_t* pat = cairo_pattern_create_radial(
+          w.x - w.r * 0.3, w.y - w.r * 0.35, w.r * 0.1, w.x, w.y, w.r);
+      cairo_pattern_add_color_stop_rgb(pat, 0.0, 0.76, 0.78, 0.80);
+      cairo_pattern_add_color_stop_rgb(pat, 1.0, 0.22, 0.23, 0.25);
+      cairo_arc(cr, w.x, w.y, w.r, 0, 2 * kPi);
+      cairo_set_source(cr, pat);
+      cairo_fill(cr);
+      cairo_pattern_destroy(pat);
+      cairo_arc(cr, w.x, w.y, w.r * 0.55, 0, 2 * kPi);
+      setRgb(cr, {0.10, 0.10, 0.11});
+      cairo_fill(cr);
+      cairo_arc(cr, w.x, w.y - w.r - 13, 5, 0, 2 * kPi);
+      setRgb(cr, on ? st.accent
+                    : Rgb{st.accent.r * 0.25, st.accent.g * 0.25,
+                          st.accent.b * 0.25});
+      cairo_fill(cr);
+      text(cr, on ? "ON" : "BYPASS", w.x, w.y + w.r + 17, 8, 1,
+           on ? 0.95 : 0.72, on ? 0.95 : 0.72, on ? 0.90 : 0.70);
       break;
     }
     case Kind::ModulePresetButton: {
@@ -1558,6 +1617,10 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
       case Kind::BrowserScroll:
       case Kind::BrowserSearch:
         break;
+      case Kind::Footswitch:
+        shared.set(w.param, shared.get(w.param) > 0.5 ? 0.0 : 1.0);
+        state.presetDirty = true;
+        return true;
       case Kind::ModuleToggle:
         shared.set(w.param, shared.get(w.param) > 0.5 ? 0.0 : 1.0);
         state.presetDirty = true;
@@ -1627,12 +1690,23 @@ bool Panel::pointerMove(Shared& shared, PanelState& state, double x, double y,
     if (slotDragging_) {
       dragX_ = x;
       dragY_ = y;
+      if (y >= 20.0 && y <= 48.0) {
+        if (x >= 610.0 && x <= 650.0 && state.boardPage != 0) {
+          state.boardPage = 0;
+          return true;
+        }
+        if (x >= 658.0 && x <= 698.0 && state.boardPage != 1) {
+          state.boardPage = 1;
+          return true;
+        }
+      }
       const int target = slotAtX(x, state.boardPage);
       if (target != dragSlot_) {
         moveSlot(shared, dragSlot_, target);
         dragSlot_ = target;
         dropSlot_ = target;
         state.selectedSlot = target;
+        state.boardPage = target / 4;
         state.presetDirty = true;
       } else {
         dropSlot_ = target;
@@ -2144,7 +2218,7 @@ std::vector<Panel::WidgetRect> Panel::widgetRects() const {
     r.param = w.param;
     r.label = w.label;
     r.knob = w.kind == Kind::Knob;
-    r.toggle = w.kind == Kind::Pill;
+    r.toggle = w.kind == Kind::Pill || w.kind == Kind::Footswitch;
     r.r = w.r;
     if (w.kind == Kind::Knob) {
       r.x = w.x - w.r; r.y = w.y - w.r; r.w = w.r * 2; r.h = w.r * 2;

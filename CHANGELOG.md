@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2-alpha — 2026-11-18
+
+- Matched the Amp Suite pedal card shape: 236×380 vertical stompboxes with
+  gradient faceplates, stage-size knobs and accurate 808 green / boost gold.
+- Replaced the bypass bar with a circular footswitch, metal cap and LED.
+- Moved MIX and GAIN below each pedal, with MIX under the pedal body.
+- Added patch cables and side jacks between pedals.
+- Added page switching while dragging for page-1 ↔ page-2 reordering.
+- Page 2 carries its own pedals and the same card layout.
+
 ## 0.1.1-alpha — 2026-11-18
 
 - Link pedal-dsp into the LV2 module so 808 Drive resolves at load time.

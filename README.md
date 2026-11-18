@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.1.0-alpha — first playable pedalboard skeleton.**
+**Status: 0.1.2-alpha — pedalboard cards, footswitches and page 2.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -18,8 +18,9 @@ and full board visuals land in later milestones.
 
 - 1040×720 panel with power, preset bar, page buttons and utility pills.
 - Four wide pedal slots per page; **PAGE 1** = pedals 1–4, **PAGE 2** = 5–8.
-- Per-pedal footswitch, preset button, mix and gain.
-- Drag a pedal name or card to reorder within a page.
+- Amp Suite-style pedal cards: gradient faceplates, footswitch, LED, preset button.
+- MIX and GAIN sit below each pedal body.
+- Drag a pedal name or card to reorder, including page-to-page moves.
 - Browser with **ALL / DRIVE / MOD / DYN / TIME / VERB / PRESETS**.
 - **Boost** — Gain, Tone, Level.
 - **808 Drive** — Drive, Tone, Level; retuned TS9/808 from Amp Suite.

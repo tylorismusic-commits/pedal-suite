@@ -71,7 +71,7 @@ int main() {
   panel.draw(cr, s, state);
 
   // Add a Boost to slot 5.
-  panel.pointerDown(s, state, 158, 134, false);
+  panel.pointerDown(s, state, 158, 180, false);
   panel.pointerUp(s, state);
   panel.draw(cr, s, state);
   check(clickLabel(panel, s, state, "DRIVE"), "browser offers DRIVE");
