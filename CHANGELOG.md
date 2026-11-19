@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.2-alpha — 2026-11-19
+
+- Narrowed the pedal cards and moved them left so the fourth pedal no longer
+  hides behind the output meter.
+- Moved TUNER and MIDI into a stacked utility strip on the right side, below
+  the header buttons. The footer is back to just INPUT/OUTPUT.
+- Updated drag/reorder hit-testing for the new board geometry.
+
 ## 0.8.1-alpha — 2026-11-19
 
 - Reverted the board rails, screws and colour-coded patch cables; the original

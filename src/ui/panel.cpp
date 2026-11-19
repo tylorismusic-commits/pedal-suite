@@ -22,6 +22,19 @@ namespace {
 
 constexpr double kPi = 3.14159265358979323846;
 
+// Pedalboard geometry.  The right-hand strip leaves room for the utility
+// buttons and keeps the fourth pedal clear of the output meter.
+constexpr double kPedalStartX = 38.0;
+constexpr double kPedalWidth = 210.0;
+constexpr double kPedalGap = 12.0;
+constexpr double kPedalY = 150.0;
+constexpr double kPedalH = 380.0;
+constexpr double kUtilityX = 926.0;
+constexpr double kUtilityW = 70.0;
+constexpr double kUtilityH = 24.0;
+constexpr double kTunerY = 150.0;
+constexpr double kMidiY = 182.0;
+
 // Rack preset browser geometry.
 constexpr double kPresetListX = 72.0;
 constexpr double kPresetListY = 54.0;
@@ -352,14 +365,14 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
   knob(P_INPUT, 140, 675, 16, "", -1, true);
   knob(P_OUTPUT, 860, 675, 16, "", -1, true);
 
-  const double colW = 236.0;
-  const double gap = 14.0;
-  const double y = 150.0;
-  const double h = 380.0;
+  const double colW = kPedalWidth;
+  const double gap = kPedalGap;
+  const double y = kPedalY;
+  const double h = kPedalH;
   const int base = state.boardPage * 4;
   for (int i = 0; i < 4; ++i) {
     const int slot = base + i;
-    const double x = 32.0 + i * (colW + gap);
+    const double x = kPedalStartX + i * (colW + gap);
     const int type = static_cast<int>(
         shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
 
@@ -684,12 +697,12 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
                 state.boardPage + 1);
   text(cr, pageLabel, 520, 118, 15, 1, kText.r, kText.g, kText.b);
 
-  const double colW = 236.0, gap = 14.0, y = 150.0, h = 380.0;
+  const double colW = kPedalWidth, gap = kPedalGap, y = kPedalY, h = kPedalH;
   const int base = state.boardPage * 4;
 
   // Patch cables run through the gaps between pedals.
   for (int i = 0; i < 3; ++i) {
-    const double x1 = 32.0 + i * (colW + gap) + colW + 1.0;
+    const double x1 = kPedalStartX + i * (colW + gap) + colW + 1.0;
     const double x2 = x1 + gap - 2.0;
     const double yj = y + 300.0;
     cairo_move_to(cr, x1, yj);
@@ -704,7 +717,7 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
 
   for (int i = 0; i < 4; ++i) {
     const int slot = base + i;
-    const double x = 32.0 + i * (colW + gap);
+    const double x = kPedalStartX + i * (colW + gap);
     const int type = static_cast<int>(
         shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
     const ModuleStyle st = styleFor(type);
@@ -761,7 +774,7 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
   }
 
   for (int i = 0; i < 4; ++i) {
-    const double x = 32.0 + i * (colW + gap);
+    const double x = kPedalStartX + i * (colW + gap);
     const double yj = y + 300.0;
     for (double jx : {x + 1.5, x + colW - 1.5}) {
       cairo_arc(cr, jx, yj, 5.0, 0, 2 * kPi);
@@ -1404,16 +1417,17 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   if (slotDragging_) drawDragGhost(cr, shared);
   drawLevelMeter(cr, 20, 100, 14, 520, state.inLevelL, state.inLevelR);
   drawLevelMeter(cr, 1006, 100, 14, 520, state.outLevelL, state.outLevelR);
-  roundRect(cr, 42, 632, 80, 22, 4);
+  // Utility stack in the right-hand strip, below the header buttons.
+  roundRect(cr, kUtilityX, kTunerY, kUtilityW, kUtilityH, 4);
   setRgb(cr, state.tunerOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
   cairo_fill(cr);
-  text(cr, "TUNER", 82, 647, 8.5, 1,
+  text(cr, "TUNER", kUtilityX + kUtilityW * 0.5, kTunerY + 15, 8.5, 1,
        state.tunerOpen ? 0.10 : kDim.r, state.tunerOpen ? 0.08 : kDim.g,
        state.tunerOpen ? 0.05 : kDim.b);
-  roundRect(cr, 210, 600, 72, 22, 4);
+  roundRect(cr, kUtilityX, kMidiY, kUtilityW, kUtilityH, 4);
   setRgb(cr, state.midiOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
   cairo_fill(cr);
-  text(cr, "MIDI", 246, 615, 8.5, 1,
+  text(cr, "MIDI", kUtilityX + kUtilityW * 0.5, kMidiY + 15, 8.5, 1,
        state.midiOpen ? 0.10 : kDim.r, state.midiOpen ? 0.08 : kDim.g,
        state.midiOpen ? 0.05 : kDim.b);
   text(cr, "IN", 27, 640, 8, 1, kDim.r, kDim.g, kDim.b);
@@ -1832,9 +1846,9 @@ bool Panel::hitWidget(const Widget& w, double x, double y) const {
 }
 
 int Panel::slotAtX(double x, int page) const {
-  constexpr double colW = 220.0;
-  constexpr double gap = 16.0;
-  constexpr double start = 48.0;
+  constexpr double colW = kPedalWidth;
+  constexpr double gap = kPedalGap;
+  constexpr double start = kPedalStartX;
   const double center = start + colW * 0.5;
   const int column =
       static_cast<int>(std::lround((x - center) / (colW + gap)));
@@ -1989,7 +2003,8 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     }
     return true;
   }
-  if (x >= 42 && x <= 122 && y >= 632 && y <= 654) {
+  if (x >= kUtilityX && x <= kUtilityX + kUtilityW &&
+      y >= kTunerY && y <= kTunerY + kUtilityH) {
     state.tunerOpen = !state.tunerOpen;
     state.midiOpen = false;
     state.aboutOpen = false;
@@ -1997,7 +2012,8 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.browserSlot = -1;
     return true;
   }
-  if (x >= 210 && x <= 282 && y >= 600 && y <= 622) {
+  if (x >= kUtilityX && x <= kUtilityX + kUtilityW &&
+      y >= kMidiY && y <= kMidiY + kUtilityH) {
     state.midiOpen = !state.midiOpen;
     state.tunerOpen = false;
     state.aboutOpen = false;
