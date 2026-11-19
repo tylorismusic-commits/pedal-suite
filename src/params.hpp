@@ -278,6 +278,13 @@ public:
   std::atomic<bool> midiLearnExpr{false};
   std::atomic<int> midiLearnSlotState{-1};
   std::atomic<bool> midiLearnExprState{false};
+  // Performance requests raised by MIDI and consumed by the editor.
+  std::atomic<uint32_t> midiSetlistNextSeq{0};
+  std::atomic<uint32_t> midiSetlistPrevSeq{0};
+  std::atomic<uint32_t> midiSetlistPcSeq{0};
+  std::atomic<int> midiSetlistPcValue{-1};
+  std::atomic<uint32_t> midiBankNextSeq{0};
+  std::atomic<uint32_t> midiBankPrevSeq{0};
   std::atomic<int> irBankCount{0};
   std::atomic<int> namBankCount{0};
 

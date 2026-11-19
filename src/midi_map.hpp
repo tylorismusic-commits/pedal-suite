@@ -18,6 +18,13 @@ inline constexpr int footswitchSlotForNote(int note) noexcept {
   return -1;
 }
 
+// Performance controls. Program Change selects a setlist entry (or a preset
+// within the current bank when no setlist is active).
+inline constexpr int kSetlistPrevCc = 28;
+inline constexpr int kSetlistNextCc = 29;
+inline constexpr int kBankPrevCc = 30;
+inline constexpr int kBankNextCc = 31;
+
 // CC 20..27 and 80..87 are the common footswitch assignments.
 inline constexpr int footswitchSlotForCc(int cc) noexcept {
   if (cc >= 20 && cc < 20 + kSlotCount) return cc - 20;

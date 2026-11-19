@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.5-alpha — 2026-11-19
+
+- MIDI control for setlists and banks:
+  - CC 28 / 29 = previous / next setlist entry.
+  - CC 30 / 31 = previous / next preset bank.
+  - Program Change selects an entry in the active setlist, or a preset within
+    the current bank when no setlist is active.
+- CLAP consumes the events directly; LV2 transfers them to the UI through
+  sequence and value ports.
+- Fixed expression mode swallowing unrelated CC messages.
+- MIDI panel now documents the performance mapping.
+
 ## 0.8.4-alpha — 2026-11-19
 
 - Board preset banks: the preset browser now filters by **ALL**, each factory

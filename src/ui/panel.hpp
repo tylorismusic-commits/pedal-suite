@@ -45,6 +45,11 @@ struct PanelState {
   int presetBank = 0;
   int midiLearnSlot = -1;
   bool midiLearnExpr = false;
+  uint32_t midiSetlistNextSeen = 0;
+  uint32_t midiSetlistPrevSeen = 0;
+  uint32_t midiSetlistPcSeen = 0;
+  uint32_t midiBankNextSeen = 0;
+  uint32_t midiBankPrevSeen = 0;
   int irPickerSlot = -1;
   int irScroll = 0;
   bool pickerNam = false;
@@ -77,7 +82,7 @@ public:
   Panel& operator=(const Panel&) = delete;
 
   void loadFont(const std::string& dir);
-  void tick(const Shared& shared, PanelState& state) const;
+  void tick(Shared& shared, PanelState& state) const;
   void draw(cairo_t* cr, Shared& shared, const PanelState& state);
 
   bool pointerDown(Shared& shared, PanelState& state, double x, double y,
@@ -89,6 +94,7 @@ public:
   void applyPreset(Shared& shared, PanelState& state, int index) const;
   int presetCount() const;
   const char* presetName(int index) const;
+  void reloadSetlists();
   bool wheel(Shared& shared, PanelState& state, double x, double y, double dy);
   void beginTextEntry(Shared& shared, PanelState& state, double x, double y);
   static constexpr int kTextEnter = 1;
@@ -150,7 +156,6 @@ private:
                 const PanelState& state) const;
   void drawSetlist(cairo_t* cr, const Shared& shared,
                    const PanelState& state) const;
-  void reloadSetlists();
   std::vector<std::string> presetBankNames() const;
   std::vector<int> presetOrderForBank(int bank) const;
   int resolveSetlistEntry(const SetlistEntry& entry) const;

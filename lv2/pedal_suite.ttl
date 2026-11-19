@@ -24,7 +24,7 @@
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     lv2:minorVersion 8 ;
-    lv2:microVersion 4 ;
+    lv2:microVersion 5 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
     ui:ui <https://github.com/tylorismusic-commits/pedal-suite#ui> ;
@@ -2248,6 +2248,72 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 177 ;
+        lv2:symbol "midi_setlist_next" ;
+        lv2:name "MIDI Setlist Next" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 178 ;
+        lv2:symbol "midi_setlist_prev" ;
+        lv2:name "MIDI Setlist Previous" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 179 ;
+        lv2:symbol "midi_setlist_pc_seq" ;
+        lv2:name "MIDI Setlist PC Seq" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 180 ;
+        lv2:symbol "midi_setlist_pc_value" ;
+        lv2:name "MIDI Setlist PC Value" ;
+        lv2:default 0 ;
+        lv2:minimum -1 ;
+        lv2:maximum 127 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 181 ;
+        lv2:symbol "midi_bank_next" ;
+        lv2:name "MIDI Bank Next" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 182 ;
+        lv2:symbol "midi_bank_prev" ;
+        lv2:name "MIDI Bank Previous" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000000 ;
         lv2:portProperty pprops:notOnGUI ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
     ] .

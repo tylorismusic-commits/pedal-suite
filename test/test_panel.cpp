@@ -160,6 +160,38 @@ int main() {
   check(!state.setlistOpen, "setlist manager closes");
   state.presetBank = 0;
 
+  // MIDI bank and setlist control.
+  s.midiBankNextSeq.store(1);
+  panel.tick(s, state);
+  check(state.presetBank == 1, "MIDI bank next advances the bank filter");
+  s.midiBankPrevSeq.store(1);
+  panel.tick(s, state);
+  check(state.presetBank == 0, "MIDI bank previous returns to ALL");
+
+  Setlist midiSet;
+  midiSet.name = "MIDI Set";
+  midiSet.entries = {{"Clean Platform", true}, {"808 Stack", true}};
+  writeSetlist(setlistDir(), midiSet);
+  panel.reloadSetlists();
+  state.setlistIndex = 0;
+  state.setlistEntry = 0;
+  s.midiSetlistNextSeq.store(1);
+  panel.tick(s, state);
+  check(state.presetIndex == 2 && state.setlistEntry == 1,
+        "MIDI setlist next loads the next entry");
+  s.midiSetlistPrevSeq.store(1);
+  panel.tick(s, state);
+  check(state.presetIndex == 1 && state.setlistEntry == 0,
+        "MIDI setlist previous loads the previous entry");
+  deleteSetlist(setlistDir(), "MIDI Set");
+  panel.reloadSetlists();
+
+  s.midiSetlistPcValue.store(2);
+  s.midiSetlistPcSeq.store(1);
+  panel.tick(s, state);
+  check(state.presetIndex == 2,
+        "MIDI Program Change selects a preset in the current bank");
+
   // Browser categories: UTIL, AMP and PRESETS.
   state.browserSlot = 4;
   state.browserCategory = 1;

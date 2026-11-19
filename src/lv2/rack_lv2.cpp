@@ -55,6 +55,12 @@ enum Port : uint32_t {
   PORT_MIDI_LEARN_EXPR,
   PORT_MIDI_LEARN_SLOT_STATE,
   PORT_MIDI_LEARN_EXPR_STATE,
+  PORT_MIDI_SETLIST_NEXT,
+  PORT_MIDI_SETLIST_PREV,
+  PORT_MIDI_SETLIST_PC_SEQ,
+  PORT_MIDI_SETLIST_PC_VALUE,
+  PORT_MIDI_BANK_NEXT,
+  PORT_MIDI_BANK_PREV,
   PORT_COUNT
 };
 
@@ -86,6 +92,12 @@ struct Plugin {
   float* midiLearnExprPort = nullptr;
   float* midiLearnSlotStatePort = nullptr;
   float* midiLearnExprStatePort = nullptr;
+  float* midiSetlistNextPort = nullptr;
+  float* midiSetlistPrevPort = nullptr;
+  float* midiSetlistPcSeqPort = nullptr;
+  float* midiSetlistPcValuePort = nullptr;
+  float* midiBankNextPort = nullptr;
+  float* midiBankPrevPort = nullptr;
   float lastLearnSlot = -2.0f;
   float lastLearnExpr = -1.0f;
   uint8_t lastCc[128] = {};
@@ -175,6 +187,24 @@ void connectPort(LV2_Handle handle, uint32_t port, void* data) {
     case PORT_MIDI_LEARN_EXPR_STATE:
       p->midiLearnExprStatePort = static_cast<float*>(data);
       break;
+    case PORT_MIDI_SETLIST_NEXT:
+      p->midiSetlistNextPort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_SETLIST_PREV:
+      p->midiSetlistPrevPort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_SETLIST_PC_SEQ:
+      p->midiSetlistPcSeqPort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_SETLIST_PC_VALUE:
+      p->midiSetlistPcValuePort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_BANK_NEXT:
+      p->midiBankNextPort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_BANK_PREV:
+      p->midiBankPrevPort = static_cast<float*>(data);
+      break;
     default:
       if (port >= PORT_FIRST_PARAM &&
           port < PORT_FIRST_PARAM + pedal::P_COUNT) {
@@ -238,6 +268,12 @@ void run(LV2_Handle handle, uint32_t frames) {
       }
       const uint8_t* msg = reinterpret_cast<const uint8_t*>(ev + 1);
       const uint8_t status = msg[0] & 0xF0;
+      if (status == 0xC0) {
+        p->shared.midiSetlistPcValue.store(msg[1] & 0x7F,
+                                           std::memory_order_relaxed);
+        p->shared.midiSetlistPcSeq.fetch_add(1, std::memory_order_release);
+        continue;
+      }
       if (status == 0x90 && msg[2] > 0) {
         const int note = msg[1] & 0x7F;
         const int learnSlot = p->shared.midiLearnSlot.load();
@@ -264,10 +300,9 @@ void run(LV2_Handle handle, uint32_t frames) {
           p->shared.midiLearnExprState.store(false);
           continue;
         }
-        if (pedal::expressionEnabled(p->shared)) {
-          if (cc == pedal::expressionCc(p->shared)) {
-            pedal::applyExpression(p->shared, (msg[2] & 0x7F) / 127.0f);
-          }
+        if (pedal::expressionEnabled(p->shared) &&
+            cc == pedal::expressionCc(p->shared)) {
+          pedal::applyExpression(p->shared, (msg[2] & 0x7F) / 127.0f);
           continue;
         }
         if (cc == 11 || cc == 4) {
@@ -275,6 +310,27 @@ void run(LV2_Handle handle, uint32_t frames) {
           continue;
         }
         const bool now = (msg[2] & 0x7F) >= 64;
+        if (cc == pedal::kSetlistPrevCc || cc == pedal::kSetlistNextCc ||
+            cc == pedal::kBankPrevCc || cc == pedal::kBankNextCc) {
+          const bool was = p->lastCc[cc] >= 64;
+          p->lastCc[cc] = msg[2] & 0x7F;
+          if (now && !was) {
+            if (cc == pedal::kSetlistPrevCc) {
+              p->shared.midiSetlistPrevSeq.fetch_add(
+                  1, std::memory_order_release);
+            } else if (cc == pedal::kSetlistNextCc) {
+              p->shared.midiSetlistNextSeq.fetch_add(
+                  1, std::memory_order_release);
+            } else if (cc == pedal::kBankPrevCc) {
+              p->shared.midiBankPrevSeq.fetch_add(1,
+                                                  std::memory_order_release);
+            } else {
+              p->shared.midiBankNextSeq.fetch_add(1,
+                                                  std::memory_order_release);
+            }
+          }
+          continue;
+        }
         const bool was = p->lastCc[cc] >= 64;
         p->lastCc[cc] = msg[2] & 0x7F;
         if (now && !was) {
@@ -292,6 +348,31 @@ void run(LV2_Handle handle, uint32_t frames) {
   if (p->midiLearnExprStatePort) {
     *p->midiLearnExprStatePort =
         p->shared.midiLearnExprState.load() ? 1.0f : 0.0f;
+  }
+  if (p->midiSetlistNextPort) {
+    *p->midiSetlistNextPort = static_cast<float>(
+        p->shared.midiSetlistNextSeq.load(std::memory_order_relaxed));
+  }
+  if (p->midiSetlistPrevPort) {
+    *p->midiSetlistPrevPort = static_cast<float>(
+        p->shared.midiSetlistPrevSeq.load(std::memory_order_relaxed));
+  }
+  if (p->midiSetlistPcSeqPort) {
+    *p->midiSetlistPcSeqPort = static_cast<float>(
+        p->shared.midiSetlistPcSeq.load(std::memory_order_relaxed));
+  }
+  if (p->midiSetlistPcValuePort) {
+    *p->midiSetlistPcValuePort =
+        static_cast<float>(p->shared.midiSetlistPcValue.load(
+            std::memory_order_relaxed));
+  }
+  if (p->midiBankNextPort) {
+    *p->midiBankNextPort = static_cast<float>(
+        p->shared.midiBankNextSeq.load(std::memory_order_relaxed));
+  }
+  if (p->midiBankPrevPort) {
+    *p->midiBankPrevPort = static_cast<float>(
+        p->shared.midiBankPrevSeq.load(std::memory_order_relaxed));
   }
 
   p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());

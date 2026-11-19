@@ -40,6 +40,12 @@ constexpr uint32_t kLearnSlotPort = kMidiInPort + 1;
 constexpr uint32_t kLearnExprPort = kMidiInPort + 2;
 constexpr uint32_t kLearnSlotStatePort = kMidiInPort + 3;
 constexpr uint32_t kLearnExprStatePort = kMidiInPort + 4;
+constexpr uint32_t kSetlistNextPort = kMidiInPort + 5;
+constexpr uint32_t kSetlistPrevPort = kMidiInPort + 6;
+constexpr uint32_t kSetlistPcSeqPort = kMidiInPort + 7;
+constexpr uint32_t kSetlistPcValuePort = kMidiInPort + 8;
+constexpr uint32_t kBankNextPort = kMidiInPort + 9;
+constexpr uint32_t kBankPrevPort = kMidiInPort + 10;
 constexpr auto kFrameInterval = std::chrono::milliseconds(33);
 
 struct Ui {
@@ -380,6 +386,41 @@ void uiPortEvent(LV2UI_Handle handle, uint32_t port, uint32_t size,
     const bool on = v > 0.5f;
     ui->shared.midiLearnExprState.store(on);
     if (!on) ui->shared.midiLearnExpr.store(false);
+    ui->dirty = true;
+    return;
+  }
+  if (port == kSetlistNextPort) {
+    ui->shared.midiSetlistNextSeq.store(
+        static_cast<uint32_t>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kSetlistPrevPort) {
+    ui->shared.midiSetlistPrevSeq.store(
+        static_cast<uint32_t>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kSetlistPcSeqPort) {
+    ui->shared.midiSetlistPcSeq.store(
+        static_cast<uint32_t>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kSetlistPcValuePort) {
+    ui->shared.midiSetlistPcValue.store(static_cast<int>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kBankNextPort) {
+    ui->shared.midiBankNextSeq.store(
+        static_cast<uint32_t>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kBankPrevPort) {
+    ui->shared.midiBankPrevSeq.store(
+        static_cast<uint32_t>(std::lround(v)));
     ui->dirty = true;
     return;
   }

@@ -385,7 +385,7 @@ void Panel::text(cairo_t* cr, const char* s, double x, double y, double size,
   cairo_show_text(cr, s);
 }
 
-void Panel::tick(const Shared& shared, PanelState& state) const {
+void Panel::tick(Shared& shared, PanelState& state) const {
   state.inLevelL = shared.inPeakLDb.load(std::memory_order_relaxed);
   state.inLevelR = shared.inPeakRDb.load(std::memory_order_relaxed);
   state.outLevelL = shared.outPeakLDb.load(std::memory_order_relaxed);
@@ -396,6 +396,104 @@ void Panel::tick(const Shared& shared, PanelState& state) const {
       shared.midiLearnSlotState.load(std::memory_order_relaxed);
   state.midiLearnExpr =
       shared.midiLearnExprState.load(std::memory_order_relaxed);
+
+  const uint32_t bankNext =
+      shared.midiBankNextSeq.load(std::memory_order_acquire);
+  if (bankNext != state.midiBankNextSeen) {
+    state.midiBankNextSeen = bankNext;
+    const int n = static_cast<int>(presetBankNames().size());
+    if (n > 0) {
+      state.presetBank = (state.presetBank + 1) % n;
+      state.presetScroll = 0;
+    }
+  }
+  const uint32_t bankPrev =
+      shared.midiBankPrevSeq.load(std::memory_order_acquire);
+  if (bankPrev != state.midiBankPrevSeen) {
+    state.midiBankPrevSeen = bankPrev;
+    const int n = static_cast<int>(presetBankNames().size());
+    if (n > 0) {
+      state.presetBank = (state.presetBank + n - 1) % n;
+      state.presetScroll = 0;
+    }
+  }
+
+  auto loadSetlistIndex = [&](int index) {
+    if (setlists_.empty()) return;
+    const int setCount = static_cast<int>(setlists_.size());
+    state.setlistIndex = std::clamp(state.setlistIndex, 0, setCount - 1);
+    const Setlist& set = setlists_[static_cast<size_t>(state.setlistIndex)];
+    if (index < 0 || index >= static_cast<int>(set.entries.size())) return;
+    state.setlistEntry = index;
+    state.setlistEntryScroll =
+        std::max(0, std::min(index - 5,
+                             static_cast<int>(set.entries.size()) - 12));
+    const int resolved =
+        resolveSetlistEntry(set.entries[static_cast<size_t>(index)]);
+    if (resolved >= 0) applyPreset(shared, state, resolved);
+  };
+
+  const uint32_t setlistNext =
+      shared.midiSetlistNextSeq.load(std::memory_order_acquire);
+  if (setlistNext != state.midiSetlistNextSeen) {
+    state.midiSetlistNextSeen = setlistNext;
+    if (!setlists_.empty()) {
+      state.setlistIndex = std::clamp(
+          state.setlistIndex, 0, static_cast<int>(setlists_.size()) - 1);
+      const int count = static_cast<int>(
+          setlists_[static_cast<size_t>(state.setlistIndex)].entries.size());
+      if (count > 0) {
+        const int next =
+            state.setlistEntry < 0 || state.setlistEntry + 1 >= count
+                ? 0
+                : state.setlistEntry + 1;
+        loadSetlistIndex(next);
+      }
+    }
+  }
+  const uint32_t setlistPrev =
+      shared.midiSetlistPrevSeq.load(std::memory_order_acquire);
+  if (setlistPrev != state.midiSetlistPrevSeen) {
+    state.midiSetlistPrevSeen = setlistPrev;
+    if (!setlists_.empty()) {
+      state.setlistIndex = std::clamp(
+          state.setlistIndex, 0, static_cast<int>(setlists_.size()) - 1);
+      const int count = static_cast<int>(
+          setlists_[static_cast<size_t>(state.setlistIndex)].entries.size());
+      if (count > 0) {
+        const int prev = state.setlistEntry <= 0 ? count - 1
+                                                 : state.setlistEntry - 1;
+        loadSetlistIndex(prev);
+      }
+    }
+  }
+
+  const uint32_t pcSeq =
+      shared.midiSetlistPcSeq.load(std::memory_order_acquire);
+  if (pcSeq != state.midiSetlistPcSeen) {
+    state.midiSetlistPcSeen = pcSeq;
+    const int program =
+        shared.midiSetlistPcValue.load(std::memory_order_relaxed);
+    if (program >= 0) {
+      bool usedSetlist = false;
+      if (!setlists_.empty()) {
+        state.setlistIndex = std::clamp(
+            state.setlistIndex, 0, static_cast<int>(setlists_.size()) - 1);
+        const int count = static_cast<int>(
+            setlists_[static_cast<size_t>(state.setlistIndex)].entries.size());
+        if (program < count) {
+          loadSetlistIndex(program);
+          usedSetlist = true;
+        }
+      }
+      if (!usedSetlist) {
+        const std::vector<int> order = presetOrderForBank(state.presetBank);
+        if (program < static_cast<int>(order.size())) {
+          applyPreset(shared, state, order[static_cast<size_t>(program)]);
+        }
+      }
+    }
+  }
 }
 
 void Panel::layout(const Shared& shared, const PanelState& state) {
@@ -1401,6 +1499,8 @@ void Panel::drawMidi(cairo_t* cr, const Shared& shared,
 
   text(cr, "Click PEDAL or CONTROL to change the target. With expression off, CC 4/11 drive the first Wah.",
        bx + 30, ey + 40, 7.5, 0, kDim.r, kDim.g, kDim.b);
+  text(cr, "PERFORMANCE: PC selects a setlist/bank item · CC 28/29 setlist · CC 30/31 bank",
+       bx + 30, ey + 54, 7.0, 0, kDim.r, kDim.g, kDim.b);
 
   roundRect(cr, bx + bw - 110, by + bh - 40, 90, 24, 4);
   setRgb(cr, {0.20, 0.17, 0.14});

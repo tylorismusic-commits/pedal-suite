@@ -888,6 +888,12 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
       } else if (header->type == CLAP_EVENT_MIDI) {
         const auto* midi = reinterpret_cast<const clap_event_midi_t*>(header);
         const uint8_t status = midi->data[0] & 0xF0;
+        if (status == 0xC0) {
+          s->shared.midiSetlistPcValue.store(midi->data[1] & 0x7F,
+                                             std::memory_order_relaxed);
+          s->shared.midiSetlistPcSeq.fetch_add(1, std::memory_order_release);
+          continue;
+        }
         if (status == 0x90 && (midi->data[2] & 0x7F) > 0) {
           const int learnedNote = midi->data[1] & 0x7F;
           const int learnSlot = s->shared.midiLearnSlot.load();
@@ -916,10 +922,9 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
           s->shared.midiLearnExprState.store(false);
           continue;
         }
-        if (expressionEnabled(s->shared)) {
-          if (cc == expressionCc(s->shared)) {
-            applyExpression(s->shared, (midi->data[2] & 0x7F) / 127.0f);
-          }
+        if (expressionEnabled(s->shared) &&
+            cc == expressionCc(s->shared)) {
+          applyExpression(s->shared, (midi->data[2] & 0x7F) / 127.0f);
           continue;
         }
         if (cc == 11 || cc == 4) {
@@ -927,6 +932,27 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
           continue;
         }
         const bool now = (midi->data[2] & 0x7F) >= 64;
+        if (cc == kSetlistPrevCc || cc == kSetlistNextCc ||
+            cc == kBankPrevCc || cc == kBankNextCc) {
+          const bool was = s->lastCc[cc] >= 64;
+          s->lastCc[cc] = midi->data[2] & 0x7F;
+          if (now && !was) {
+            if (cc == kSetlistPrevCc) {
+              s->shared.midiSetlistPrevSeq.fetch_add(
+                  1, std::memory_order_release);
+            } else if (cc == kSetlistNextCc) {
+              s->shared.midiSetlistNextSeq.fetch_add(
+                  1, std::memory_order_release);
+            } else if (cc == kBankPrevCc) {
+              s->shared.midiBankPrevSeq.fetch_add(1,
+                                                  std::memory_order_release);
+            } else {
+              s->shared.midiBankNextSeq.fetch_add(1,
+                                                  std::memory_order_release);
+            }
+          }
+          continue;
+        }
         const bool was = s->lastCc[cc] >= 64;
         s->lastCc[cc] = midi->data[2] & 0x7F;
         if (now && !was) {

@@ -309,6 +309,30 @@ std::string buildPluginTtl() {
     }
   }
 
+  {
+    const char* const symbols[6] = {
+        "midi_setlist_next", "midi_setlist_prev", "midi_setlist_pc_seq",
+        "midi_setlist_pc_value", "midi_bank_next", "midi_bank_prev"};
+    const char* const names[6] = {
+        "MIDI Setlist Next", "MIDI Setlist Previous", "MIDI Setlist PC Seq",
+        "MIDI Setlist PC Value", "MIDI Bank Next", "MIDI Bank Previous"};
+    for (int i = 0; i < 6; ++i) {
+      std::ostringstream p;
+      p << "    [\n";
+      p << "        a lv2:OutputPort , lv2:ControlPort ;\n";
+      p << "        lv2:index " << index++ << " ;\n";
+      p << "        lv2:symbol \"" << symbols[i] << "\" ;\n";
+      p << "        lv2:name \"" << names[i] << "\" ;\n";
+      p << "        lv2:default 0 ;\n";
+      p << "        lv2:minimum " << (i == 3 ? -1 : 0) << " ;\n";
+      p << "        lv2:maximum " << (i == 3 ? 127 : 1000000) << " ;\n";
+      p << "        lv2:portProperty pprops:notOnGUI ;\n";
+      p << "        pg:group <" << groupUri("MIDI") << "> ;\n";
+      p << "    ]";
+      ports.push_back(p.str());
+    }
+  }
+
   for (size_t i = 0; i < ports.size(); ++i) {
     out << ports[i];
     out << (i + 1 == ports.size() ? " .\n" : " ,\n");
