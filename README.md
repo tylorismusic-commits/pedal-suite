@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.7.0-alpha — 42 pedals, FFT Cab, NAM, tuner and MIDI.**
+**Status: 0.7.0-alpha — 43 pedals, FFT Cab, NAM, tuner and MIDI.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -75,6 +75,7 @@ and full board visuals land in later milestones.
 - **FET Comp** — Input, Ratio, Attack, Release, Output.
 - **Opto Comp** — Peak, Gain, Mix.
 - **Envelope Filter** — Sens, Q, Range, Blend.
+- **Auto-Wah** — Sens, Q, Range, Mix; vocal envelope sweep that opens with picking attack.
 - **Noise Gate** — Threshold, Decay, Range.
 - **Tight Gate** — Threshold, Decay, Range, Link.
 - **3-Band EQ** — Low, Mid, High, Level.

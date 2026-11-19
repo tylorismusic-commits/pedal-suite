@@ -325,6 +325,16 @@ inline stomp::modules::EnvFilterControls envFilterControlsFrom(
   return out;
 }
 
+inline stomp::modules::AutoWahControls autoWahControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::AutoWahControls out;
+  out.sens = c.c[0];
+  out.q = c.c[1];
+  out.range = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
 inline stomp::modules::GatePedalControls gateControlsFrom(
     const SlotControls& c) noexcept {
   stomp::modules::GatePedalControls out;

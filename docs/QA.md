@@ -27,8 +27,8 @@ fixed everything the measurements exposed. The automated equivalents live in
 | NAM | 220 Hz test model at 44.1/48/96 kHz | 220 Hz preserved |
 | NAM | zero input with a model | DC blocked; ~0 after 1 s |
 | NAM | eight blocks, 2 live | finite, third+ dry |
-| All 42 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
-| All 42 pedals | default settings | audible output |
+| All 43 pedals | 48/96 kHz, controls at 0 and 1 | finite, no NaNs |
+| All 43 pedals | default settings | audible output |
 | All values | display → parse round-trip | within one display step |
 
 ## Fixes made

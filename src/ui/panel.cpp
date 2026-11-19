@@ -174,6 +174,9 @@ ModuleStyle styleFor(int type) {
     case ModuleId::EnvFilter:
       return {{0.42, 0.18, 0.04}, {0.18, 0.06, 0.01},
               {1.00, 0.70, 0.30}, {0.99, 0.89, 0.72}};
+    case ModuleId::AutoWah:
+      return {{0.10, 0.32, 0.20}, {0.03, 0.10, 0.06},
+              {0.66, 1.00, 0.72}, {0.86, 0.99, 0.90}};
     case ModuleId::NoiseGate:
       return {{0.16, 0.18, 0.20}, {0.05, 0.06, 0.07},
               {0.68, 0.88, 1.00}, {0.88, 0.96, 1.00}};

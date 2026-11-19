@@ -225,6 +225,7 @@ public:
     for (auto& p : fetComp_) p.reset();
     for (auto& p : optoComp_) p.reset();
     for (auto& p : envFilter_) p.reset();
+    for (auto& p : autoWah_) p.reset();
     for (auto& p : noiseGate_) p.reset();
     for (auto& p : tightGate_) p.reset();
     for (auto& p : eq3_) p.reset();
@@ -303,6 +304,7 @@ private:
       case ModuleId::FetComp: fetComp_[s].prepare(sr_); break;
       case ModuleId::OptoComp: optoComp_[s].prepare(sr_); break;
       case ModuleId::EnvFilter: envFilter_[s].prepare(sr_); break;
+      case ModuleId::AutoWah: autoWah_[s].prepare(sr_); break;
       case ModuleId::NoiseGate: noiseGate_[s].prepare(sr_); break;
       case ModuleId::TightGate: tightGate_[s].prepare(sr_); break;
       case ModuleId::Eq3: eq3_[s].prepare(sr_, 120.0f, 800.0f, 4000.0f); break;
@@ -351,6 +353,7 @@ private:
       case ModuleId::FetComp: fetComp_[s].setControls(fetCompControlsFrom(c)); break;
       case ModuleId::OptoComp: optoComp_[s].setControls(optoCompControlsFrom(c)); break;
       case ModuleId::EnvFilter: envFilter_[s].setControls(envFilterControlsFrom(c)); break;
+      case ModuleId::AutoWah: autoWah_[s].setControls(autoWahControlsFrom(c)); break;
       case ModuleId::NoiseGate: noiseGate_[s].setControls(gateControlsFrom(c)); break;
       case ModuleId::TightGate: tightGate_[s].setControls(tightGateControlsFrom(c)); break;
       case ModuleId::Eq3: eq3_[s].setControls(eq3ControlsFrom(c)); break;
@@ -399,6 +402,7 @@ private:
       case ModuleId::FetComp: fetComp_[s].process(l, r); break;
       case ModuleId::OptoComp: optoComp_[s].process(l, r); break;
       case ModuleId::EnvFilter: envFilter_[s].process(l, r); break;
+      case ModuleId::AutoWah: autoWah_[s].process(l, r); break;
       case ModuleId::NoiseGate: noiseGate_[s].process(l, r); break;
       case ModuleId::TightGate: tightGate_[s].process(l, r); break;
       case ModuleId::Eq3: eq3_[s].process(l, r); break;
@@ -453,6 +457,7 @@ private:
   stomp::modules::FetComp fetComp_[kSlotCount];
   stomp::modules::OptoComp optoComp_[kSlotCount];
   stomp::modules::EnvFilter envFilter_[kSlotCount];
+  stomp::modules::AutoWah autoWah_[kSlotCount];
   stomp::modules::NoiseGate noiseGate_[kSlotCount];
   stomp::modules::TightGate tightGate_[kSlotCount];
   stomp::modules::Eq3 eq3_[kSlotCount];

@@ -50,6 +50,7 @@ enum ModuleId : int {
   Laser,
   Cab,
   Nam,
+  AutoWah,
   Count
 };
 
@@ -64,7 +65,7 @@ inline constexpr const char* kModuleLabels[] = {
     "Digital Delay", "Ping-Pong", "Plate Reverb", "Room Reverb",
     "FET Comp", "Opto Comp", "Envelope Filter", "Noise Gate", "Tight Gate",
     "3-Band EQ", "Bass EQ", "Lo-Fi", "Tape Sat", "Precision Drive", "Wah",
-    "Laser", "Cab", "NAM Amp"};
+    "Laser", "Cab", "NAM Amp", "Auto-Wah"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -402,6 +403,14 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 1: return 0.45;  // Drive
         case 2: return 0.70;  // Attack
         case 3: return 0.50;  // Level
+        default: return 0.50;
+      }
+    case ModuleId::AutoWah:
+      switch (control) {
+        case 0: return 0.55;  // Sens
+        case 1: return 0.60;  // Q
+        case 2: return 0.65;  // Range
+        case 3: return 0.85;  // Mix
         default: return 0.50;
       }
     case ModuleId::Wah:

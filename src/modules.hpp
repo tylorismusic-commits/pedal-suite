@@ -234,6 +234,12 @@ inline constexpr ControlDesc kWahControls[] = {
     {2, "RANGE", "Range", ControlFormat::Percent},
     {3, "MIX", "Mix", ControlFormat::Percent},
 };
+inline constexpr ControlDesc kAutoWahControls[] = {
+    {0, "SENS", "Sensitivity", ControlFormat::Percent},
+    {1, "Q", "Q", ControlFormat::QValue},
+    {2, "RANGE", "Range", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
 inline constexpr ControlDesc kLaserControls[] = {
     {0, "PITCH", "Pitch", ControlFormat::PitchSemis},
     {1, "RING", "Ring", ControlFormat::Percent},
@@ -580,12 +586,18 @@ inline constexpr ModuleDesc kModules[] = {
      0,
      static_cast<int>(sizeof(kNamControls) / sizeof(kNamControls[0])),
      kNamControls},
+    {ModuleId::AutoWah, "Auto-Wah", "Dyn",
+     "Envelope wah that follows picking dynamics", false, false, 0,
+     static_cast<int>(sizeof(kAutoWahControls) /
+                      sizeof(kAutoWahControls[0])),
+     kAutoWahControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

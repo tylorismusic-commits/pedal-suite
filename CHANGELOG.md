@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added an Auto-Wah pedal with a wider envelope sweep, independent Q and range,
+  and three module presets.
+
 ## 0.7.0-alpha — 2026-11-18
 
 Big interaction and performance audit.
