@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.6-alpha — 2026-11-19
+
+- Moved the setlist manager hint above the action buttons so it no longer
+  collides with ADD CURRENT / REMOVE.
+
 ## 0.8.5-alpha — 2026-11-19
 
 - MIDI control for setlists and banks:

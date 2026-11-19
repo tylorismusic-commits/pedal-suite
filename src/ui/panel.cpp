@@ -1634,7 +1634,7 @@ void Panel::drawSetlist(cairo_t* cr, const Shared& /*shared*/,
   button(rightX + 3 * (btnW + btnGap), row2, btnW, "CLOSE", false);
 
   text(cr, "Click an entry to load it. Setlists are saved automatically.",
-       leftX, by + bh - 64, 7.5, 0, kDim.r, kDim.g, kDim.b);
+       leftX, by + bh - 104, 7.5, 0, kDim.r, kDim.g, kDim.b);
 }
 
 void Panel::drawIrPicker(cairo_t* cr, const Shared& shared,

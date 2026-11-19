@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.8.5-alpha — 43 pedals, FFT Cab, NAM, tuner, MIDI learn, banks and setlists.**
+**Status: 0.8.6-alpha — 43 pedals, FFT Cab, NAM, tuner, MIDI learn, banks and setlists.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
