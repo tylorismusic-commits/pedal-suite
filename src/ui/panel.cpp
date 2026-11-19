@@ -687,55 +687,18 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
   const double colW = 236.0, gap = 14.0, y = 150.0, h = 380.0;
   const int base = state.boardPage * 4;
 
-  // Board rails top and bottom.
-  for (double ry : {137.0, 534.0}) {
-    cairo_pattern_t* rail = cairo_pattern_create_linear(0, ry, 0, ry + 9);
-    cairo_pattern_add_color_stop_rgb(rail, 0.0, 0.20, 0.19, 0.17);
-    cairo_pattern_add_color_stop_rgb(rail, 0.45, 0.32, 0.30, 0.27);
-    cairo_pattern_add_color_stop_rgb(rail, 1.0, 0.12, 0.11, 0.10);
-    roundRect(cr, 26, ry, 988, 9, 4);
-    cairo_set_source(cr, rail);
-    cairo_fill(cr);
-    cairo_pattern_destroy(rail);
-    setRgb(cr, {0.0, 0.0, 0.0}, 0.5);
-    cairo_set_line_width(cr, 1.0);
-    roundRect(cr, 26.5, ry + 0.5, 987, 8, 4);
-    cairo_stroke(cr);
-    for (double sx : {44.0, 300.0, 740.0, 996.0}) {
-      cairo_arc(cr, sx, ry + 4.5, 3.4, 0, 2 * kPi);
-      setRgb(cr, {0.10, 0.10, 0.09});
-      cairo_fill(cr);
-      setRgb(cr, {0.52, 0.50, 0.46}, 0.7);
-      cairo_set_line_width(cr, 0.9);
-      cairo_move_to(cr, sx - 2.2, ry + 4.5);
-      cairo_line_to(cr, sx + 2.2, ry + 4.5);
-      cairo_stroke(cr);
-    }
-  }
-
-  // Patch cables run through the gaps between pedals.  Each cable takes its
-  // colour from the pedal feeding it, with a black sleeve and a bright core.
+  // Patch cables run through the gaps between pedals.
   for (int i = 0; i < 3; ++i) {
     const double x1 = 32.0 + i * (colW + gap) + colW + 1.0;
     const double x2 = x1 + gap - 2.0;
     const double yj = y + 300.0;
-    const int srcType = static_cast<int>(
-        shared.get(slotParam(base + i, kSlotOffsetType)) + 0.5);
-    const ModuleStyle st = styleFor(srcType);
     cairo_move_to(cr, x1, yj);
-    cairo_curve_to(cr, x1 + 7.0, yj + 20.0, x2 - 7.0, yj + 20.0, x2, yj);
-    cairo_set_source_rgba(cr, 0.010, 0.010, 0.012, 0.98);
-    cairo_set_line_width(cr, 6.5);
+    cairo_curve_to(cr, x1 + 5.0, yj + 11.0, x2 - 5.0, yj + 11.0, x2, yj);
+    cairo_set_source_rgba(cr, 0.015, 0.015, 0.018, 0.95);
+    cairo_set_line_width(cr, 4.5);
     cairo_stroke_preserve(cr);
-    setRgb(cr, st.accent, 0.72);
-    cairo_set_line_width(cr, 3.0);
-    cairo_stroke_preserve(cr);
-    setRgb(cr,
-           {std::min(1.0, st.accent.r + 0.30),
-            std::min(1.0, st.accent.g + 0.30),
-            std::min(1.0, st.accent.b + 0.30)},
-           0.85);
-    cairo_set_line_width(cr, 1.0);
+    cairo_set_source_rgba(cr, 0.20, 0.21, 0.23, 0.55);
+    cairo_set_line_width(cr, 1.2);
     cairo_stroke(cr);
   }
 
@@ -1447,10 +1410,10 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   text(cr, "TUNER", 82, 647, 8.5, 1,
        state.tunerOpen ? 0.10 : kDim.r, state.tunerOpen ? 0.08 : kDim.g,
        state.tunerOpen ? 0.05 : kDim.b);
-  roundRect(cr, 130, 632, 72, 22, 4);
+  roundRect(cr, 210, 600, 72, 22, 4);
   setRgb(cr, state.midiOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
   cairo_fill(cr);
-  text(cr, "MIDI", 166, 647, 8.5, 1,
+  text(cr, "MIDI", 246, 615, 8.5, 1,
        state.midiOpen ? 0.10 : kDim.r, state.midiOpen ? 0.08 : kDim.g,
        state.midiOpen ? 0.05 : kDim.b);
   text(cr, "IN", 27, 640, 8, 1, kDim.r, kDim.g, kDim.b);
@@ -2034,7 +1997,7 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.browserSlot = -1;
     return true;
   }
-  if (x >= 130 && x <= 202 && y >= 632 && y <= 654) {
+  if (x >= 210 && x <= 282 && y >= 600 && y <= 622) {
     state.midiOpen = !state.midiOpen;
     state.tunerOpen = false;
     state.aboutOpen = false;

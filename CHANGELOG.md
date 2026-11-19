@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1-alpha — 2026-11-19
+
+- Reverted the board rails, screws and colour-coded patch cables; the original
+  board look is back.
+- Moved the MIDI button above the footer so it no longer crowds the input knob.
+
 ## 0.8.0-alpha — 2026-11-19
 
 - Added an Auto-Wah pedal with a wider envelope sweep, independent Q and range,
@@ -14,7 +20,6 @@
 - Added twelve board presets: Classic Rock, Bluesbreaker, Country Twang,
   Shoegaze, Funk Machine, Bass DI, Synth Bass, Prog Lead, Worship, Garage,
   Doom and Acoustic DI.
-- Added aluminium board rails, screws and colour-coded patch cables.
 - Updated the README, preset count and roadmap.
 
 ## 0.7.0-alpha — 2026-11-18
