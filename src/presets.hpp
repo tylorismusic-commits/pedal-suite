@@ -134,6 +134,22 @@ inline constexpr PresetValue kFunkWah[] = {
     PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
 };
 
+inline constexpr PresetValue kAutoFunk[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::AutoWah)),
+    PV(PC(0, 0), 0.72), PV(PC(0, 1), 0.55), PV(PC(0, 2), 0.60),
+    PV(PC(0, 3), 0.88),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::OptoComp)),
+    PV(PC(1, 0), 0.50), PV(PC(1, 1), 0.55), PV(PC(1, 2), 1.00),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::Drive808)),
+    PV(PC(2, 0), 0.32), PV(PC(2, 1), 0.55), PV(PC(2, 2), 0.55),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::Tremolo)),
+    PV(PC(3, 0), 0.45), PV(PC(3, 1), 0.35), PV(PC(3, 2), 0.10),
+    PV(PC(3, 3), 0.85),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
 inline constexpr PresetValue kPitchLead[] = {
     PV(P_POWER, 1),
     PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::PitchDrop)),
@@ -270,6 +286,8 @@ inline constexpr Preset kPresets[] = {
      static_cast<int>(sizeof(kBassGrowl) / sizeof(kBassGrowl[0]))},
     {"Funk", "Funk Wah", kFunkWah,
      static_cast<int>(sizeof(kFunkWah) / sizeof(kFunkWah[0]))},
+    {"Funk", "Auto Funk", kAutoFunk,
+     static_cast<int>(sizeof(kAutoFunk) / sizeof(kAutoFunk[0]))},
     {"Lead", "Pitch Lead", kPitchLead,
      static_cast<int>(sizeof(kPitchLead) / sizeof(kPitchLead[0]))},
     {"Surf", "Spring Surf", kSpringSurf,

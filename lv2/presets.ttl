@@ -264,6 +264,37 @@
     [ lv2:symbol "slot6_type" ; pset:value 0 ] ,
     [ lv2:symbol "slot7_type" ; pset:value 0 ] .
 
+<https://github.com/tylorismusic-commits/pedal-suite#preset_auto-funk>
+    a pset:Preset ;
+    lv2:appliesTo <https://github.com/tylorismusic-commits/pedal-suite> ;
+    rdfs:label "Auto Funk" ;
+    rdfs:comment "Funk" ;
+    pset:bank <https://github.com/tylorismusic-commits/pedal-suite#bank_funk> ;
+    lv2:port
+    [ lv2:symbol "power" ; pset:value 1 ] ,
+    [ lv2:symbol "slot0_type" ; pset:value 43 ] ,
+    [ lv2:symbol "slot0_c0" ; pset:value 0.72 ] ,
+    [ lv2:symbol "slot0_c1" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot0_c2" ; pset:value 0.6 ] ,
+    [ lv2:symbol "slot0_c3" ; pset:value 0.88 ] ,
+    [ lv2:symbol "slot1_type" ; pset:value 30 ] ,
+    [ lv2:symbol "slot1_c0" ; pset:value 0.5 ] ,
+    [ lv2:symbol "slot1_c1" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot1_c2" ; pset:value 1 ] ,
+    [ lv2:symbol "slot2_type" ; pset:value 2 ] ,
+    [ lv2:symbol "slot2_c0" ; pset:value 0.32 ] ,
+    [ lv2:symbol "slot2_c1" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot2_c2" ; pset:value 0.55 ] ,
+    [ lv2:symbol "slot3_type" ; pset:value 18 ] ,
+    [ lv2:symbol "slot3_c0" ; pset:value 0.45 ] ,
+    [ lv2:symbol "slot3_c1" ; pset:value 0.35 ] ,
+    [ lv2:symbol "slot3_c2" ; pset:value 0.1 ] ,
+    [ lv2:symbol "slot3_c3" ; pset:value 0.85 ] ,
+    [ lv2:symbol "slot4_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot5_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot6_type" ; pset:value 0 ] ,
+    [ lv2:symbol "slot7_type" ; pset:value 0 ] .
+
 <https://github.com/tylorismusic-commits/pedal-suite#preset_pitch-lead>
     a pset:Preset ;
     lv2:appliesTo <https://github.com/tylorismusic-commits/pedal-suite> ;
