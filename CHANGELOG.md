@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.4-alpha — 2026-11-19
+
+- Board preset banks: the preset browser now filters by **ALL**, each factory
+  category and **USER**.
+- Setlist manager: create, rename and delete setlists; add the current board;
+  reorder entries; step with PREVIOUS/NEXT; and load any entry. Setlists are
+  stored in `~/.config/PedalSuite/setlists`.
+- Preset list header now carries the BANK and SETLIST controls.
+- Setlist and bank state is kept out of the host parameter block; setlists are
+  performance files, not part of a board preset.
+
 ## 0.8.3-alpha — 2026-11-19
 
 - Restored the pedal cards to near their original size while keeping them

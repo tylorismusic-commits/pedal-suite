@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "params.hpp"
+#include "setlists.hpp"
 #include "user_presets.hpp"
 
 namespace pedal {
@@ -34,6 +35,14 @@ struct PanelState {
   bool aboutOpen = false;
   bool tunerOpen = false;
   bool midiOpen = false;
+  bool setlistOpen = false;
+  int setlistIndex = 0;
+  int setlistEntry = -1;
+  int setlistScroll = 0;
+  int setlistEntryScroll = 0;
+  bool renameSetlist = false;
+  bool deleteSetlistConfirm = false;
+  int presetBank = 0;
   int midiLearnSlot = -1;
   bool midiLearnExpr = false;
   int irPickerSlot = -1;
@@ -139,6 +148,12 @@ private:
                  const PanelState& state) const;
   void drawMidi(cairo_t* cr, const Shared& shared,
                 const PanelState& state) const;
+  void drawSetlist(cairo_t* cr, const Shared& shared,
+                   const PanelState& state) const;
+  void reloadSetlists();
+  std::vector<std::string> presetBankNames() const;
+  std::vector<int> presetOrderForBank(int bank) const;
+  int resolveSetlistEntry(const SetlistEntry& entry) const;
   void drawIrPicker(cairo_t* cr, const Shared& shared,
                     const PanelState& state) const;
   void drawPresetList(cairo_t* cr, const Shared& shared,
@@ -146,6 +161,7 @@ private:
   void drawBrowserMenu(cairo_t* cr, const PanelState& state) const;
   void drawTextEntry(cairo_t* cr, const PanelState& state) const;
   std::vector<UserPreset> userPresets_;
+  std::vector<Setlist> setlists_;
   std::vector<ModulePreset> modulePresets_;
   double browserHeight(int category, const std::string& query,
                        int presetFilterType) const;

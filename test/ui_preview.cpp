@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include <cairo.h>
 #include <cstdio>
+#include <cstdlib>
+#include <filesystem>
 #include <string>
 
 #include "module_ids.hpp"
 #include "modules.hpp"
 #include "params.hpp"
 #include "presets.hpp"
+#include "setlists.hpp"
 #include "ui/panel.hpp"
 #include "user_presets.hpp"
 
@@ -16,9 +19,21 @@ using namespace pedal;
 int main(int argc, char** argv) {
   if (argc < 3) return 2;
   const std::string font = argv[1], out = argv[2];
+  setenv("XDG_CONFIG_HOME", "/tmp/opencode/pedal-preview-config", 1);
+  std::filesystem::remove_all(setlistDir().parent_path());
   Shared s;
   initializeRack(s);
   saveUserPreset(userPresetDir(), "Preview Board", s);
+  {
+    Setlist preview;
+    preview.name = "Live Set";
+    preview.entries = {{"Clean Platform", true},
+                       {"808 Stack", true},
+                       {"Lead Lift", true},
+                       {"Ambient Wash", true},
+                       {"Bass Growl", true}};
+    writeSetlist(setlistDir(), preview);
+  }
   Panel panel;
   panel.loadFont(font);
   PanelState state;
@@ -162,6 +177,13 @@ int main(int argc, char** argv) {
   cairo_surface_write_to_png(surf, (out + "/pedal-midi.png").c_str());
   state.midiOpen = false;
   state.midiLearnSlot = -1;
+
+  state.setlistOpen = true;
+  state.setlistIndex = 0;
+  state.setlistEntry = 2;
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-setlist.png").c_str());
+  state.setlistOpen = false;
 
   state.aboutOpen = true;
   panel.draw(cr, s, state);

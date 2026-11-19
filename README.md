@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.8.3-alpha — 43 pedals, FFT Cab, NAM, tuner and MIDI learn.**
+**Status: 0.8.4-alpha — 43 pedals, FFT Cab, NAM, tuner, MIDI learn, banks and setlists.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -36,6 +36,8 @@ monophonic tuner and MIDI learn/expression mapping.
 
 ![Pedal Suite — MIDI mapping](docs/pedal-midi.png)
 
+![Pedal Suite — setlist manager](docs/pedal-setlist.png)
+
 ## Current slice
 
 - 1040×720 panel with power, preset bar, page buttons and utility pills.
@@ -44,6 +46,8 @@ monophonic tuner and MIDI learn/expression mapping.
 - MIX and GAIN sit below each pedal body.
 - Drag a pedal name or card to reorder, including page-to-page moves.
 - Browser with **ALL / DRIVE / MOD / DYN / TIME / UTIL / AMP / PRESETS**.
+- Board preset banks: **ALL**, each factory category and **USER**.
+- Setlist manager for ordered live performance lists.
 - **Boost** — Gain, Tone, Level.
 - **808 Drive** — Drive, Tone, Level; retuned TS9/808 from Amp Suite.
 - **Treble Boost** — Boost, Range, Level.
@@ -99,6 +103,12 @@ note, octave, cents, frequency and confidence.
 **MIDI footswitch:** notes 36–43 or 60–67, and CC 20–27 or 80–87, toggle
 pedals 1–8. CC 4 or 11 drives the first Wah pedal. Both CLAP and LV2 accept
 the events.
+
+**Banks and setlists:** the board preset browser has a **BANK** filter that
+cycles through ALL, each factory category and USER. **SETLIST** opens the
+setlist manager: create, rename and delete lists; add the current board;
+reorder entries; step with PREVIOUS/NEXT; and click an entry to load it.
+Setlists are stored in `~/.config/PedalSuite/setlists` and survive sessions.
 
 **MIDI learn and expression:** open the **MIDI** button in the footer, then
 click **LEARN** on a pedal and send the note or CC you want. Each pedal stores
@@ -170,7 +180,7 @@ cp -r build/lv2/pedal-suite.lv2 ~/.lv2/
 ## Roadmap
 
 1. More pedal models and artist-style capture/IR packs.
-2. Setlist and bank management for larger preset collections.
+2. More factory preset packs and artist-style boards.
 3. macOS / Windows and VST3/AU packaging.
 4. Public beta polish and wider listening tests.
 

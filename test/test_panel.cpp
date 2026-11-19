@@ -127,6 +127,39 @@ int main() {
   check(state.presetIndex == beforeGap,
         "preset list gap does not select a hidden preset");
 
+  // Bank filtering and setlist management.
+  panel.pointerDown(s, state, 237, 34, false);
+  panel.pointerUp(s, state);
+  check(state.presetOpen, "preset browser reopens for banks");
+  panel.pointerDown(s, state, 318, 72, false);
+  panel.pointerUp(s, state);
+  check(state.presetBank == 1, "bank button filters the preset list");
+  panel.pointerDown(s, state, 411, 72, false);
+  panel.pointerUp(s, state);
+  check(state.setlistOpen && !state.presetOpen,
+        "SETLIST button opens the setlist manager");
+  panel.pointerDown(s, state, 177, 631, false);
+  panel.pointerUp(s, state);
+  check(std::filesystem::exists(setlistDir() / "Setlist 1.setlist"),
+        "NEW creates a setlist file");
+  panel.pointerDown(s, state, 417, 587, false);
+  panel.pointerUp(s, state);
+  auto created = loadSetlists(setlistDir());
+  check(created.size() == 1 && created[0].entries.size() == 1,
+        "ADD CURRENT appends the active board");
+  panel.pointerDown(s, state, 540, 621, false);
+  panel.pointerUp(s, state);
+  check(state.setlistEntry == 0, "NEXT selects the first entry");
+  panel.pointerDown(s, state, 311, 631, false);
+  panel.pointerUp(s, state);
+  panel.pointerDown(s, state, 311, 631, false);
+  panel.pointerUp(s, state);
+  check(loadSetlists(setlistDir()).empty(), "DELETE removes the setlist");
+  panel.pointerDown(s, state, 786, 621, false);
+  panel.pointerUp(s, state);
+  check(!state.setlistOpen, "setlist manager closes");
+  state.presetBank = 0;
+
   // Browser categories: UTIL, AMP and PRESETS.
   state.browserSlot = 4;
   state.browserCategory = 1;

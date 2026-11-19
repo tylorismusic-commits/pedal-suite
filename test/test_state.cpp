@@ -11,6 +11,7 @@
 #include "modules.hpp"
 #include "params.hpp"
 #include "presets.hpp"
+#include "setlists.hpp"
 #include "dsp/ir_bank.hpp"
 #include "factory_module_presets.hpp"
 #include "state.hpp"
@@ -300,6 +301,29 @@ int main() {
               n.get(P_MIDI_EXPR_ON) > 0.5 &&
               std::lround(n.get(P_MIDI_EXPR_CC)) == 64,
           "state restores MIDI mappings and expression");
+  }
+
+
+  {
+    Setlist s;
+    s.name = "Test Set";
+    s.entries.push_back({"Clean Platform", true});
+    s.entries.push_back({"My Board", false});
+    std::filesystem::remove_all(setlistDir());
+    check(writeSetlist(setlistDir(), s), "setlist file writes");
+    auto loaded = loadSetlists(setlistDir());
+    check(loaded.size() == 1 && loaded[0].name == "Test Set" &&
+              loaded[0].entries.size() == 2 &&
+              loaded[0].entries[0].factory &&
+              loaded[0].entries[0].name == "Clean Platform",
+          "setlist file round-trips entries");
+    check(renameSetlist(setlistDir(), "Test Set", "Renamed Set", loaded[0]),
+          "setlist renames");
+    loaded = loadSetlists(setlistDir());
+    check(loaded.size() == 1 && loaded[0].name == "Renamed Set",
+          "renamed setlist is listed");
+    check(deleteSetlist(setlistDir(), "Renamed Set"), "setlist deletes");
+    check(loadSetlists(setlistDir()).empty(), "setlist directory is empty");
   }
 
   std::printf("%d failure(s)\n", failures);
