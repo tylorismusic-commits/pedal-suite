@@ -120,7 +120,8 @@ std::string slug(const std::string& s) {
 std::string portBlock(int index, const char* symbol, const char* name,
                       double minimum, double maximum, double def, bool integer,
                       bool toggled, const pedal::Labels& labels, const char* unit,
-                      const char* group, bool output, bool notOnGui = true) {
+                      const char* group, bool output, bool notOnGui = true,
+                      bool hidden = false) {
   std::ostringstream out;
   out << "    [\n";
   out << "        a lv2:" << (output ? "OutputPort" : "InputPort")
@@ -159,7 +160,7 @@ std::string portBlock(int index, const char* symbol, const char* name,
   if (unitUri) {
     out << "        units:unit units:" << unitUri << " ;\n";
   }
-  if (output && notOnGui) {
+  if ((output && notOnGui) || hidden) {
     out << "        lv2:portProperty pprops:notOnGUI ;\n";
   }
   out << "        pg:group <" << group << "> ;\n";
@@ -228,7 +229,7 @@ std::string buildPluginTtl() {
     ports.push_back(portBlock(static_cast<int>(kAudioPorts + id), s.symbol,
                               s.name, s.min, s.max, s.def, s.stepped, s.toggled,
                               s.labels, s.unit, groupUri(s.module).c_str(),
-                              false));
+                              false, true, s.hidden));
   }
 
   int index = kAudioPorts + static_cast<int>(pedal::P_COUNT);
@@ -266,6 +267,46 @@ std::string buildPluginTtl() {
     p << "        atom:supports midi:MidiEvent ;\n";
     p << "    ]";
     ports.push_back(p.str());
+  }
+
+  {
+    const char* const symbols[2] = {"midi_learn_slot", "midi_learn_expr"};
+    const char* const names[2] = {"MIDI Learn Slot", "MIDI Learn Expression"};
+    for (int i = 0; i < 2; ++i) {
+      std::ostringstream p;
+      p << "    [\n";
+      p << "        a lv2:InputPort , lv2:ControlPort ;\n";
+      p << "        lv2:index " << index++ << " ;\n";
+      p << "        lv2:symbol \"" << symbols[i] << "\" ;\n";
+      p << "        lv2:name \"" << names[i] << "\" ;\n";
+      p << "        lv2:default " << (i == 0 ? -1 : 0) << " ;\n";
+      p << "        lv2:minimum " << (i == 0 ? -1 : 0) << " ;\n";
+      p << "        lv2:maximum " << (i == 0 ? 7 : 1) << " ;\n";
+      if (i == 1) p << "        lv2:portProperty lv2:toggled ;\n";
+      p << "        lv2:portProperty pprops:notOnGUI ;\n";
+      p << "        pg:group <" << groupUri("MIDI") << "> ;\n";
+      p << "    ]";
+      ports.push_back(p.str());
+    }
+    const char* const stateSymbols[2] = {"midi_learn_slot_state",
+                                         "midi_learn_expr_state"};
+    const char* const stateNames[2] = {"MIDI Learn Slot State",
+                                       "MIDI Learn Expression State"};
+    for (int i = 0; i < 2; ++i) {
+      std::ostringstream p;
+      p << "    [\n";
+      p << "        a lv2:OutputPort , lv2:ControlPort ;\n";
+      p << "        lv2:index " << index++ << " ;\n";
+      p << "        lv2:symbol \"" << stateSymbols[i] << "\" ;\n";
+      p << "        lv2:name \"" << stateNames[i] << "\" ;\n";
+      p << "        lv2:default " << (i == 0 ? -1 : 0) << " ;\n";
+      p << "        lv2:minimum " << (i == 0 ? -1 : 0) << " ;\n";
+      p << "        lv2:maximum " << (i == 0 ? 7 : 1) << " ;\n";
+      p << "        lv2:portProperty pprops:notOnGUI ;\n";
+      p << "        pg:group <" << groupUri("MIDI") << "> ;\n";
+      p << "    ]";
+      ports.push_back(p.str());
+    }
   }
 
   for (size_t i = 0; i < ports.size(); ++i) {

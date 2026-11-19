@@ -51,6 +51,10 @@ enum Port : uint32_t {
   PORT_SLOT7_GR,
   PORT_LATENCY,
   PORT_MIDI_IN,
+  PORT_MIDI_LEARN_SLOT,
+  PORT_MIDI_LEARN_EXPR,
+  PORT_MIDI_LEARN_SLOT_STATE,
+  PORT_MIDI_LEARN_EXPR_STATE,
   PORT_COUNT
 };
 
@@ -78,6 +82,12 @@ struct Plugin {
   float* slotGr[pedal::kSlotCount] = {};
   float* latency = nullptr;
   const LV2_Atom_Sequence* midiIn = nullptr;
+  float* midiLearnSlotPort = nullptr;
+  float* midiLearnExprPort = nullptr;
+  float* midiLearnSlotStatePort = nullptr;
+  float* midiLearnExprStatePort = nullptr;
+  float lastLearnSlot = -2.0f;
+  float lastLearnExpr = -1.0f;
   uint8_t lastCc[128] = {};
   std::shared_ptr<const pedal::IrBank> irBank;
   int lastIrIndex = -2;
@@ -153,6 +163,18 @@ void connectPort(LV2_Handle handle, uint32_t port, void* data) {
     case PORT_MIDI_IN:
       p->midiIn = static_cast<const LV2_Atom_Sequence*>(data);
       break;
+    case PORT_MIDI_LEARN_SLOT:
+      p->midiLearnSlotPort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_LEARN_EXPR:
+      p->midiLearnExprPort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_LEARN_SLOT_STATE:
+      p->midiLearnSlotStatePort = static_cast<float*>(data);
+      break;
+    case PORT_MIDI_LEARN_EXPR_STATE:
+      p->midiLearnExprStatePort = static_cast<float*>(data);
+      break;
     default:
       if (port >= PORT_FIRST_PARAM &&
           port < PORT_FIRST_PARAM + pedal::P_COUNT) {
@@ -199,6 +221,16 @@ void run(LV2_Handle handle, uint32_t frames) {
   }
   p->portsSeen = true;
 
+  if (p->midiLearnSlotPort && *p->midiLearnSlotPort != p->lastLearnSlot) {
+    p->lastLearnSlot = *p->midiLearnSlotPort;
+    p->shared.midiLearnSlot.store(
+        static_cast<int>(std::lround(*p->midiLearnSlotPort)));
+  }
+  if (p->midiLearnExprPort && *p->midiLearnExprPort != p->lastLearnExpr) {
+    p->lastLearnExpr = *p->midiLearnExprPort;
+    p->shared.midiLearnExpr.store(*p->midiLearnExprPort > 0.5f);
+  }
+
   if (p->midiIn && p->midiEventType) {
     LV2_ATOM_SEQUENCE_FOREACH(p->midiIn, ev) {
       if (!ev || ev->body.type != p->midiEventType || ev->body.size < 3) {
@@ -207,23 +239,59 @@ void run(LV2_Handle handle, uint32_t frames) {
       const uint8_t* msg = reinterpret_cast<const uint8_t*>(ev + 1);
       const uint8_t status = msg[0] & 0xF0;
       if (status == 0x90 && msg[2] > 0) {
-        const int slot = pedal::footswitchSlotForNote(msg[1] & 0x7F);
+        const int note = msg[1] & 0x7F;
+        const int learnSlot = p->shared.midiLearnSlot.load();
+        if (learnSlot >= 0) {
+          pedal::assignNoteMapping(p->shared, learnSlot, note);
+          p->shared.midiLearnSlot.store(-1);
+          p->shared.midiLearnSlotState.store(-1);
+          continue;
+        }
+        const int slot = pedal::mappedNoteSlot(p->shared, note);
         if (slot >= 0) pedal::toggleSlotBypass(p->shared, slot);
       } else if (status == 0xB0) {
         const int cc = msg[1] & 0x7F;
+        const int learnSlot = p->shared.midiLearnSlot.load();
+        if (learnSlot >= 0) {
+          pedal::assignCcMapping(p->shared, learnSlot, cc);
+          p->shared.midiLearnSlot.store(-1);
+          p->shared.midiLearnSlotState.store(-1);
+          continue;
+        }
+        if (p->shared.midiLearnExpr.exchange(false)) {
+          p->shared.set(pedal::P_MIDI_EXPR_CC, static_cast<double>(cc));
+          p->shared.set(pedal::P_MIDI_EXPR_ON, 1.0);
+          p->shared.midiLearnExprState.store(false);
+          continue;
+        }
+        if (pedal::expressionEnabled(p->shared)) {
+          if (cc == pedal::expressionCc(p->shared)) {
+            pedal::applyExpression(p->shared, (msg[2] & 0x7F) / 127.0f);
+          }
+          continue;
+        }
         if (cc == 11 || cc == 4) {
-          pedal::setFirstWahPedal(p->shared, (msg[2] & 0x7F) / 127.0f);
+          pedal::applyExpression(p->shared, (msg[2] & 0x7F) / 127.0f);
           continue;
         }
         const bool now = (msg[2] & 0x7F) >= 64;
         const bool was = p->lastCc[cc] >= 64;
         p->lastCc[cc] = msg[2] & 0x7F;
         if (now && !was) {
-          const int slot = pedal::footswitchSlotForCc(cc);
+          const int slot = pedal::mappedCcSlot(p->shared, cc);
           if (slot >= 0) pedal::toggleSlotBypass(p->shared, slot);
         }
       }
     }
+  }
+
+  if (p->midiLearnSlotStatePort) {
+    *p->midiLearnSlotStatePort =
+        static_cast<float>(p->shared.midiLearnSlotState.load());
+  }
+  if (p->midiLearnExprStatePort) {
+    *p->midiLearnExprStatePort =
+        p->shared.midiLearnExprState.load() ? 1.0f : 0.0f;
   }
 
   p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());

@@ -33,6 +33,9 @@ struct PanelState {
   bool browserPresetFilter = false;
   bool aboutOpen = false;
   bool tunerOpen = false;
+  bool midiOpen = false;
+  int midiLearnSlot = -1;
+  bool midiLearnExpr = false;
   int irPickerSlot = -1;
   int irScroll = 0;
   bool pickerNam = false;
@@ -134,6 +137,8 @@ private:
                  const PanelState& state) const;
   void drawTuner(cairo_t* cr, const Shared& shared,
                  const PanelState& state) const;
+  void drawMidi(cairo_t* cr, const Shared& shared,
+                const PanelState& state) const;
   void drawIrPicker(cairo_t* cr, const Shared& shared,
                     const PanelState& state) const;
   void drawPresetList(cairo_t* cr, const Shared& shared,

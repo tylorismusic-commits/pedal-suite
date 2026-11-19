@@ -35,6 +35,11 @@ constexpr const char* kUiUri =
     "https://github.com/tylorismusic-commits/pedal-suite#ui";
 constexpr uint32_t kFirstParam = 4;
 constexpr uint32_t kMeterBase = kFirstParam + pedal::P_COUNT;
+constexpr uint32_t kMidiInPort = kMeterBase + 15;
+constexpr uint32_t kLearnSlotPort = kMidiInPort + 1;
+constexpr uint32_t kLearnExprPort = kMidiInPort + 2;
+constexpr uint32_t kLearnSlotStatePort = kMidiInPort + 3;
+constexpr uint32_t kLearnExprStatePort = kMidiInPort + 4;
 constexpr auto kFrameInterval = std::chrono::milliseconds(33);
 
 struct Ui {
@@ -59,6 +64,8 @@ struct Ui {
   uint32_t height = pedal::kPanelHeight;
 
   bool dirty = true;
+  int lastLearnSlotSent = -2;
+  bool lastLearnExprSent = false;
   std::chrono::steady_clock::time_point lastFrame{};
 
   double layoutScale() const {
@@ -218,6 +225,20 @@ struct Ui {
   }
 
   int idle() {
+    if (write && controller) {
+      const int learnSlot = shared.midiLearnSlot.load();
+      if (learnSlot != lastLearnSlotSent) {
+        lastLearnSlotSent = learnSlot;
+        const float v = static_cast<float>(learnSlot);
+        write(controller, kLearnSlotPort, sizeof(float), 0, &v);
+      }
+      const bool learnExpr = shared.midiLearnExpr.load();
+      if (learnExpr != lastLearnExprSent) {
+        lastLearnExprSent = learnExpr;
+        const float v = learnExpr ? 1.0f : 0.0f;
+        write(controller, kLearnExprPort, sizeof(float), 0, &v);
+      }
+    }
     while (dpy && XPending(dpy) > 0) {
       XEvent ev;
       XNextEvent(dpy, &ev);
@@ -345,6 +366,20 @@ void uiPortEvent(LV2UI_Handle handle, uint32_t port, uint32_t size,
   const float v = *static_cast<const float*>(buffer);
   if (port >= kFirstParam && port < kFirstParam + pedal::P_COUNT) {
     ui->shared.setFromHost(port - kFirstParam, static_cast<double>(v));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kLearnSlotStatePort) {
+    const int slot = static_cast<int>(std::lround(v));
+    ui->shared.midiLearnSlotState.store(slot);
+    if (slot < 0) ui->shared.midiLearnSlot.store(-1);
+    ui->dirty = true;
+    return;
+  }
+  if (port == kLearnExprStatePort) {
+    const bool on = v > 0.5f;
+    ui->shared.midiLearnExprState.store(on);
+    if (!on) ui->shared.midiLearnExpr.store(false);
     ui->dirty = true;
     return;
   }

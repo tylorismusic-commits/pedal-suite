@@ -23,7 +23,7 @@
         foaf:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
-    lv2:minorVersion 7 ;
+    lv2:minorVersion 8 ;
     lv2:microVersion 0 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
@@ -1770,6 +1770,7 @@
         lv2:minimum 0 ;
         lv2:maximum 64 ;
         lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#cabinet> ;
     ] ,
     [
@@ -1781,11 +1782,253 @@
         lv2:minimum 0 ;
         lv2:maximum 64 ;
         lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#amp> ;
     ] ,
     [
-        a lv2:OutputPort , lv2:ControlPort ;
+        a lv2:InputPort , lv2:ControlPort ;
         lv2:index 137 ;
+        lv2:symbol "midi_note1" ;
+        lv2:name "MIDI Note 1" ;
+        lv2:default 36 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 138 ;
+        lv2:symbol "midi_note2" ;
+        lv2:name "MIDI Note 2" ;
+        lv2:default 37 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 139 ;
+        lv2:symbol "midi_note3" ;
+        lv2:name "MIDI Note 3" ;
+        lv2:default 38 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 140 ;
+        lv2:symbol "midi_note4" ;
+        lv2:name "MIDI Note 4" ;
+        lv2:default 39 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 141 ;
+        lv2:symbol "midi_note5" ;
+        lv2:name "MIDI Note 5" ;
+        lv2:default 40 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 142 ;
+        lv2:symbol "midi_note6" ;
+        lv2:name "MIDI Note 6" ;
+        lv2:default 41 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 143 ;
+        lv2:symbol "midi_note7" ;
+        lv2:name "MIDI Note 7" ;
+        lv2:default 42 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 144 ;
+        lv2:symbol "midi_note8" ;
+        lv2:name "MIDI Note 8" ;
+        lv2:default 43 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 145 ;
+        lv2:symbol "midi_cc1" ;
+        lv2:name "MIDI CC 1" ;
+        lv2:default 20 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 146 ;
+        lv2:symbol "midi_cc2" ;
+        lv2:name "MIDI CC 2" ;
+        lv2:default 21 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 147 ;
+        lv2:symbol "midi_cc3" ;
+        lv2:name "MIDI CC 3" ;
+        lv2:default 22 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 148 ;
+        lv2:symbol "midi_cc4" ;
+        lv2:name "MIDI CC 4" ;
+        lv2:default 23 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 149 ;
+        lv2:symbol "midi_cc5" ;
+        lv2:name "MIDI CC 5" ;
+        lv2:default 24 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 150 ;
+        lv2:symbol "midi_cc6" ;
+        lv2:name "MIDI CC 6" ;
+        lv2:default 25 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 151 ;
+        lv2:symbol "midi_cc7" ;
+        lv2:name "MIDI CC 7" ;
+        lv2:default 26 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 152 ;
+        lv2:symbol "midi_cc8" ;
+        lv2:name "MIDI CC 8" ;
+        lv2:default 27 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 153 ;
+        lv2:symbol "midi_expr_on" ;
+        lv2:name "MIDI Expression" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty lv2:toggled ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 154 ;
+        lv2:symbol "midi_expr_slot" ;
+        lv2:name "Expression Slot" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 7 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 155 ;
+        lv2:symbol "midi_expr_ctl" ;
+        lv2:name "Expression Control" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 11 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 156 ;
+        lv2:symbol "midi_expr_cc" ;
+        lv2:name "Expression CC" ;
+        lv2:default 4 ;
+        lv2:minimum 0 ;
+        lv2:maximum 127 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 157 ;
         lv2:symbol "in_peak_l" ;
         lv2:name "Input Peak Left" ;
         lv2:default 0 ;
@@ -1797,7 +2040,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 138 ;
+        lv2:index 158 ;
         lv2:symbol "in_peak_r" ;
         lv2:name "Input Peak Right" ;
         lv2:default 0 ;
@@ -1809,7 +2052,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 139 ;
+        lv2:index 159 ;
         lv2:symbol "out_peak_l" ;
         lv2:name "Output Peak Left" ;
         lv2:default 0 ;
@@ -1821,7 +2064,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 140 ;
+        lv2:index 160 ;
         lv2:symbol "out_peak_r" ;
         lv2:name "Output Peak Right" ;
         lv2:default 0 ;
@@ -1833,7 +2076,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 141 ;
+        lv2:index 161 ;
         lv2:symbol "in_peak" ;
         lv2:name "Input Peak" ;
         lv2:default 0 ;
@@ -1845,7 +2088,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 142 ;
+        lv2:index 162 ;
         lv2:symbol "out_peak" ;
         lv2:name "Output Peak" ;
         lv2:default 0 ;
@@ -1857,7 +2100,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 143 ;
+        lv2:index 163 ;
         lv2:symbol "slot1_gr" ;
         lv2:name "Slot 1 Gain Reduction" ;
         lv2:default 0 ;
@@ -1868,7 +2111,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 144 ;
+        lv2:index 164 ;
         lv2:symbol "slot2_gr" ;
         lv2:name "Slot 2 Gain Reduction" ;
         lv2:default 0 ;
@@ -1879,7 +2122,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 145 ;
+        lv2:index 165 ;
         lv2:symbol "slot3_gr" ;
         lv2:name "Slot 3 Gain Reduction" ;
         lv2:default 0 ;
@@ -1890,7 +2133,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 146 ;
+        lv2:index 166 ;
         lv2:symbol "slot4_gr" ;
         lv2:name "Slot 4 Gain Reduction" ;
         lv2:default 0 ;
@@ -1901,7 +2144,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 147 ;
+        lv2:index 167 ;
         lv2:symbol "slot5_gr" ;
         lv2:name "Slot 5 Gain Reduction" ;
         lv2:default 0 ;
@@ -1912,7 +2155,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 148 ;
+        lv2:index 168 ;
         lv2:symbol "slot6_gr" ;
         lv2:name "Slot 6 Gain Reduction" ;
         lv2:default 0 ;
@@ -1923,7 +2166,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 149 ;
+        lv2:index 169 ;
         lv2:symbol "slot7_gr" ;
         lv2:name "Slot 7 Gain Reduction" ;
         lv2:default 0 ;
@@ -1934,7 +2177,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 150 ;
+        lv2:index 170 ;
         lv2:symbol "slot8_gr" ;
         lv2:name "Slot 8 Gain Reduction" ;
         lv2:default 0 ;
@@ -1945,7 +2188,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 151 ;
+        lv2:index 171 ;
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:default 0 ;
@@ -1957,11 +2200,56 @@
     ] ,
     [
         a lv2:InputPort , atom:AtomPort ;
-        lv2:index 152 ;
+        lv2:index 172 ;
         lv2:symbol "midi_in" ;
         lv2:name "MIDI In" ;
         atom:bufferType atom:Sequence ;
         atom:supports midi:MidiEvent ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 173 ;
+        lv2:symbol "midi_learn_slot" ;
+        lv2:name "MIDI Learn Slot" ;
+        lv2:default -1 ;
+        lv2:minimum -1 ;
+        lv2:maximum 7 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 174 ;
+        lv2:symbol "midi_learn_expr" ;
+        lv2:name "MIDI Learn Expression" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 175 ;
+        lv2:symbol "midi_learn_slot_state" ;
+        lv2:name "MIDI Learn Slot State" ;
+        lv2:default -1 ;
+        lv2:minimum -1 ;
+        lv2:maximum 7 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 176 ;
+        lv2:symbol "midi_learn_expr_state" ;
+        lv2:name "MIDI Learn Expression State" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
     ] .
 
 
@@ -1986,6 +2274,8 @@
 <https://github.com/tylorismusic-commits/pedal-suite#cabinet> a pg:Group ; lv2:symbol "cabinet" ; lv2:name "Cabinet" .
 
 <https://github.com/tylorismusic-commits/pedal-suite#amp> a pg:Group ; lv2:symbol "amp" ; lv2:name "Amp" .
+
+<https://github.com/tylorismusic-commits/pedal-suite#midi> a pg:Group ; lv2:symbol "midi" ; lv2:name "MIDI" .
 
 <https://github.com/tylorismusic-commits/pedal-suite#meter> a pg:Group ; lv2:symbol "meter" ; lv2:name "Meter" .
 

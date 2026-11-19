@@ -876,21 +876,61 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
       if (header->type == CLAP_EVENT_NOTE_ON) {
         const auto* note = reinterpret_cast<const clap_event_note_t*>(header);
         if (note->velocity <= 0.0) continue;
-        const int slot = footswitchSlotForNote(note->key);
+        const int learnSlot = s->shared.midiLearnSlot.load();
+        if (learnSlot >= 0) {
+          assignNoteMapping(s->shared, learnSlot, note->key);
+          s->shared.midiLearnSlot.store(-1);
+          s->shared.midiLearnSlotState.store(-1);
+          continue;
+        }
+        const int slot = mappedNoteSlot(s->shared, note->key);
         if (slot >= 0) toggleSlotBypass(s->shared, slot);
       } else if (header->type == CLAP_EVENT_MIDI) {
         const auto* midi = reinterpret_cast<const clap_event_midi_t*>(header);
-        if ((midi->data[0] & 0xF0) != 0xB0) continue;
+        const uint8_t status = midi->data[0] & 0xF0;
+        if (status == 0x90 && (midi->data[2] & 0x7F) > 0) {
+          const int learnedNote = midi->data[1] & 0x7F;
+          const int learnSlot = s->shared.midiLearnSlot.load();
+          if (learnSlot >= 0) {
+            assignNoteMapping(s->shared, learnSlot, learnedNote);
+            s->shared.midiLearnSlot.store(-1);
+            s->shared.midiLearnSlotState.store(-1);
+            continue;
+          }
+          const int slot = mappedNoteSlot(s->shared, learnedNote);
+          if (slot >= 0) toggleSlotBypass(s->shared, slot);
+          continue;
+        }
+        if (status != 0xB0) continue;
         const int cc = midi->data[1] & 0x7F;
+        const int learnSlot = s->shared.midiLearnSlot.load();
+        if (learnSlot >= 0) {
+          assignCcMapping(s->shared, learnSlot, cc);
+          s->shared.midiLearnSlot.store(-1);
+          s->shared.midiLearnSlotState.store(-1);
+          continue;
+        }
+        if (s->shared.midiLearnExpr.exchange(false)) {
+          s->shared.set(P_MIDI_EXPR_CC, static_cast<double>(cc));
+          s->shared.set(P_MIDI_EXPR_ON, 1.0);
+          s->shared.midiLearnExprState.store(false);
+          continue;
+        }
+        if (expressionEnabled(s->shared)) {
+          if (cc == expressionCc(s->shared)) {
+            applyExpression(s->shared, (midi->data[2] & 0x7F) / 127.0f);
+          }
+          continue;
+        }
         if (cc == 11 || cc == 4) {
-          setFirstWahPedal(s->shared, (midi->data[2] & 0x7F) / 127.0f);
+          applyExpression(s->shared, (midi->data[2] & 0x7F) / 127.0f);
           continue;
         }
         const bool now = (midi->data[2] & 0x7F) >= 64;
         const bool was = s->lastCc[cc] >= 64;
         s->lastCc[cc] = midi->data[2] & 0x7F;
         if (now && !was) {
-          const int slot = footswitchSlotForCc(cc);
+          const int slot = mappedCcSlot(s->shared, cc);
           if (slot >= 0) toggleSlotBypass(s->shared, slot);
         }
       }

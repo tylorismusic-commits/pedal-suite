@@ -35,6 +35,26 @@ enum ParamId : uint32_t {
 #undef SLOT_PARAMS
   P_CAB_IR,
   P_NAM_MODEL,
+  P_MIDI_NOTE0,
+  P_MIDI_NOTE1,
+  P_MIDI_NOTE2,
+  P_MIDI_NOTE3,
+  P_MIDI_NOTE4,
+  P_MIDI_NOTE5,
+  P_MIDI_NOTE6,
+  P_MIDI_NOTE7,
+  P_MIDI_CC0,
+  P_MIDI_CC1,
+  P_MIDI_CC2,
+  P_MIDI_CC3,
+  P_MIDI_CC4,
+  P_MIDI_CC5,
+  P_MIDI_CC6,
+  P_MIDI_CC7,
+  P_MIDI_EXPR_ON,
+  P_MIDI_EXPR_SLOT,
+  P_MIDI_EXPR_CTL,
+  P_MIDI_EXPR_CC,
   P_COUNT
 };
 
@@ -135,6 +155,46 @@ inline constexpr ParamSpec kParamSpecs[P_COUNT] = {
      static_cast<double>(kMaxCabIr), 0.0, true, true, false, nullptr, {}},
     {"nam_model", "NAM Model", "Amp", 0.0,
      static_cast<double>(kMaxNamModels), 0.0, true, true, false, nullptr, {}},
+    {"midi_note1", "MIDI Note 1", "MIDI", 0.0, 127.0, 36.0, true, true, false,
+     nullptr, {}},
+    {"midi_note2", "MIDI Note 2", "MIDI", 0.0, 127.0, 37.0, true, true, false,
+     nullptr, {}},
+    {"midi_note3", "MIDI Note 3", "MIDI", 0.0, 127.0, 38.0, true, true, false,
+     nullptr, {}},
+    {"midi_note4", "MIDI Note 4", "MIDI", 0.0, 127.0, 39.0, true, true, false,
+     nullptr, {}},
+    {"midi_note5", "MIDI Note 5", "MIDI", 0.0, 127.0, 40.0, true, true, false,
+     nullptr, {}},
+    {"midi_note6", "MIDI Note 6", "MIDI", 0.0, 127.0, 41.0, true, true, false,
+     nullptr, {}},
+    {"midi_note7", "MIDI Note 7", "MIDI", 0.0, 127.0, 42.0, true, true, false,
+     nullptr, {}},
+    {"midi_note8", "MIDI Note 8", "MIDI", 0.0, 127.0, 43.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc1", "MIDI CC 1", "MIDI", 0.0, 127.0, 20.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc2", "MIDI CC 2", "MIDI", 0.0, 127.0, 21.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc3", "MIDI CC 3", "MIDI", 0.0, 127.0, 22.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc4", "MIDI CC 4", "MIDI", 0.0, 127.0, 23.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc5", "MIDI CC 5", "MIDI", 0.0, 127.0, 24.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc6", "MIDI CC 6", "MIDI", 0.0, 127.0, 25.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc7", "MIDI CC 7", "MIDI", 0.0, 127.0, 26.0, true, true, false,
+     nullptr, {}},
+    {"midi_cc8", "MIDI CC 8", "MIDI", 0.0, 127.0, 27.0, true, true, false,
+     nullptr, {}},
+    {"midi_expr_on", "MIDI Expression", "MIDI", 0.0, 1.0, 0.0, true, true,
+     true, nullptr, {}},
+    {"midi_expr_slot", "Expression Slot", "MIDI", 0.0, 7.0, 0.0, true, true,
+     false, nullptr, {}},
+    {"midi_expr_ctl", "Expression Control", "MIDI", 0.0, 11.0, 0.0, true, true,
+     false, nullptr, {}},
+    {"midi_expr_cc", "Expression CC", "MIDI", 0.0, 127.0, 4.0, true, true,
+     false, nullptr, {}},
 };
 
 #undef SLOT_SPECS
@@ -212,6 +272,12 @@ public:
   std::atomic<float> slotGrDb[kSlotCount];
   std::atomic<float> tunerHz, tunerCents, tunerConfidence;
   std::atomic<int> tunerNote;
+  // Learn requests written by the editor and consumed by the audio thread,
+  // plus feedback so an out-of-process LV2 UI can see when learn completes.
+  std::atomic<int> midiLearnSlot{-1};
+  std::atomic<bool> midiLearnExpr{false};
+  std::atomic<int> midiLearnSlotState{-1};
+  std::atomic<bool> midiLearnExprState{false};
   std::atomic<int> irBankCount{0};
   std::atomic<int> namBankCount{0};
 

@@ -4,6 +4,7 @@
 #include "dsp/ir_bank.hpp"
 
 #include "factory_module_presets.hpp"
+#include "midi_map.hpp"
 #include "modules.hpp"
 #include "presets.hpp"
 #include "value_text.hpp"
@@ -320,6 +321,10 @@ void Panel::tick(const Shared& shared, PanelState& state) const {
   state.outLevelR = shared.outPeakRDb.load(std::memory_order_relaxed);
   for (int i = 0; i < kSlotCount; ++i)
     state.slotGrDb[i] = shared.slotGrDb[i].load(std::memory_order_relaxed);
+  state.midiLearnSlot =
+      shared.midiLearnSlotState.load(std::memory_order_relaxed);
+  state.midiLearnExpr =
+      shared.midiLearnExprState.load(std::memory_order_relaxed);
 }
 
 void Panel::layout(const Shared& shared, const PanelState& state) {
@@ -682,18 +687,55 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
   const double colW = 236.0, gap = 14.0, y = 150.0, h = 380.0;
   const int base = state.boardPage * 4;
 
-  // Patch cables run through the gaps between pedals.
+  // Board rails top and bottom.
+  for (double ry : {137.0, 534.0}) {
+    cairo_pattern_t* rail = cairo_pattern_create_linear(0, ry, 0, ry + 9);
+    cairo_pattern_add_color_stop_rgb(rail, 0.0, 0.20, 0.19, 0.17);
+    cairo_pattern_add_color_stop_rgb(rail, 0.45, 0.32, 0.30, 0.27);
+    cairo_pattern_add_color_stop_rgb(rail, 1.0, 0.12, 0.11, 0.10);
+    roundRect(cr, 26, ry, 988, 9, 4);
+    cairo_set_source(cr, rail);
+    cairo_fill(cr);
+    cairo_pattern_destroy(rail);
+    setRgb(cr, {0.0, 0.0, 0.0}, 0.5);
+    cairo_set_line_width(cr, 1.0);
+    roundRect(cr, 26.5, ry + 0.5, 987, 8, 4);
+    cairo_stroke(cr);
+    for (double sx : {44.0, 300.0, 740.0, 996.0}) {
+      cairo_arc(cr, sx, ry + 4.5, 3.4, 0, 2 * kPi);
+      setRgb(cr, {0.10, 0.10, 0.09});
+      cairo_fill(cr);
+      setRgb(cr, {0.52, 0.50, 0.46}, 0.7);
+      cairo_set_line_width(cr, 0.9);
+      cairo_move_to(cr, sx - 2.2, ry + 4.5);
+      cairo_line_to(cr, sx + 2.2, ry + 4.5);
+      cairo_stroke(cr);
+    }
+  }
+
+  // Patch cables run through the gaps between pedals.  Each cable takes its
+  // colour from the pedal feeding it, with a black sleeve and a bright core.
   for (int i = 0; i < 3; ++i) {
     const double x1 = 32.0 + i * (colW + gap) + colW + 1.0;
     const double x2 = x1 + gap - 2.0;
     const double yj = y + 300.0;
+    const int srcType = static_cast<int>(
+        shared.get(slotParam(base + i, kSlotOffsetType)) + 0.5);
+    const ModuleStyle st = styleFor(srcType);
     cairo_move_to(cr, x1, yj);
-    cairo_curve_to(cr, x1 + 5.0, yj + 11.0, x2 - 5.0, yj + 11.0, x2, yj);
-    cairo_set_source_rgba(cr, 0.015, 0.015, 0.018, 0.95);
-    cairo_set_line_width(cr, 4.5);
+    cairo_curve_to(cr, x1 + 7.0, yj + 20.0, x2 - 7.0, yj + 20.0, x2, yj);
+    cairo_set_source_rgba(cr, 0.010, 0.010, 0.012, 0.98);
+    cairo_set_line_width(cr, 6.5);
     cairo_stroke_preserve(cr);
-    cairo_set_source_rgba(cr, 0.20, 0.21, 0.23, 0.55);
-    cairo_set_line_width(cr, 1.2);
+    setRgb(cr, st.accent, 0.72);
+    cairo_set_line_width(cr, 3.0);
+    cairo_stroke_preserve(cr);
+    setRgb(cr,
+           {std::min(1.0, st.accent.r + 0.30),
+            std::min(1.0, st.accent.g + 0.30),
+            std::min(1.0, st.accent.b + 0.30)},
+           0.85);
+    cairo_set_line_width(cr, 1.0);
     cairo_stroke(cr);
   }
 
@@ -1196,6 +1238,122 @@ void Panel::drawTuner(cairo_t* cr, const Shared& shared,
 }
 
 
+void Panel::drawMidi(cairo_t* cr, const Shared& shared,
+                     const PanelState& state) const {
+  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.64);
+  cairo_paint(cr);
+  const double bx = 180, by = 100, bw = 680, bh = 540;
+  roundRect(cr, bx, by, bw, bh, 6);
+  setRgb(cr, {0.13, 0.115, 0.10});
+  cairo_fill(cr);
+  setRgb(cr, kAccent, 0.85);
+  cairo_set_line_width(cr, 1.5);
+  roundRect(cr, bx + 0.5, by + 0.5, bw - 1, bh - 1, 6);
+  cairo_stroke(cr);
+
+  text(cr, "MIDI MAPPING", bx + bw * 0.5, by + 36, 18, 1, kText.r, kText.g,
+       kText.b);
+  text(cr, "Learn a note or CC per pedal · expression maps one CC to a control",
+       bx + bw * 0.5, by + 58, 8.5, 1, kDim.r, kDim.g, kDim.b);
+
+  text(cr, "PEDAL", bx + 30, by + 86, 8, 0, kDim.r, kDim.g, kDim.b);
+  text(cr, "NOTE", bx + 230, by + 86, 8, 0, kDim.r, kDim.g, kDim.b);
+  text(cr, "CC", bx + 330, by + 86, 8, 0, kDim.r, kDim.g, kDim.b);
+  text(cr, "LEARN", bx + 466, by + 86, 8, 0, kDim.r, kDim.g, kDim.b);
+
+  for (int slot = 0; slot < kSlotCount; ++slot) {
+    const double ry = by + 106 + slot * 34;
+    if (slot % 2 == 0) {
+      setRgb(cr, {0.10, 0.09, 0.08}, 0.65);
+      roundRect(cr, bx + 18, ry - 14, bw - 36, 28, 3);
+      cairo_fill(cr);
+    }
+    const int type = static_cast<int>(
+        shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
+    char name[64];
+    std::snprintf(name, sizeof(name), "PEDAL %d  ·  %s", slot + 1,
+                  slotModuleName(type));
+    text(cr, name, bx + 30, ry + 4, 9, 0, kText.r, kText.g, kText.b);
+
+    char note[32];
+    std::snprintf(note, sizeof(note), "NOTE %d",
+                  static_cast<int>(std::lround(shared.get(midiNoteParam(slot)))));
+    text(cr, note, bx + 230, ry + 4, 9, 0, kText.r, kText.g, kText.b);
+    char cc[32];
+    std::snprintf(cc, sizeof(cc), "CC %d",
+                  static_cast<int>(std::lround(shared.get(midiCcParam(slot)))));
+    text(cr, cc, bx + 330, ry + 4, 9, 0, kText.r, kText.g, kText.b);
+
+    const bool learning = state.midiLearnSlot == slot;
+    roundRect(cr, bx + 458, ry - 12, 100, 24, 4);
+    setRgb(cr, learning ? kAccent : Rgb{0.20, 0.17, 0.14});
+    cairo_fill(cr);
+    text(cr, learning ? "MOVE NOTE / CC" : "LEARN", bx + 508, ry + 4, 8, 1,
+         learning ? 0.10 : kDim.r, learning ? 0.08 : kDim.g,
+         learning ? 0.05 : kDim.b);
+  }
+
+  const double ey = by + 410;
+  setRgb(cr, kEdge, 0.55);
+  cairo_set_line_width(cr, 1.0);
+  cairo_move_to(cr, bx + 30, ey - 24);
+  cairo_line_to(cr, bx + bw - 30, ey - 24);
+  cairo_stroke(cr);
+
+  text(cr, "EXPRESSION", bx + 30, ey + 4, 8, 0, kDim.r, kDim.g, kDim.b);
+  const bool exprOn = shared.get(P_MIDI_EXPR_ON) > 0.5;
+  roundRect(cr, bx + 126, ey - 12, 74, 24, 4);
+  setRgb(cr, exprOn ? kAccent : Rgb{0.20, 0.17, 0.14});
+  cairo_fill(cr);
+  text(cr, exprOn ? "ON" : "OFF", bx + 163, ey + 4, 8, 1,
+       exprOn ? 0.10 : kDim.r, exprOn ? 0.08 : kDim.g, exprOn ? 0.05 : kDim.b);
+
+  char ccLabel[24];
+  std::snprintf(ccLabel, sizeof(ccLabel), "CC %d", expressionCc(shared));
+  roundRect(cr, bx + 216, ey - 12, 74, 24, 4);
+  setRgb(cr, {0.16, 0.14, 0.12});
+  cairo_fill(cr);
+  text(cr, ccLabel, bx + 253, ey + 4, 8, 1, kText.r, kText.g, kText.b);
+
+  const int targetSlot = expressionSlot(shared);
+  char slotLabel[24];
+  std::snprintf(slotLabel, sizeof(slotLabel), "PEDAL %d", targetSlot + 1);
+  roundRect(cr, bx + 306, ey - 12, 92, 24, 4);
+  setRgb(cr, {0.16, 0.14, 0.12});
+  cairo_fill(cr);
+  text(cr, slotLabel, bx + 352, ey + 4, 8, 1, kText.r, kText.g, kText.b);
+
+  const int ctl = expressionControl(shared);
+  const int targetType = static_cast<int>(
+      shared.get(slotParam(targetSlot, kSlotOffsetType)) + 0.5);
+  const ModuleDesc* targetModule = moduleDesc(targetType);
+  const char* ctlLabel =
+      targetModule->controlCount > 0 && ctl < targetModule->controlCount
+          ? targetModule->controls[ctl].label
+          : "—";
+  roundRect(cr, bx + 414, ey - 12, 132, 24, 4);
+  setRgb(cr, {0.16, 0.14, 0.12});
+  cairo_fill(cr);
+  text(cr, ctlLabel, bx + 480, ey + 4, 8, 1, kText.r, kText.g, kText.b);
+
+  const bool learningExpr = state.midiLearnExpr;
+  roundRect(cr, bx + 562, ey - 12, 92, 24, 4);
+  setRgb(cr, learningExpr ? kAccent : Rgb{0.20, 0.17, 0.14});
+  cairo_fill(cr);
+  text(cr, learningExpr ? "MOVE CC" : "LEARN CC", bx + 608, ey + 4, 8, 1,
+       learningExpr ? 0.10 : kDim.r, learningExpr ? 0.08 : kDim.g,
+       learningExpr ? 0.05 : kDim.b);
+
+  text(cr, "Click PEDAL or CONTROL to change the target. With expression off, CC 4/11 drive the first Wah.",
+       bx + 30, ey + 40, 7.5, 0, kDim.r, kDim.g, kDim.b);
+
+  roundRect(cr, bx + bw - 110, by + bh - 40, 90, 24, 4);
+  setRgb(cr, {0.20, 0.17, 0.14});
+  cairo_fill(cr);
+  text(cr, "CLOSE", bx + bw - 65, by + bh - 24, 8.5, 1, kDim.r, kDim.g,
+       kDim.b);
+}
+
 void Panel::drawIrPicker(cairo_t* cr, const Shared& shared,
                          const PanelState& state) const {
   cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.72);
@@ -1289,6 +1447,12 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   text(cr, "TUNER", 82, 647, 8.5, 1,
        state.tunerOpen ? 0.10 : kDim.r, state.tunerOpen ? 0.08 : kDim.g,
        state.tunerOpen ? 0.05 : kDim.b);
+  roundRect(cr, 130, 632, 72, 22, 4);
+  setRgb(cr, state.midiOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
+  cairo_fill(cr);
+  text(cr, "MIDI", 166, 647, 8.5, 1,
+       state.midiOpen ? 0.10 : kDim.r, state.midiOpen ? 0.08 : kDim.g,
+       state.midiOpen ? 0.05 : kDim.b);
   text(cr, "IN", 27, 640, 8, 1, kDim.r, kDim.g, kDim.b);
   text(cr, "OUT", 1013, 640, 8, 1, kDim.r, kDim.g, kDim.b);
   text(cr, "INPUT", 96, 681, 7.5, 2, kDim.r, kDim.g, kDim.b);
@@ -1298,6 +1462,7 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   if (state.presetOpen) drawPresetList(cr, shared, state);
   if (state.aboutOpen) drawAbout(cr, shared, state);
   if (state.tunerOpen) drawTuner(cr, shared, state);
+  if (state.midiOpen) drawMidi(cr, shared, state);
   if (state.irPickerSlot >= 0) drawIrPicker(cr, shared, state);
   drawTextEntry(cr, state);
 }
@@ -1796,8 +1961,82 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     }
     return true;
   }
+  if (state.midiOpen) {
+    const double bx = 180, by = 100, bw = 680, bh = 540;
+    if (x < bx || x > bx + bw || y < by || y > by + bh) {
+      state.midiOpen = false;
+      return true;
+    }
+    if (x >= bx + bw - 110 && x <= bx + bw - 20 && y >= by + bh - 40 &&
+        y <= by + bh - 16) {
+      state.midiOpen = false;
+      return true;
+    }
+    if (x >= bx + 458 && x <= bx + 558) {
+      for (int slot = 0; slot < kSlotCount; ++slot) {
+        const double ry = by + 106 + slot * 34;
+        if (y >= ry - 12 && y <= ry + 12) {
+          const int current =
+              shared.midiLearnSlot.load(std::memory_order_relaxed);
+          const int next = current == slot ? -1 : slot;
+          shared.midiLearnSlot.store(next, std::memory_order_relaxed);
+          shared.midiLearnSlotState.store(next, std::memory_order_relaxed);
+          shared.midiLearnExpr.store(false, std::memory_order_relaxed);
+          shared.midiLearnExprState.store(false, std::memory_order_relaxed);
+          state.midiLearnSlot = next;
+          state.midiLearnExpr = false;
+          return true;
+        }
+      }
+    }
+    const double ey = by + 410;
+    if (y >= ey - 12 && y <= ey + 12) {
+      if (x >= bx + 126 && x <= bx + 200) {
+        shared.set(P_MIDI_EXPR_ON,
+                   shared.get(P_MIDI_EXPR_ON) > 0.5 ? 0.0 : 1.0);
+        return true;
+      }
+      if (x >= bx + 306 && x <= bx + 398) {
+        const int next = (expressionSlot(shared) + 1) % kSlotCount;
+        shared.set(P_MIDI_EXPR_SLOT, static_cast<double>(next));
+        shared.set(P_MIDI_EXPR_CTL, 0.0);
+        return true;
+      }
+      if (x >= bx + 414 && x <= bx + 546) {
+        const int targetSlot = expressionSlot(shared);
+        const int type = static_cast<int>(
+            shared.get(slotParam(targetSlot, kSlotOffsetType)) + 0.5);
+        const int count = std::max(1, moduleDesc(type)->controlCount);
+        const int next = (expressionControl(shared) + 1) % count;
+        shared.set(P_MIDI_EXPR_CTL, static_cast<double>(next));
+        return true;
+      }
+      if (x >= bx + 562 && x <= bx + 654) {
+        const bool current =
+            shared.midiLearnExpr.load(std::memory_order_relaxed);
+        shared.midiLearnExpr.store(!current, std::memory_order_relaxed);
+        shared.midiLearnExprState.store(!current, std::memory_order_relaxed);
+        shared.midiLearnSlot.store(-1, std::memory_order_relaxed);
+        shared.midiLearnSlotState.store(-1, std::memory_order_relaxed);
+        state.midiLearnExpr = !current;
+        state.midiLearnSlot = -1;
+        return true;
+      }
+      return true;
+    }
+    return true;
+  }
   if (x >= 42 && x <= 122 && y >= 632 && y <= 654) {
     state.tunerOpen = !state.tunerOpen;
+    state.midiOpen = false;
+    state.aboutOpen = false;
+    state.presetOpen = 0;
+    state.browserSlot = -1;
+    return true;
+  }
+  if (x >= 130 && x <= 202 && y >= 632 && y <= 654) {
+    state.midiOpen = !state.midiOpen;
+    state.tunerOpen = false;
     state.aboutOpen = false;
     state.presetOpen = 0;
     state.browserSlot = -1;
@@ -1866,6 +2105,7 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.aboutScroll = 0;
     state.presetOpen = 0;
     state.tunerOpen = false;
+    state.midiOpen = false;
     state.irPickerSlot = -1;
     return true;
   }

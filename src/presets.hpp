@@ -266,9 +266,194 @@ inline constexpr PresetValue kWahRock[] = {
     PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
 };
 
+
+inline constexpr PresetValue kClassicRock[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::Overdrive)),
+    PV(PC(0, 0), 0.55), PV(PC(0, 1), 0.55), PV(PC(0, 2), 0.50),
+    PV(PC(0, 3), 0.90),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::TrebleBoost)),
+    PV(PC(1, 0), 0.55), PV(PC(1, 1), 0.55), PV(PC(1, 2), 0.45),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::AnalogDelay)),
+    PV(PC(2, 0), 0.35), PV(PC(2, 1), 0.30), PV(PC(2, 2), 0.45),
+    PV(PC(2, 3), 0.22),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::SpringReverb)),
+    PV(PC(3, 0), 0.35), PV(PC(3, 1), 0.55), PV(PC(3, 2), 0.22),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kBluesbreaker[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::BluesDrive)),
+    PV(PC(0, 0), 0.50), PV(PC(0, 1), 0.55), PV(PC(0, 2), 0.50),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Boost)),
+    PV(PC(1, 0), 0.15), PV(PC(1, 1), 0.55), PV(PC(1, 2), 0.55),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::SpringReverb)),
+    PV(PC(2, 0), 0.30), PV(PC(2, 1), 0.60), PV(PC(2, 2), 0.25),
+    PV(PS(3, kSlotOffsetType), 0), PV(PS(4, kSlotOffsetType), 0),
+    PV(PS(5, kSlotOffsetType), 0), PV(PS(6, kSlotOffsetType), 0),
+    PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kCountryTwang[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::TrebleBoost)),
+    PV(PC(0, 0), 0.62), PV(PC(0, 1), 0.65), PV(PC(0, 2), 0.50),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::OptoComp)),
+    PV(PC(1, 0), 0.45), PV(PC(1, 1), 0.55), PV(PC(1, 2), 0.72),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::AnalogDelay)),
+    PV(PC(2, 0), 0.18), PV(PC(2, 1), 0.20), PV(PC(2, 2), 0.58),
+    PV(PC(2, 3), 0.18),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::SpringReverb)),
+    PV(PC(3, 0), 0.28), PV(PC(3, 1), 0.60), PV(PC(3, 2), 0.30),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kShoegaze[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::BigFuzz)),
+    PV(PC(0, 0), 0.55), PV(PC(0, 1), 0.45), PV(PC(0, 2), 0.45),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Chorus)),
+    PV(PC(1, 0), 0.28), PV(PC(1, 1), 0.60), PV(PC(1, 2), 0.88),
+    PV(PC(1, 3), 0.55),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::TapeEcho)),
+    PV(PC(2, 0), 0.55), PV(PC(2, 1), 0.55), PV(PC(2, 2), 0.30),
+    PV(PC(2, 3), 0.38), PV(PC(2, 4), 0.38),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::PlateReverb)),
+    PV(PC(3, 0), 0.80), PV(PC(3, 1), 0.60), PV(PC(3, 2), 0.45),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kFunkMachine[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::EnvFilter)),
+    PV(PC(0, 0), 0.45), PV(PC(0, 1), 0.55), PV(PC(0, 2), 0.50),
+    PV(PC(0, 3), 0.55),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::OptoComp)),
+    PV(PC(1, 0), 0.55), PV(PC(1, 1), 0.50), PV(PC(1, 2), 0.78),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::Boost)),
+    PV(PC(2, 0), 0.20), PV(PC(2, 1), 0.55), PV(PC(2, 2), 0.50),
+    PV(PS(3, kSlotOffsetType), 0), PV(PS(4, kSlotOffsetType), 0),
+    PV(PS(5, kSlotOffsetType), 0), PV(PS(6, kSlotOffsetType), 0),
+    PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kBassDI[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::BassEq)),
+    PV(PC(0, 0), 0.58), PV(PC(0, 1), 0.50), PV(PC(0, 2), 0.55),
+    PV(PC(0, 3), 0.50),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::OptoComp)),
+    PV(PC(1, 0), 0.50), PV(PC(1, 1), 0.50), PV(PC(1, 2), 0.85),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::Cab)),
+    PV(PC(2, 0), 0.30), PV(PC(2, 1), 0.80), PV(PC(2, 2), 0.50),
+    PV(PC(2, 3), 0.40),
+    PV(PS(3, kSlotOffsetType), 0), PV(PS(4, kSlotOffsetType), 0),
+    PV(PS(5, kSlotOffsetType), 0), PV(PS(6, kSlotOffsetType), 0),
+    PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kSynthBass[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::Octave)),
+    PV(PC(0, 0), 0.55), PV(PC(0, 1), 0.35), PV(PC(0, 2), 0.50),
+    PV(PC(0, 3), 0.45),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::BassFuzz)),
+    PV(PC(1, 0), 0.50), PV(PC(1, 1), 0.60), PV(PC(1, 2), 0.45),
+    PV(PC(1, 3), 0.45),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::BassChorus)),
+    PV(PC(2, 0), 0.25), PV(PC(2, 1), 0.55), PV(PC(2, 2), 0.30),
+    PV(PC(2, 3), 0.35),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::BassEq)),
+    PV(PC(3, 0), 0.55), PV(PC(3, 1), 0.50), PV(PC(3, 2), 0.55),
+    PV(PC(3, 3), 0.50),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kProgLead[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::PitchDrop)),
+    PV(PC(0, 0), 0.50), PV(PC(0, 1), 0.67), PV(PC(0, 2), 0.10),
+    PV(PC(0, 3), 0.55), PV(PC(0, 4), 0.45),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Overdrive)),
+    PV(PC(1, 0), 0.55), PV(PC(1, 1), 0.60), PV(PC(1, 2), 0.50),
+    PV(PC(1, 3), 0.85),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::DigitalDelay)),
+    PV(PC(2, 0), 0.42), PV(PC(2, 1), 0.45), PV(PC(2, 2), 0.55),
+    PV(PC(2, 3), 0.30),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::PlateReverb)),
+    PV(PC(3, 0), 0.55), PV(PC(3, 1), 0.65), PV(PC(3, 2), 0.30),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kWorship[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::Boost)),
+    PV(PC(0, 0), 0.15), PV(PC(0, 1), 0.50), PV(PC(0, 2), 0.55),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Chorus)),
+    PV(PC(1, 0), 0.22), PV(PC(1, 1), 0.55), PV(PC(1, 2), 0.80),
+    PV(PC(1, 3), 0.50),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::TapeEcho)),
+    PV(PC(2, 0), 0.50), PV(PC(2, 1), 0.50), PV(PC(2, 2), 0.35),
+    PV(PC(2, 3), 0.35), PV(PC(2, 4), 0.35),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::PlateReverb)),
+    PV(PC(3, 0), 0.78), PV(PC(3, 1), 0.60), PV(PC(3, 2), 0.45),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kGarage[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::FuzzFace)),
+    PV(PC(0, 0), 0.65), PV(PC(0, 1), 0.50), PV(PC(0, 2), 0.55),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Tremolo)),
+    PV(PC(1, 0), 0.45), PV(PC(1, 1), 0.60), PV(PC(1, 2), 0.20),
+    PV(PC(1, 3), 1.00),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::SpringReverb)),
+    PV(PC(2, 0), 0.40), PV(PC(2, 1), 0.55), PV(PC(2, 2), 0.30),
+    PV(PS(3, kSlotOffsetType), 0), PV(PS(4, kSlotOffsetType), 0),
+    PV(PS(5, kSlotOffsetType), 0), PV(PS(6, kSlotOffsetType), 0),
+    PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kDoom[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::BigFuzz)),
+    PV(PC(0, 0), 0.85), PV(PC(0, 1), 0.40), PV(PC(0, 2), 0.45),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Rat)),
+    PV(PC(1, 0), 0.45), PV(PC(1, 1), 0.35), PV(PC(1, 2), 0.50),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::Eq3)),
+    PV(PC(2, 0), 0.65), PV(PC(2, 1), 0.45), PV(PC(2, 2), 0.45),
+    PV(PC(2, 3), 0.50),
+    PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::RoomReverb)),
+    PV(PC(3, 0), 0.55), PV(PC(3, 1), 0.45), PV(PC(3, 2), 0.30),
+    PV(PS(4, kSlotOffsetType), 0), PV(PS(5, kSlotOffsetType), 0),
+    PV(PS(6, kSlotOffsetType), 0), PV(PS(7, kSlotOffsetType), 0),
+};
+
+inline constexpr PresetValue kAcousticDI[] = {
+    PV(P_POWER, 1),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::Eq3)),
+    PV(PC(0, 0), 0.52), PV(PC(0, 1), 0.50), PV(PC(0, 2), 0.55),
+    PV(PC(0, 3), 0.50),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::OptoComp)),
+    PV(PC(1, 0), 0.40), PV(PC(1, 1), 0.45), PV(PC(1, 2), 0.70),
+    PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::RoomReverb)),
+    PV(PC(2, 0), 0.45), PV(PC(2, 1), 0.55), PV(PC(2, 2), 0.25),
+    PV(PS(3, kSlotOffsetType), 0), PV(PS(4, kSlotOffsetType), 0),
+    PV(PS(5, kSlotOffsetType), 0), PV(PS(6, kSlotOffsetType), 0),
+    PV(PS(7, kSlotOffsetType), 0),
+};
+
 #undef PC
 #undef PS
 #undef PV
+
 
 inline constexpr Preset kPresets[] = {
     {"Init", "Init", kInit, static_cast<int>(sizeof(kInit) / sizeof(kInit[0]))},
@@ -302,6 +487,30 @@ inline constexpr Preset kPresets[] = {
      static_cast<int>(sizeof(kLaserLead) / sizeof(kLaserLead[0]))},
     {"Rock", "Wah Rock", kWahRock,
      static_cast<int>(sizeof(kWahRock) / sizeof(kWahRock[0]))},
+    {"Rock", "Classic Rock", kClassicRock,
+     static_cast<int>(sizeof(kClassicRock) / sizeof(kClassicRock[0]))},
+    {"Blues", "Bluesbreaker", kBluesbreaker,
+     static_cast<int>(sizeof(kBluesbreaker) / sizeof(kBluesbreaker[0]))},
+    {"Country", "Country Twang", kCountryTwang,
+     static_cast<int>(sizeof(kCountryTwang) / sizeof(kCountryTwang[0]))},
+    {"Shoegaze", "Shoegaze", kShoegaze,
+     static_cast<int>(sizeof(kShoegaze) / sizeof(kShoegaze[0]))},
+    {"Funk", "Funk Machine", kFunkMachine,
+     static_cast<int>(sizeof(kFunkMachine) / sizeof(kFunkMachine[0]))},
+    {"Bass", "Bass DI", kBassDI,
+     static_cast<int>(sizeof(kBassDI) / sizeof(kBassDI[0]))},
+    {"Bass", "Synth Bass", kSynthBass,
+     static_cast<int>(sizeof(kSynthBass) / sizeof(kSynthBass[0]))},
+    {"Prog", "Prog Lead", kProgLead,
+     static_cast<int>(sizeof(kProgLead) / sizeof(kProgLead[0]))},
+    {"Worship", "Worship", kWorship,
+     static_cast<int>(sizeof(kWorship) / sizeof(kWorship[0]))},
+    {"Garage", "Garage", kGarage,
+     static_cast<int>(sizeof(kGarage) / sizeof(kGarage[0]))},
+    {"Doom", "Doom", kDoom,
+     static_cast<int>(sizeof(kDoom) / sizeof(kDoom[0]))},
+    {"Acoustic", "Acoustic DI", kAcousticDI,
+     static_cast<int>(sizeof(kAcousticDI) / sizeof(kAcousticDI[0]))},
 };
 
 inline constexpr int kPresetCount =

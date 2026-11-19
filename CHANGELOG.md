@@ -1,9 +1,21 @@
 # Changelog
 
-## Unreleased
+## 0.8.0-alpha — 2026-11-19
 
 - Added an Auto-Wah pedal with a wider envelope sweep, independent Q and range,
   and three module presets.
+- **MIDI learn:** the new MIDI panel learns a note or CC for each of the eight
+  pedals. Learned mappings override the factory note/CC ranges and are saved
+  with the plugin state.
+- **Expression mapping:** learn a CC and route it to any control on any loaded
+  pedal. The old CC 4/11 first-Wah behaviour remains when expression is off.
+- LV2 learns work across the UI/plugin boundary through dedicated learn and
+  learn-state control ports.
+- Added twelve board presets: Classic Rock, Bluesbreaker, Country Twang,
+  Shoegaze, Funk Machine, Bass DI, Synth Bass, Prog Lead, Worship, Garage,
+  Doom and Acoustic DI.
+- Added aluminium board rails, screws and colour-coded patch cables.
+- Updated the README, preset count and roadmap.
 
 ## 0.7.0-alpha — 2026-11-18
 

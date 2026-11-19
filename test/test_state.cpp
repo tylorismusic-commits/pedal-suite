@@ -250,6 +250,58 @@ int main() {
   unsigned char bad[8] = {0};
   check(!deserializeState(bad, sizeof(bad), b), "short state is rejected");
 
+
+  {
+    Shared m;
+    initializeRack(m);
+    check(mappedNoteSlot(m, 36) == 0, "default MIDI note 36 maps to pedal 1");
+    check(mappedNoteSlot(m, 60) == 0,
+          "alternate MIDI note range still maps to pedal 1");
+    check(mappedCcSlot(m, 20) == 0, "default MIDI CC 20 maps to pedal 1");
+
+    assignNoteMapping(m, 3, 64);
+    check(std::lround(m.get(P_MIDI_NOTE3)) == 64,
+          "MIDI note learn stores the note");
+    check(mappedNoteSlot(m, 64) == 3,
+          "learned MIDI note wins over the default range");
+    assignNoteMapping(m, 4, 64);
+    check(std::lround(m.get(P_MIDI_NOTE3)) == 0,
+          "learning a duplicate note clears the old mapping");
+    check(mappedNoteSlot(m, 64) == 4, "duplicate note moves to the new pedal");
+
+    assignCcMapping(m, 5, 70);
+    check(std::lround(m.get(P_MIDI_CC5)) == 70,
+          "MIDI CC learn stores the CC");
+    check(mappedCcSlot(m, 70) == 5, "learned MIDI CC maps to its pedal");
+
+    applyModuleDefaults(m, 0, static_cast<int>(ModuleId::Wah), false);
+    m.set(P_MIDI_EXPR_ON, 0.0);
+    applyExpression(m, 0.62f);
+    check(std::fabs(m.get(slotParam(0, kSlotOffsetC0)) - 0.62) < 1e-6,
+          "legacy expression drives the first Wah");
+
+    applyModuleDefaults(m, 1, static_cast<int>(ModuleId::Boost), false);
+    m.set(P_MIDI_EXPR_ON, 1.0);
+    m.set(P_MIDI_EXPR_SLOT, 1.0);
+    m.set(P_MIDI_EXPR_CTL, 2.0);
+    m.set(P_MIDI_EXPR_CC, 64.0);
+    applyExpression(m, 0.27f);
+    check(std::fabs(m.get(slotParam(1, kSlotOffsetC0 + 2)) - 0.27) < 1e-6,
+          "mapped expression drives the chosen pedal control");
+
+    m.set(P_MIDI_NOTE2, 55.0);
+    m.set(P_MIDI_CC2, 42.0);
+    const auto midiBlob = serializeState(m, 1.0);
+    Shared n;
+    check(deserializeState(midiBlob.data(), midiBlob.size(), n),
+          "MIDI mappings survive state round-trip");
+    check(std::lround(n.get(P_MIDI_NOTE2)) == 55 &&
+              std::lround(n.get(P_MIDI_CC2)) == 42 &&
+              n.get(P_MIDI_EXPR_ON) > 0.5 &&
+              std::lround(n.get(P_MIDI_EXPR_CC)) == 64,
+          "state restores MIDI mappings and expression");
+  }
+
   std::printf("%d failure(s)\n", failures);
   return failures == 0 ? 0 : 1;
 }

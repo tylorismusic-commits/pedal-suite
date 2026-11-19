@@ -151,6 +151,18 @@ int main(int argc, char** argv) {
   cairo_surface_write_to_png(surf, (out + "/pedal-tuner.png").c_str());
   state.tunerOpen = false;
 
+  state.midiOpen = true;
+  state.midiLearnSlot = 0;
+  state.midiLearnExpr = false;
+  s.set(P_MIDI_EXPR_ON, 1.0);
+  s.set(P_MIDI_EXPR_SLOT, 4.0);
+  s.set(P_MIDI_EXPR_CTL, 0.0);
+  s.set(P_MIDI_EXPR_CC, 11.0);
+  panel.draw(cr, s, state);
+  cairo_surface_write_to_png(surf, (out + "/pedal-midi.png").c_str());
+  state.midiOpen = false;
+  state.midiLearnSlot = -1;
+
   state.aboutOpen = true;
   panel.draw(cr, s, state);
   cairo_surface_write_to_png(surf, (out + "/pedal-about.png").c_str());

@@ -161,6 +161,28 @@ int main() {
   panel.pointerUp(s, state);
   check(!state.aboutOpen, "ABOUT closes");
 
+  // MIDI mapping panel.
+  panel.draw(cr, s, state);
+  panel.pointerDown(s, state, 166, 643, false);
+  panel.pointerUp(s, state);
+  check(state.midiOpen, "MIDI button opens the mapping panel");
+  panel.draw(cr, s, state);
+  panel.pointerDown(s, state, 688, 206, false);
+  panel.pointerUp(s, state);
+  check(s.midiLearnSlot.load() == 0, "pedal 1 learn button arms note/CC learn");
+  panel.pointerDown(s, state, 688, 206, false);
+  panel.pointerUp(s, state);
+  check(s.midiLearnSlot.load() == -1, "learn button cancels learn mode");
+  panel.pointerDown(s, state, 343, 510, false);
+  panel.pointerUp(s, state);
+  check(s.get(P_MIDI_EXPR_ON) > 0.5, "expression toggle enables expression");
+  panel.pointerDown(s, state, 788, 510, false);
+  panel.pointerUp(s, state);
+  check(s.midiLearnExpr.load(), "expression learn arms CC learn");
+  panel.pointerDown(s, state, 795, 612, false);
+  panel.pointerUp(s, state);
+  check(!state.midiOpen, "MIDI panel closes");
+
   // Descriptor sanity.
   bool valid = true;
   for (int id = 1; id < kModuleCount; ++id) {

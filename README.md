@@ -1,14 +1,14 @@
 # Pedal Suite
 
-**Status: 0.7.0-alpha — 43 pedals, FFT Cab, NAM, tuner and MIDI.**
+**Status: 0.8.0-alpha — 43 pedals, FFT Cab, NAM, tuner and MIDI learn.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
 drag reordering and host automation.
 
-This is the first P1 slice. It currently ships **Boost** and **808 Drive**
-(the retuned Amp Suite TS9/808). The rest of the pedal catalog, pitch engine
-and full board visuals land in later milestones.
+The full pedal catalog is in place: drive and fuzz, pitch and retune,
+modulation, time, reverb, dynamics, utility pedals, FFT cab IRs, NAM, a
+monophonic tuner and MIDI learn/expression mapping.
 
 ![Pedal Suite — page 1](docs/pedal-board.png)
 
@@ -34,14 +34,17 @@ and full board visuals land in later milestones.
 
 ![Pedal Suite — tuner](docs/pedal-tuner.png)
 
+![Pedal Suite — MIDI mapping](docs/pedal-midi.png)
+
 ## Current slice
 
 - 1040×720 panel with power, preset bar, page buttons and utility pills.
 - Four wide pedal slots per page; **PAGE 1** = pedals 1–4, **PAGE 2** = 5–8.
 - Amp Suite-style pedal cards: gradient faceplates, footswitch, LED, preset button.
+- Aluminium board rails and colour-coded patch cables between pedals.
 - MIX and GAIN sit below each pedal body.
 - Drag a pedal name or card to reorder, including page-to-page moves.
-- Browser with **ALL / DRIVE / MOD / DYN / TIME / VERB / PRESETS**.
+- Browser with **ALL / DRIVE / MOD / DYN / TIME / UTIL / AMP / PRESETS**.
 - **Boost** — Gain, Tone, Level.
 - **808 Drive** — Drive, Tone, Level; retuned TS9/808 from Amp Suite.
 - **Treble Boost** — Boost, Range, Level.
@@ -98,6 +101,13 @@ note, octave, cents, frequency and confidence.
 pedals 1–8. CC 4 or 11 drives the first Wah pedal. Both CLAP and LV2 accept
 the events.
 
+**MIDI learn and expression:** open the **MIDI** button in the footer, then
+click **LEARN** on a pedal and send the note or CC you want. Each pedal stores
+its own note and CC. **LEARN CC** in the expression row captures a continuous
+controller, and the PEDAL / CONTROL pills choose which loaded pedal control it
+drives. Mappings are stored with the plugin state, so they survive sessions and
+presets.
+
 **NAM amps:** drop `.nam` files in `~/.local/share/pedal-suite/nam` (or
 `$XDG_DATA_HOME/pedal-suite/nam`), then use **LOAD AMP**. Only **two** NAM
 blocks run per session; further NAM pedals pass dry and show a limit warning.
@@ -112,10 +122,13 @@ utility pedals and the Cab live in UTIL, the NAM Amp lives in AMP.
 use the **IR** button on the Cab pedal. IRs are rescanned when the plugin is
 loaded, so reload after adding files.
 
-Twelve board presets ship ready to play, including Clean Platform, 808 Stack,
-Lead Lift, Ambient Wash, Gojira Drop, Bass Growl, Funk Wah, Pitch Lead,
-Spring Surf, Lo-Fi Tape and Modern Metal.
-- Factory board presets: Clean Platform, 808 Stack, Lead Lift.
+Twenty-eight board presets ship ready to play, including Clean Platform, 808
+Stack, Lead Lift, Ambient Wash, Gojira Drop, Bass Growl, Funk Wah, Pitch Lead,
+Spring Surf, Lo-Fi Tape, Modern Metal, Classic Rock, Bluesbreaker, Country
+Twang, Shoegaze, Funk Machine, Bass DI, Synth Bass, Prog Lead, Worship, Garage,
+Doom and Acoustic DI.
+- Factory board presets: 28 across clean, drive, rock, blues, country, funk,
+  metal, bass, ambient, prog, worship, garage and acoustic categories.
 - User board and pedal presets: save, rename and delete.
 - Double-click resets a knob; right-click types an exact value.
 - CLAP and LV2 builds share state, automation, latency and GR plumbing.
@@ -157,9 +170,9 @@ cp -r build/lv2/pedal-suite.lv2 ~/.lv2/
 
 ## Roadmap
 
-1. Pedalboard visuals: LEDs, footswitch caps, patch cables.
-2. Pitch Drop and low-latency Retune.
-3. Drive/fuzz family, then modulation, time, reverb, dynamics.
-4. Full preset catalog and public alpha.
+1. More pedal models and artist-style capture/IR packs.
+2. Setlist and bank management for larger preset collections.
+3. macOS / Windows and VST3/AU packaging.
+4. Public beta polish and wider listening tests.
 
 GPL-3.0-or-later.
