@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.8-alpha — 2026-11-19
+
+- CLAP now keeps its own setlist/bank performance copy, so MIDI setlist and
+  bank control works with the editor closed.
+  - Setlists and user presets reload when the editor closes.
+  - Performance bank/entry position is published to the editor and adopted
+    when it reopens.
+- LV2 keeps the existing editor-driven performance control for now.
+
 ## 0.8.7-alpha — 2026-11-19
 
 - **ADD CURRENT** now snapshots the live board instead of requiring a loaded

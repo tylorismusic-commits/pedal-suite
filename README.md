@@ -1,6 +1,6 @@
 # Pedal Suite
 
-**Status: 0.8.7-alpha — 43 pedals, FFT Cab, NAM, tuner, MIDI learn, banks and setlists.**
+**Status: 0.8.8-alpha — 43 pedals, FFT Cab, NAM, tuner, MIDI learn, banks and setlists.**
 
 A virtual guitar and bass pedalboard in the Suite visual language: eight pedal
 slots across two pages of four, with a shared preset browser, typed values,
@@ -116,6 +116,10 @@ Setlists are stored in `~/.config/PedalSuite/setlists` and survive sessions.
 selects an entry in the active setlist. With no active setlist, Program Change
 selects a preset within the current bank. CC 28–31 are reserved for these
 performance controls.
+
+In **CLAP**, setlist and bank MIDI continue working with the editor closed:
+the plugin keeps a preloaded performance copy and reloads it when the editor
+closes. **LV2** still applies these controls through the editor window.
 
 **MIDI learn and expression:** open the **MIDI** button in the footer, then
 click **LEARN** on a pedal and send the note or CC you want. Each pedal stores

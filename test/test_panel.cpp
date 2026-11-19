@@ -202,6 +202,17 @@ int main() {
   check(state.presetIndex == 2,
         "MIDI Program Change selects a preset in the current bank");
 
+  // Performance position is published to the plugin and synced back.
+  state.presetBank = 3;
+  panel.tick(s, state);
+  check(s.perfBankIndex.load() == 3,
+        "editor publishes its performance bank");
+  s.perfBankIndex.store(2);
+  s.perfRevision.fetch_add(1);
+  panel.tick(s, state);
+  check(state.presetBank == 2,
+        "editor adopts audio-side performance bank");
+
   // Browser categories: UTIL, AMP and PRESETS.
   state.browserSlot = 4;
   state.browserCategory = 1;

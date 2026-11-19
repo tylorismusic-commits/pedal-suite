@@ -10,6 +10,7 @@
 #include "module_ids.hpp"
 #include "modules.hpp"
 #include "params.hpp"
+#include "performance.hpp"
 #include "presets.hpp"
 #include "setlists.hpp"
 #include "dsp/ir_bank.hpp"
@@ -324,6 +325,29 @@ int main() {
           "renamed setlist is listed");
     check(deleteSetlist(setlistDir(), "Renamed Set"), "setlist deletes");
     check(loadSetlists(setlistDir()).empty(), "setlist directory is empty");
+  }
+
+
+  {
+    std::filesystem::remove_all(setlistDir());
+    Setlist perfSet;
+    perfSet.name = "Perf Data";
+    SetlistEntry snap;
+    snap.name = "Live";
+    for (uint32_t i = 0; i < P_COUNT; ++i) snap.snapshot.push_back(a.get(i));
+    perfSet.entries = {snap, {"Clean Platform", true}, {"808 Stack", true}};
+    writeSetlist(setlistDir(), perfSet);
+    auto data = loadPerformanceData();
+    check(data && !data->banks.empty() &&
+              data->banks[0].size() >= static_cast<size_t>(kPresetCount),
+          "performance data builds preset banks");
+    check(data->setlists.size() == 1 && data->setlists[0].size() == 3,
+          "performance data resolves setlist entries");
+    check(data->setlists[0][0].size() == P_COUNT &&
+              data->setlists[0][1].size() == P_COUNT,
+          "performance snapshots expand to every parameter");
+    deleteSetlist(setlistDir(), "Perf Data");
+    std::filesystem::remove_all(setlistDir());
   }
 
   std::printf("%d failure(s)\n", failures);

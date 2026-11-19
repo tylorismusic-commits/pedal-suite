@@ -510,6 +510,40 @@ void Panel::tick(Shared& shared, PanelState& state) const {
       }
     }
   }
+
+  const uint32_t perfRevision =
+      shared.perfRevision.load(std::memory_order_acquire);
+  if (perfRevision != state.perfSeen) {
+    state.presetBank =
+        shared.perfBankIndex.load(std::memory_order_relaxed);
+    state.setlistIndex =
+        shared.perfSetlistIndex.load(std::memory_order_relaxed);
+    state.setlistEntry =
+        shared.perfSetlistEntry.load(std::memory_order_relaxed);
+    state.perfSeen = perfRevision;
+  }
+  const uint32_t programRevision =
+      shared.perfProgramRevision.load(std::memory_order_acquire);
+  if (programRevision != state.perfProgramSeen) {
+    state.perfProgramSeen = programRevision;
+    state.presetIndex = -1;
+    state.presetDirty = true;
+  }
+  if (perfRevision == state.perfSeen &&
+      (state.presetBank !=
+           shared.perfBankIndex.load(std::memory_order_relaxed) ||
+       state.setlistIndex !=
+           shared.perfSetlistIndex.load(std::memory_order_relaxed) ||
+       state.setlistEntry !=
+           shared.perfSetlistEntry.load(std::memory_order_relaxed))) {
+    shared.perfBankIndex.store(state.presetBank, std::memory_order_relaxed);
+    shared.perfSetlistIndex.store(state.setlistIndex,
+                                  std::memory_order_relaxed);
+    shared.perfSetlistEntry.store(state.setlistEntry,
+                                  std::memory_order_relaxed);
+    state.perfSeen =
+        shared.perfRevision.fetch_add(1, std::memory_order_release) + 1;
+  }
 }
 
 void Panel::layout(const Shared& shared, const PanelState& state) {

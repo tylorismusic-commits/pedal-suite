@@ -29,6 +29,7 @@
 #include "midi_map.hpp"
 #include "modules.hpp"
 #include "params.hpp"
+#include "performance.hpp"
 #include "state.hpp"
 #include "value_text.hpp"
 #include "version.hpp"
@@ -375,6 +376,7 @@ struct Plugin {
   std::atomic<bool> rescanQueued{false};
   std::atomic<bool> latencyQueued{false};
   std::shared_ptr<const pedal::IrBank> irBank;
+  std::shared_ptr<const PerformanceData> performance;
   int lastIrIndex = -2;
   bool irDirty = true;
   std::vector<std::string> namNames;
@@ -383,6 +385,80 @@ struct Plugin {
   int reportedTypes[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
   uint8_t lastCc[128] = {};
   float reportedGr[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
+
+  void reloadPerformance() {
+    std::atomic_store(&performance, loadPerformanceData());
+  }
+
+  void applyPerformanceValues(const std::vector<double>& values) {
+    if (values.empty()) return;
+    const size_t n = std::min(values.size(), static_cast<size_t>(P_COUNT));
+    for (size_t i = 0; i < n; ++i) {
+      shared.set(static_cast<uint32_t>(i), values[i]);
+    }
+    shared.perfProgramRevision.fetch_add(1, std::memory_order_release);
+  }
+
+  void performanceBankStep(int delta) {
+    auto data = std::atomic_load(&performance);
+    if (!data || data->banks.empty()) return;
+    const int count = static_cast<int>(data->banks.size());
+    int bank = shared.perfBankIndex.load(std::memory_order_relaxed);
+    bank = (bank + delta + count) % count;
+    shared.perfBankIndex.store(bank, std::memory_order_relaxed);
+    shared.perfRevision.fetch_add(1, std::memory_order_release);
+  }
+
+  void performanceSetlistStep(int delta) {
+    auto data = std::atomic_load(&performance);
+    if (!data || data->setlists.empty()) return;
+    const int setCount = static_cast<int>(data->setlists.size());
+    int set = std::clamp(
+        shared.perfSetlistIndex.load(std::memory_order_relaxed), 0,
+        setCount - 1);
+    const auto& entries = data->setlists[static_cast<size_t>(set)];
+    if (entries.empty()) return;
+    const int count = static_cast<int>(entries.size());
+    int entry = shared.perfSetlistEntry.load(std::memory_order_relaxed);
+    if (entry < 0) {
+      entry = delta > 0 ? 0 : count - 1;
+    } else {
+      entry = (entry + delta + count) % count;
+    }
+    applyPerformanceValues(entries[static_cast<size_t>(entry)]);
+    shared.perfSetlistIndex.store(set, std::memory_order_relaxed);
+    shared.perfSetlistEntry.store(entry, std::memory_order_relaxed);
+    shared.perfRevision.fetch_add(1, std::memory_order_release);
+  }
+
+  void performanceProgram(int program) {
+    if (program < 0) return;
+    auto data = std::atomic_load(&performance);
+    if (!data) return;
+    if (!data->setlists.empty()) {
+      const int setCount = static_cast<int>(data->setlists.size());
+      const int set = std::clamp(
+          shared.perfSetlistIndex.load(std::memory_order_relaxed), 0,
+          setCount - 1);
+      const auto& entries = data->setlists[static_cast<size_t>(set)];
+      if (program < static_cast<int>(entries.size())) {
+        applyPerformanceValues(entries[static_cast<size_t>(program)]);
+        shared.perfSetlistEntry.store(program, std::memory_order_relaxed);
+        shared.perfRevision.fetch_add(1, std::memory_order_release);
+        return;
+      }
+    }
+    if (data->banks.empty()) return;
+    const int bankCount = static_cast<int>(data->banks.size());
+    const int bank = std::clamp(
+        shared.perfBankIndex.load(std::memory_order_relaxed), 0,
+        bankCount - 1);
+    const auto& presets = data->banks[static_cast<size_t>(bank)];
+    if (program < static_cast<int>(presets.size())) {
+      applyPerformanceValues(presets[static_cast<size_t>(program)]);
+      shared.perfRevision.fetch_add(1, std::memory_order_release);
+    }
+  }
 };
 
 const char* const kFeatures[] = {CLAP_PLUGIN_FEATURE_AUDIO_EFFECT,
@@ -720,7 +796,12 @@ bool guiGetPreferredApi(const clap_plugin_t*, const char** api, bool* isFloating
 
 bool guiCreate(const clap_plugin_t*, const char*, bool) { return true; }
 
-void guiDestroy(const clap_plugin_t* p) { self(p)->editor.close(); }
+void guiDestroy(const clap_plugin_t* p) {
+  Plugin* s = self(p);
+  s->editor.close();
+  s->reloadPerformance();
+  s->shared.editorOpen.store(false, std::memory_order_release);
+}
 
 // X11 embedding uses physical pixels, so the host does not set a scale.
 bool guiSetScale(const clap_plugin_t*, double) { return false; }
@@ -757,9 +838,13 @@ bool guiSetSize(const clap_plugin_t* p, uint32_t width, uint32_t height) {
 }
 
 bool guiSetParent(const clap_plugin_t* p, const clap_window_t* window) {
-  return self(p)->editor.open(window->x11 ? reinterpret_cast<void*>(
-                                                static_cast<uintptr_t>(window->x11))
-                                          : nullptr);
+  Plugin* s = self(p);
+  const bool opened = s->editor.open(
+      window->x11 ? reinterpret_cast<void*>(
+                        static_cast<uintptr_t>(window->x11))
+                  : nullptr);
+  s->shared.editorOpen.store(opened, std::memory_order_release);
+  return opened;
 }
 
 bool guiSetTransient(const clap_plugin_t*, const clap_window_t*) { return false; }
@@ -889,9 +974,14 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
         const auto* midi = reinterpret_cast<const clap_event_midi_t*>(header);
         const uint8_t status = midi->data[0] & 0xF0;
         if (status == 0xC0) {
-          s->shared.midiSetlistPcValue.store(midi->data[1] & 0x7F,
-                                             std::memory_order_relaxed);
-          s->shared.midiSetlistPcSeq.fetch_add(1, std::memory_order_release);
+          const int program = midi->data[1] & 0x7F;
+          if (s->shared.editorOpen.load(std::memory_order_relaxed)) {
+            s->shared.midiSetlistPcValue.store(program,
+                                               std::memory_order_relaxed);
+            s->shared.midiSetlistPcSeq.fetch_add(1, std::memory_order_release);
+          } else {
+            s->performanceProgram(program);
+          }
           continue;
         }
         if (status == 0x90 && (midi->data[2] & 0x7F) > 0) {
@@ -937,18 +1027,32 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
           const bool was = s->lastCc[cc] >= 64;
           s->lastCc[cc] = midi->data[2] & 0x7F;
           if (now && !was) {
-            if (cc == kSetlistPrevCc) {
-              s->shared.midiSetlistPrevSeq.fetch_add(
-                  1, std::memory_order_release);
-            } else if (cc == kSetlistNextCc) {
-              s->shared.midiSetlistNextSeq.fetch_add(
-                  1, std::memory_order_release);
-            } else if (cc == kBankPrevCc) {
-              s->shared.midiBankPrevSeq.fetch_add(1,
-                                                  std::memory_order_release);
+            const bool uiOpen =
+                s->shared.editorOpen.load(std::memory_order_relaxed);
+            if (uiOpen) {
+              if (cc == kSetlistPrevCc) {
+                s->shared.midiSetlistPrevSeq.fetch_add(
+                    1, std::memory_order_release);
+              } else if (cc == kSetlistNextCc) {
+                s->shared.midiSetlistNextSeq.fetch_add(
+                    1, std::memory_order_release);
+              } else if (cc == kBankPrevCc) {
+                s->shared.midiBankPrevSeq.fetch_add(
+                    1, std::memory_order_release);
+              } else {
+                s->shared.midiBankNextSeq.fetch_add(
+                    1, std::memory_order_release);
+              }
             } else {
-              s->shared.midiBankNextSeq.fetch_add(1,
-                                                  std::memory_order_release);
+              if (cc == kSetlistPrevCc) {
+                s->performanceSetlistStep(-1);
+              } else if (cc == kSetlistNextCc) {
+                s->performanceSetlistStep(1);
+              } else if (cc == kBankPrevCc) {
+                s->performanceBankStep(-1);
+              } else {
+                s->performanceBankStep(1);
+              }
             }
           }
           continue;
@@ -1115,6 +1219,7 @@ Plugin* createPlugin(const clap_host_t* host) {
   s->plugin.on_main_thread = pluginOnMainThread;
   s->engine.prepare(48000.0f);
   initializeRack(s->shared);
+  s->reloadPerformance();
   s->irBank = pedal::loadIrBank(pedal::irDir(), 48000);
   s->namNames = pedal::listNamFiles(pedal::namDir());
   s->shared.namBankCount.store(

@@ -285,6 +285,15 @@ public:
   std::atomic<int> midiSetlistPcValue{-1};
   std::atomic<uint32_t> midiBankNextSeq{0};
   std::atomic<uint32_t> midiBankPrevSeq{0};
+  // Performance position shared between the UI and the plugin's audio-side
+  // setlist engine.  The editor publishes its state; audio updates it when
+  // the editor is closed.
+  std::atomic<bool> editorOpen{false};
+  std::atomic<int> perfBankIndex{0};
+  std::atomic<int> perfSetlistIndex{0};
+  std::atomic<int> perfSetlistEntry{-1};
+  std::atomic<uint32_t> perfRevision{0};
+  std::atomic<uint32_t> perfProgramRevision{0};
   std::atomic<int> irBankCount{0};
   std::atomic<int> namBankCount{0};
 

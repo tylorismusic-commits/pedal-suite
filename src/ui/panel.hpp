@@ -50,6 +50,8 @@ struct PanelState {
   uint32_t midiSetlistPcSeen = 0;
   uint32_t midiBankNextSeen = 0;
   uint32_t midiBankPrevSeen = 0;
+  uint32_t perfSeen = 0;
+  uint32_t perfProgramSeen = 0;
   int irPickerSlot = -1;
   int irScroll = 0;
   bool pickerNam = false;
