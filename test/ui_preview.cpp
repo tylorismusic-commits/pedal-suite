@@ -27,11 +27,16 @@ int main(int argc, char** argv) {
   {
     Setlist preview;
     preview.name = "Live Set";
-    preview.entries = {{"Clean Platform", true},
+    SetlistEntry snapshot;
+    snapshot.name = "Current Board";
+    for (uint32_t i = 0; i < P_COUNT; ++i) {
+      snapshot.snapshot.push_back(s.get(i));
+    }
+    preview.entries = {snapshot,
+                       {"Clean Platform", true},
                        {"808 Stack", true},
                        {"Lead Lift", true},
-                       {"Ambient Wash", true},
-                       {"Bass Growl", true}};
+                       {"Ambient Wash", true}};
     writeSetlist(setlistDir(), preview);
   }
   Panel panel;

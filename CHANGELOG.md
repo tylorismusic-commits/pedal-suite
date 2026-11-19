@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.7-alpha — 2026-11-19
+
+- **ADD CURRENT** now snapshots the live board instead of requiring a loaded
+  preset. It works on the initial/Init board and captures unsaved edits.
+- If no setlist exists, ADD CURRENT creates one automatically.
+- Setlist snapshot files store an explicit value count so future parameter
+  additions remain readable.
+
 ## 0.8.6-alpha — 2026-11-19
 
 - Moved the setlist manager hint above the action buttons so it no longer

@@ -159,6 +159,8 @@ private:
   std::vector<std::string> presetBankNames() const;
   std::vector<int> presetOrderForBank(int bank) const;
   int resolveSetlistEntry(const SetlistEntry& entry) const;
+  void applySetlistEntry(Shared& shared, PanelState& state,
+                         const SetlistEntry& entry) const;
   void drawIrPicker(cairo_t* cr, const Shared& shared,
                     const PanelState& state) const;
   void drawPresetList(cairo_t* cr, const Shared& shared,

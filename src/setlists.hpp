@@ -18,6 +18,9 @@ inline constexpr const char* kSetlistExt = ".setlist";
 struct SetlistEntry {
   std::string name;
   bool factory = false;
+  // A snapshot captures the live board, including unsaved edits.  Reference
+  // entries leave this empty and point at a factory or user preset by name.
+  std::vector<double> snapshot;
 };
 
 struct Setlist {
@@ -44,7 +47,14 @@ inline bool writeSetlist(const std::filesystem::path& dir,
   out << "PedalSuiteSetlist 1\n";
   out << "name " << name << "\n";
   for (const SetlistEntry& e : setlist.entries) {
-    out << "entry " << (e.factory ? "F " : "U ") << e.name << "\n";
+    out << "entry " << (e.snapshot.empty() ? (e.factory ? "F " : "U ") : "S ")
+        << e.name << "\n";
+    if (!e.snapshot.empty()) {
+      out.precision(17);
+      out << "snap " << e.snapshot.size();
+      for (double v : e.snapshot) out << ' ' << v;
+      out << "\n";
+    }
   }
   out.close();
   if (!out) return false;
@@ -121,8 +131,28 @@ inline std::vector<Setlist> loadSetlists(const std::filesystem::path& dir) {
         if (a == std::string::npos) continue;
         entryName = entryName.substr(a);
         if (!entryName.empty()) {
-          setlist.entries.push_back(
-              {entryName, kind == 'F' || kind == 'f'});
+          SetlistEntry entry;
+          entry.name = entryName;
+          entry.factory = kind == 'F' || kind == 'f';
+          setlist.entries.push_back(std::move(entry));
+        }
+      } else if (key == "snap") {
+        if (!setlist.entries.empty()) {
+          size_t count = 0;
+          in >> count;
+          count = std::min<size_t>(count, static_cast<size_t>(P_COUNT));
+          std::vector<double> values;
+          values.reserve(count);
+          bool ok = true;
+          for (size_t i = 0; i < count; ++i) {
+            double v = 0.0;
+            if (!(in >> v)) {
+              ok = false;
+              break;
+            }
+            values.push_back(v);
+          }
+          if (ok) setlist.entries.back().snapshot = std::move(values);
         }
       } else {
         std::string ignored;

@@ -142,11 +142,14 @@ int main() {
   panel.pointerUp(s, state);
   check(std::filesystem::exists(setlistDir() / "Setlist 1.setlist"),
         "NEW creates a setlist file");
+  state.presetIndex = -1;
   panel.pointerDown(s, state, 417, 587, false);
   panel.pointerUp(s, state);
   auto created = loadSetlists(setlistDir());
-  check(created.size() == 1 && created[0].entries.size() == 1,
-        "ADD CURRENT appends the active board");
+  check(created.size() == 1 && created[0].entries.size() == 1 &&
+            created[0].entries[0].snapshot.size() == P_COUNT &&
+            created[0].entries[0].name == "Current Board",
+        "ADD CURRENT snapshots the live board without a selected preset");
   panel.pointerDown(s, state, 540, 621, false);
   panel.pointerUp(s, state);
   check(state.setlistEntry == 0, "NEXT selects the first entry");
@@ -155,6 +158,13 @@ int main() {
   panel.pointerDown(s, state, 311, 631, false);
   panel.pointerUp(s, state);
   check(loadSetlists(setlistDir()).empty(), "DELETE removes the setlist");
+  panel.pointerDown(s, state, 417, 587, false);
+  panel.pointerUp(s, state);
+  auto autoCreated = loadSetlists(setlistDir());
+  check(autoCreated.size() == 1 && autoCreated[0].entries.size() == 1,
+        "ADD CURRENT creates a setlist when none exists");
+  deleteSetlist(setlistDir(), autoCreated[0].name);
+  panel.reloadSetlists();
   panel.pointerDown(s, state, 786, 621, false);
   panel.pointerUp(s, state);
   check(!state.setlistOpen, "setlist manager closes");

@@ -334,6 +334,7 @@ std::vector<int> Panel::presetOrderForBank(int bank) const {
 }
 
 int Panel::resolveSetlistEntry(const SetlistEntry& entry) const {
+  if (!entry.snapshot.empty()) return -1;
   if (entry.factory) {
     for (int i = 0; i < kPresetCount; ++i) {
       if (entry.name == kPresets[i].name) return i;
@@ -346,6 +347,23 @@ int Panel::resolveSetlistEntry(const SetlistEntry& entry) const {
     }
   }
   return -1;
+}
+
+void Panel::applySetlistEntry(Shared& shared, PanelState& state,
+                              const SetlistEntry& entry) const {
+  if (!entry.snapshot.empty()) {
+    const int n = std::min(static_cast<int>(entry.snapshot.size()),
+                           static_cast<int>(P_COUNT));
+    for (int i = 0; i < n; ++i) {
+      shared.set(static_cast<uint32_t>(i), entry.snapshot[static_cast<size_t>(i)]);
+    }
+    state.presetIndex = -1;
+    state.presetDirty = true;
+    state.presetOpen = 0;
+    return;
+  }
+  const int resolved = resolveSetlistEntry(entry);
+  if (resolved >= 0) applyPreset(shared, state, resolved);
 }
 Panel::~Panel() {
   if (font_) cairo_font_face_destroy(font_);
@@ -428,9 +446,7 @@ void Panel::tick(Shared& shared, PanelState& state) const {
     state.setlistEntryScroll =
         std::max(0, std::min(index - 5,
                              static_cast<int>(set.entries.size()) - 12));
-    const int resolved =
-        resolveSetlistEntry(set.entries[static_cast<size_t>(index)]);
-    if (resolved >= 0) applyPreset(shared, state, resolved);
+    applySetlistEntry(shared, state, set.entries[static_cast<size_t>(index)]);
   };
 
   const uint32_t setlistNext =
@@ -1591,16 +1607,19 @@ void Panel::drawSetlist(cairo_t* cr, const Shared& /*shared*/,
            active ? kAccent.b : kDim.b);
       const SetlistEntry& entry =
           current->entries[static_cast<size_t>(index)];
-      const int resolved = resolveSetlistEntry(entry);
+      const bool snapshot = !entry.snapshot.empty();
+      const int resolved = snapshot ? -2 : resolveSetlistEntry(entry);
+      const bool missing = !snapshot && resolved < 0;
       text(cr, entry.name.c_str(), rightX + 34, ry + 4, 8.5, 0,
-           resolved >= 0 ? kText.r : 1.0, resolved >= 0 ? kText.g : 0.45,
-           resolved >= 0 ? kText.b : 0.34);
-      const char* tag = resolved < 0
-                            ? "MISSING"
-                            : (entry.factory ? "FACTORY" : "USER");
+           missing ? 1.0 : kText.r, missing ? 0.45 : kText.g,
+           missing ? 0.34 : kText.b);
+      const char* tag = snapshot
+                            ? "SNAPSHOT"
+                            : (missing ? "MISSING"
+                                       : (entry.factory ? "FACTORY" : "USER"));
       text(cr, tag, rightX + 520, ry + 4, 6.5, 2,
-           resolved < 0 ? 1.0 : kDim.r, resolved < 0 ? 0.45 : kDim.g,
-           resolved < 0 ? 0.34 : kDim.b);
+           missing ? 1.0 : kDim.r, missing ? 0.45 : kDim.g,
+           missing ? 0.34 : kDim.b);
     }
     if (entryCount == 0) {
       text(cr, "No entries. Load a board, then click ADD CURRENT.",
@@ -2333,9 +2352,8 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
           index >= static_cast<int>(current->entries.size())) {
         return;
       }
-      const int resolved =
-          resolveSetlistEntry(current->entries[static_cast<size_t>(index)]);
-      if (resolved >= 0) applyPreset(shared, state, resolved);
+      applySetlistEntry(shared, state,
+                        current->entries[static_cast<size_t>(index)]);
       state.setlistEntry = index;
       state.setlistEntryScroll =
           std::max(0, std::min(index - 5,
@@ -2431,22 +2449,29 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     auto inButton = [&](double bx0, double by0) {
       return x >= bx0 && x <= bx0 + btnW && y >= by0 && y <= by0 + 26;
     };
-    if (inButton(rightX, row1) && current &&
-        state.presetIndex >= 0 && state.presetIndex < presetCount()) {
-      SetlistEntry entry;
-      if (state.presetIndex < kPresetCount) {
-        entry.name = kPresets[state.presetIndex].name;
-        entry.factory = true;
-      } else {
-        const int user = state.presetIndex - kPresetCount;
-        entry.name = userPresets_[static_cast<size_t>(user)].name;
-        entry.factory = false;
+    if (inButton(rightX, row1)) {
+      if (setlists_.empty()) {
+        Setlist created;
+        created.name = "Setlist 1";
+        setlists_.push_back(created);
+        state.setlistIndex = 0;
       }
-      current->entries.push_back(entry);
-      persist();
-      state.setlistEntry = static_cast<int>(current->entries.size()) - 1;
-      state.setlistEntryScroll =
-          std::max(0, state.setlistEntry - 11);
+      state.setlistIndex = std::clamp(
+          state.setlistIndex, 0, static_cast<int>(setlists_.size()) - 1);
+      Setlist& target = setlists_[static_cast<size_t>(state.setlistIndex)];
+      SetlistEntry entry;
+      entry.name = state.presetIndex >= 0 &&
+                           state.presetIndex < presetCount()
+                       ? presetName(state.presetIndex)
+                       : "Current Board";
+      entry.snapshot.reserve(P_COUNT);
+      for (uint32_t i = 0; i < P_COUNT; ++i) {
+        entry.snapshot.push_back(shared.get(i));
+      }
+      target.entries.push_back(entry);
+      writeSetlist(setlistDir(), target);
+      state.setlistEntry = static_cast<int>(target.entries.size()) - 1;
+      state.setlistEntryScroll = std::max(0, state.setlistEntry - 11);
       return true;
     }
     if (inButton(rightX + btnW + btnGap, row1) && current &&
