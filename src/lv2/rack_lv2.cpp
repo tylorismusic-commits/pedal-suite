@@ -14,7 +14,9 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <chrono>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "dsp/engine.hpp"
@@ -22,6 +24,7 @@
 #include "midi_map.hpp"
 #include "modules.hpp"
 #include "params.hpp"
+#include "performance.hpp"
 #include "state.hpp"
 
 namespace {
@@ -61,6 +64,14 @@ enum Port : uint32_t {
   PORT_MIDI_SETLIST_PC_VALUE,
   PORT_MIDI_BANK_NEXT,
   PORT_MIDI_BANK_PREV,
+  PORT_EDITOR_OPEN,
+  PORT_PERF_BANK_IN,
+  PORT_PERF_SETLIST_IN,
+  PORT_PERF_ENTRY_IN,
+  PORT_PERF_BANK,
+  PORT_PERF_SETLIST,
+  PORT_PERF_ENTRY,
+  PORT_PERF_REVISION,
   PORT_COUNT
 };
 
@@ -98,6 +109,19 @@ struct Plugin {
   float* midiSetlistPcValuePort = nullptr;
   float* midiBankNextPort = nullptr;
   float* midiBankPrevPort = nullptr;
+  float* editorOpenPort = nullptr;
+  float* perfBankInPort = nullptr;
+  float* perfSetlistInPort = nullptr;
+  float* perfEntryInPort = nullptr;
+  float* perfBankPort = nullptr;
+  float* perfSetlistPort = nullptr;
+  float* perfEntryPort = nullptr;
+  float* perfRevisionPort = nullptr;
+  pedal::PerformanceController performance;
+  std::atomic<bool> perfReload{false};
+  std::atomic<bool> perfQuit{false};
+  std::thread perfThread;
+  bool editorWasOpen = false;
   float lastLearnSlot = -2.0f;
   float lastLearnExpr = -1.0f;
   uint8_t lastCc[128] = {};
@@ -137,6 +161,15 @@ LV2_Handle instantiate(const LV2_Descriptor*, double rate, const char*,
   }
   p->engine.prepare(p->sampleRate);
   pedal::initializeRack(p->shared);
+  p->performance.reload();
+  p->perfThread = std::thread([p] {
+    while (!p->perfQuit.load(std::memory_order_relaxed)) {
+      if (p->perfReload.exchange(false, std::memory_order_acq_rel)) {
+        p->performance.reload();
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+  });
   p->irBank = pedal::loadIrBank(
       pedal::irDir(), static_cast<int>(std::lround(p->sampleRate)));
   p->namNames = pedal::listNamFiles(pedal::namDir());
@@ -205,6 +238,30 @@ void connectPort(LV2_Handle handle, uint32_t port, void* data) {
     case PORT_MIDI_BANK_PREV:
       p->midiBankPrevPort = static_cast<float*>(data);
       break;
+    case PORT_EDITOR_OPEN:
+      p->editorOpenPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_BANK_IN:
+      p->perfBankInPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_SETLIST_IN:
+      p->perfSetlistInPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_ENTRY_IN:
+      p->perfEntryInPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_BANK:
+      p->perfBankPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_SETLIST:
+      p->perfSetlistPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_ENTRY:
+      p->perfEntryPort = static_cast<float*>(data);
+      break;
+    case PORT_PERF_REVISION:
+      p->perfRevisionPort = static_cast<float*>(data);
+      break;
     default:
       if (port >= PORT_FIRST_PARAM &&
           port < PORT_FIRST_PARAM + pedal::P_COUNT) {
@@ -251,6 +308,32 @@ void run(LV2_Handle handle, uint32_t frames) {
   }
   p->portsSeen = true;
 
+  const bool editorOpen =
+      p->editorOpenPort && *p->editorOpenPort > 0.5f;
+  const bool wasOpen = p->editorWasOpen;
+  p->editorWasOpen = editorOpen;
+  if (!editorOpen && wasOpen) {
+    p->perfReload.store(true, std::memory_order_release);
+  }
+  p->shared.editorOpen.store(editorOpen, std::memory_order_relaxed);
+  if (editorOpen || (!editorOpen && wasOpen)) {
+    if (p->perfBankInPort) {
+      p->shared.perfBankIndex.store(
+          static_cast<int>(std::lround(*p->perfBankInPort)),
+          std::memory_order_relaxed);
+    }
+    if (p->perfSetlistInPort) {
+      p->shared.perfSetlistIndex.store(
+          static_cast<int>(std::lround(*p->perfSetlistInPort)),
+          std::memory_order_relaxed);
+    }
+    if (p->perfEntryInPort) {
+      p->shared.perfSetlistEntry.store(
+          static_cast<int>(std::lround(*p->perfEntryInPort)),
+          std::memory_order_relaxed);
+    }
+  }
+
   if (p->midiLearnSlotPort && *p->midiLearnSlotPort != p->lastLearnSlot) {
     p->lastLearnSlot = *p->midiLearnSlotPort;
     p->shared.midiLearnSlot.store(
@@ -269,9 +352,14 @@ void run(LV2_Handle handle, uint32_t frames) {
       const uint8_t* msg = reinterpret_cast<const uint8_t*>(ev + 1);
       const uint8_t status = msg[0] & 0xF0;
       if (status == 0xC0) {
-        p->shared.midiSetlistPcValue.store(msg[1] & 0x7F,
-                                           std::memory_order_relaxed);
-        p->shared.midiSetlistPcSeq.fetch_add(1, std::memory_order_release);
+        const int program = msg[1] & 0x7F;
+        if (p->shared.editorOpen.load(std::memory_order_relaxed)) {
+          p->shared.midiSetlistPcValue.store(program,
+                                             std::memory_order_relaxed);
+          p->shared.midiSetlistPcSeq.fetch_add(1, std::memory_order_release);
+        } else {
+          p->performance.program(p->shared, program);
+        }
         continue;
       }
       if (status == 0x90 && msg[2] > 0) {
@@ -315,18 +403,28 @@ void run(LV2_Handle handle, uint32_t frames) {
           const bool was = p->lastCc[cc] >= 64;
           p->lastCc[cc] = msg[2] & 0x7F;
           if (now && !was) {
-            if (cc == pedal::kSetlistPrevCc) {
-              p->shared.midiSetlistPrevSeq.fetch_add(
-                  1, std::memory_order_release);
+            if (p->shared.editorOpen.load(std::memory_order_relaxed)) {
+              if (cc == pedal::kSetlistPrevCc) {
+                p->shared.midiSetlistPrevSeq.fetch_add(
+                    1, std::memory_order_release);
+              } else if (cc == pedal::kSetlistNextCc) {
+                p->shared.midiSetlistNextSeq.fetch_add(
+                    1, std::memory_order_release);
+              } else if (cc == pedal::kBankPrevCc) {
+                p->shared.midiBankPrevSeq.fetch_add(
+                    1, std::memory_order_release);
+              } else {
+                p->shared.midiBankNextSeq.fetch_add(
+                    1, std::memory_order_release);
+              }
+            } else if (cc == pedal::kSetlistPrevCc) {
+              p->performance.setlistStep(p->shared, -1);
             } else if (cc == pedal::kSetlistNextCc) {
-              p->shared.midiSetlistNextSeq.fetch_add(
-                  1, std::memory_order_release);
+              p->performance.setlistStep(p->shared, 1);
             } else if (cc == pedal::kBankPrevCc) {
-              p->shared.midiBankPrevSeq.fetch_add(1,
-                                                  std::memory_order_release);
+              p->performance.bankStep(p->shared, -1);
             } else {
-              p->shared.midiBankNextSeq.fetch_add(1,
-                                                  std::memory_order_release);
+              p->performance.bankStep(p->shared, 1);
             }
           }
           continue;
@@ -373,6 +471,22 @@ void run(LV2_Handle handle, uint32_t frames) {
   if (p->midiBankPrevPort) {
     *p->midiBankPrevPort = static_cast<float>(
         p->shared.midiBankPrevSeq.load(std::memory_order_relaxed));
+  }
+  if (p->perfBankPort) {
+    *p->perfBankPort = static_cast<float>(
+        p->shared.perfBankIndex.load(std::memory_order_relaxed));
+  }
+  if (p->perfSetlistPort) {
+    *p->perfSetlistPort = static_cast<float>(
+        p->shared.perfSetlistIndex.load(std::memory_order_relaxed));
+  }
+  if (p->perfEntryPort) {
+    *p->perfEntryPort = static_cast<float>(
+        p->shared.perfSetlistEntry.load(std::memory_order_relaxed));
+  }
+  if (p->perfRevisionPort) {
+    *p->perfRevisionPort = static_cast<float>(
+        p->shared.perfRevision.load(std::memory_order_relaxed));
   }
 
   p->engine.setControls(pedal::controlsFrom(p->shared), p->shared.revision());
@@ -493,7 +607,12 @@ const void* extensionData(const char* uri) {
   return nullptr;
 }
 
-void cleanup(LV2_Handle handle) { delete static_cast<Plugin*>(handle); }
+void cleanup(LV2_Handle handle) {
+  auto* p = static_cast<Plugin*>(handle);
+  p->perfQuit.store(true, std::memory_order_release);
+  if (p->perfThread.joinable()) p->perfThread.join();
+  delete p;
+}
 
 const LV2_Descriptor kDescriptor = {kPluginUri,      instantiate, connectPort,
                                     activate,        run,         deactivate,

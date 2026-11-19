@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.9-alpha — 2026-11-19
+
+- LV2 now also keeps a plugin-side performance copy, so setlist and bank MIDI
+  works with the editor closed.
+- Added `editor_open`, performance-position input/output ports and a background
+  setlist reload when the LV2 editor closes.
+- CLAP and LV2 share the same performance engine and synchronize bank/entry
+  position with the editor.
+
 ## 0.8.8-alpha — 2026-11-19
 
 - CLAP now keeps its own setlist/bank performance copy, so MIDI setlist and

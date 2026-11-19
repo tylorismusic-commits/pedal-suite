@@ -333,6 +333,49 @@ std::string buildPluginTtl() {
     }
   }
 
+  {
+    const char* const inputs[4] = {"editor_open", "perf_bank_in",
+                                   "perf_setlist_in", "perf_entry_in"};
+    const char* const inputNames[4] = {
+        "Editor Open", "Performance Bank", "Performance Setlist",
+        "Performance Entry"};
+    for (int i = 0; i < 4; ++i) {
+      std::ostringstream p;
+      p << "    [\n";
+      p << "        a lv2:InputPort , lv2:ControlPort ;\n";
+      p << "        lv2:index " << index++ << " ;\n";
+      p << "        lv2:symbol \"" << inputs[i] << "\" ;\n";
+      p << "        lv2:name \"" << inputNames[i] << "\" ;\n";
+      p << "        lv2:default " << (i == 0 ? 0 : (i == 3 ? -1 : 0)) << " ;\n";
+      p << "        lv2:minimum " << (i == 0 ? 0 : (i == 3 ? -1 : 0)) << " ;\n";
+      p << "        lv2:maximum " << (i == 0 ? 1 : 1000) << " ;\n";
+      p << "        lv2:portProperty pprops:notOnGUI ;\n";
+      p << "        pg:group <" << groupUri("Performance") << "> ;\n";
+      p << "    ]";
+      ports.push_back(p.str());
+    }
+    const char* const outputs[4] = {"perf_bank", "perf_setlist", "perf_entry",
+                                    "perf_revision"};
+    const char* const outputNames[4] = {
+        "Performance Bank", "Performance Setlist", "Performance Entry",
+        "Performance Revision"};
+    for (int i = 0; i < 4; ++i) {
+      std::ostringstream p;
+      p << "    [\n";
+      p << "        a lv2:OutputPort , lv2:ControlPort ;\n";
+      p << "        lv2:index " << index++ << " ;\n";
+      p << "        lv2:symbol \"" << outputs[i] << "\" ;\n";
+      p << "        lv2:name \"" << outputNames[i] << "\" ;\n";
+      p << "        lv2:default " << (i == 2 ? -1 : 0) << " ;\n";
+      p << "        lv2:minimum " << (i == 2 ? -1 : 0) << " ;\n";
+      p << "        lv2:maximum " << (i == 3 ? 1000000 : 1000) << " ;\n";
+      p << "        lv2:portProperty pprops:notOnGUI ;\n";
+      p << "        pg:group <" << groupUri("Performance") << "> ;\n";
+      p << "    ]";
+      ports.push_back(p.str());
+    }
+  }
+
   for (size_t i = 0; i < ports.size(); ++i) {
     out << ports[i];
     out << (i + 1 == ports.size() ? " .\n" : " ,\n");
@@ -353,6 +396,8 @@ std::string buildPluginTtl() {
     addGroup(pedal::kParamSpecs[id].module);
   }
   addGroup("Meter");
+  addGroup("MIDI");
+  addGroup("Performance");
   addGroup("Latency");
   out << "\n" << groups.str();
   return out.str();

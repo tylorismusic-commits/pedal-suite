@@ -350,6 +350,48 @@ int main() {
     std::filesystem::remove_all(setlistDir());
   }
 
+
+  {
+    std::filesystem::remove_all(setlistDir());
+    Shared one;
+    initializeRack(one);
+    one.set(slotParam(0, kSlotOffsetC0), 0.30);
+    Shared two;
+    initializeRack(two);
+    two.set(slotParam(0, kSlotOffsetC0), 0.70);
+    Setlist perfSet;
+    perfSet.name = "Engine Set";
+    SetlistEntry a;
+    a.name = "A";
+    for (uint32_t i = 0; i < P_COUNT; ++i) a.snapshot.push_back(one.get(i));
+    SetlistEntry b;
+    b.name = "B";
+    for (uint32_t i = 0; i < P_COUNT; ++i) b.snapshot.push_back(two.get(i));
+    perfSet.entries = {a, b};
+    writeSetlist(setlistDir(), perfSet);
+
+    Shared live;
+    initializeRack(live);
+    PerformanceController controller;
+    controller.reload();
+    live.perfSetlistIndex.store(0);
+    live.perfSetlistEntry.store(-1);
+    controller.setlistStep(live, 1);
+    check(std::fabs(live.get(slotParam(0, kSlotOffsetC0)) - 0.30) < 1e-6,
+          "performance engine loads the first setlist snapshot");
+    controller.setlistStep(live, 1);
+    check(std::fabs(live.get(slotParam(0, kSlotOffsetC0)) - 0.70) < 1e-6,
+          "performance engine steps to the second snapshot");
+    controller.bankStep(live, 1);
+    check(live.perfBankIndex.load() == 1,
+          "performance engine steps the bank index");
+    controller.program(live, 0);
+    check(std::fabs(live.get(slotParam(0, kSlotOffsetC0)) - 0.30) < 1e-6,
+          "performance engine Program Change loads setlist entry 0");
+    deleteSetlist(setlistDir(), "Engine Set");
+    std::filesystem::remove_all(setlistDir());
+  }
+
   std::printf("%d failure(s)\n", failures);
   return failures == 0 ? 0 : 1;
 }

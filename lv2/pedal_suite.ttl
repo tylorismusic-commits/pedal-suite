@@ -24,7 +24,7 @@
     ] ;
     doap:homepage <https://github.com/tylorismusic-commits/pedal-suite> ;
     lv2:minorVersion 8 ;
-    lv2:microVersion 8 ;
+    lv2:microVersion 9 ;
     lv2:binary <pedal_suite.so> ;
     rdfs:seeAlso <manifest.ttl> ;
     ui:ui <https://github.com/tylorismusic-commits/pedal-suite#ui> ;
@@ -2316,6 +2316,94 @@
         lv2:maximum 1000000 ;
         lv2:portProperty pprops:notOnGUI ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 183 ;
+        lv2:symbol "editor_open" ;
+        lv2:name "Editor Open" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 184 ;
+        lv2:symbol "perf_bank_in" ;
+        lv2:name "Performance Bank" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 185 ;
+        lv2:symbol "perf_setlist_in" ;
+        lv2:name "Performance Setlist" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:InputPort , lv2:ControlPort ;
+        lv2:index 186 ;
+        lv2:symbol "perf_entry_in" ;
+        lv2:name "Performance Entry" ;
+        lv2:default -1 ;
+        lv2:minimum -1 ;
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 187 ;
+        lv2:symbol "perf_bank" ;
+        lv2:name "Performance Bank" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 188 ;
+        lv2:symbol "perf_setlist" ;
+        lv2:name "Performance Setlist" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 189 ;
+        lv2:symbol "perf_entry" ;
+        lv2:name "Performance Entry" ;
+        lv2:default -1 ;
+        lv2:minimum -1 ;
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 190 ;
+        lv2:symbol "perf_revision" ;
+        lv2:name "Performance Revision" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1000000 ;
+        lv2:portProperty pprops:notOnGUI ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#performance> ;
     ] .
 
 
@@ -2344,5 +2432,7 @@
 <https://github.com/tylorismusic-commits/pedal-suite#midi> a pg:Group ; lv2:symbol "midi" ; lv2:name "MIDI" .
 
 <https://github.com/tylorismusic-commits/pedal-suite#meter> a pg:Group ; lv2:symbol "meter" ; lv2:name "Meter" .
+
+<https://github.com/tylorismusic-commits/pedal-suite#performance> a pg:Group ; lv2:symbol "performance" ; lv2:name "Performance" .
 
 <https://github.com/tylorismusic-commits/pedal-suite#latency> a pg:Group ; lv2:symbol "latency" ; lv2:name "Latency" .

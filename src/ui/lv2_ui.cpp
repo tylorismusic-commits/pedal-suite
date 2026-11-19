@@ -46,6 +46,14 @@ constexpr uint32_t kSetlistPcSeqPort = kMidiInPort + 7;
 constexpr uint32_t kSetlistPcValuePort = kMidiInPort + 8;
 constexpr uint32_t kBankNextPort = kMidiInPort + 9;
 constexpr uint32_t kBankPrevPort = kMidiInPort + 10;
+constexpr uint32_t kEditorOpenPort = kMidiInPort + 11;
+constexpr uint32_t kPerfBankInPort = kMidiInPort + 12;
+constexpr uint32_t kPerfSetlistInPort = kMidiInPort + 13;
+constexpr uint32_t kPerfEntryInPort = kMidiInPort + 14;
+constexpr uint32_t kPerfBankPort = kMidiInPort + 15;
+constexpr uint32_t kPerfSetlistPort = kMidiInPort + 16;
+constexpr uint32_t kPerfEntryPort = kMidiInPort + 17;
+constexpr uint32_t kPerfRevisionPort = kMidiInPort + 18;
 constexpr auto kFrameInterval = std::chrono::milliseconds(33);
 
 struct Ui {
@@ -72,6 +80,10 @@ struct Ui {
   bool dirty = true;
   int lastLearnSlotSent = -2;
   bool lastLearnExprSent = false;
+  bool editorOpenSent = false;
+  int lastPerfBankSent = -999;
+  int lastPerfSetlistSent = -999;
+  int lastPerfEntrySent = -999;
   std::chrono::steady_clock::time_point lastFrame{};
 
   double layoutScale() const {
@@ -232,6 +244,29 @@ struct Ui {
 
   int idle() {
     if (write && controller) {
+      if (!editorOpenSent) {
+        editorOpenSent = true;
+        const float one = 1.0f;
+        write(controller, kEditorOpenPort, sizeof(float), 0, &one);
+      }
+      const int perfBank = shared.perfBankIndex.load();
+      const int perfSetlist = shared.perfSetlistIndex.load();
+      const int perfEntry = shared.perfSetlistEntry.load();
+      if (perfBank != lastPerfBankSent) {
+        lastPerfBankSent = perfBank;
+        const float v = static_cast<float>(perfBank);
+        write(controller, kPerfBankInPort, sizeof(float), 0, &v);
+      }
+      if (perfSetlist != lastPerfSetlistSent) {
+        lastPerfSetlistSent = perfSetlist;
+        const float v = static_cast<float>(perfSetlist);
+        write(controller, kPerfSetlistInPort, sizeof(float), 0, &v);
+      }
+      if (perfEntry != lastPerfEntrySent) {
+        lastPerfEntrySent = perfEntry;
+        const float v = static_cast<float>(perfEntry);
+        write(controller, kPerfEntryInPort, sizeof(float), 0, &v);
+      }
       const int learnSlot = shared.midiLearnSlot.load();
       if (learnSlot != lastLearnSlotSent) {
         lastLearnSlotSent = learnSlot;
@@ -347,6 +382,16 @@ LV2UI_Handle uiInstantiate(const LV2UI_Descriptor*, const char* /*pluginUri*/,
 
 void uiCleanup(LV2UI_Handle handle) {
   auto* ui = static_cast<Ui*>(handle);
+  if (ui->write && ui->controller) {
+    const float bank = static_cast<float>(ui->shared.perfBankIndex.load());
+    const float set = static_cast<float>(ui->shared.perfSetlistIndex.load());
+    const float entry = static_cast<float>(ui->shared.perfSetlistEntry.load());
+    ui->write(ui->controller, kPerfBankInPort, sizeof(float), 0, &bank);
+    ui->write(ui->controller, kPerfSetlistInPort, sizeof(float), 0, &set);
+    ui->write(ui->controller, kPerfEntryInPort, sizeof(float), 0, &entry);
+    const float zero = 0.0f;
+    ui->write(ui->controller, kEditorOpenPort, sizeof(float), 0, &zero);
+  }
   if (ui->cr) {
     cairo_destroy(ui->cr);
   }
@@ -420,6 +465,27 @@ void uiPortEvent(LV2UI_Handle handle, uint32_t port, uint32_t size,
   }
   if (port == kBankPrevPort) {
     ui->shared.midiBankPrevSeq.store(
+        static_cast<uint32_t>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kPerfBankPort) {
+    ui->shared.perfBankIndex.store(static_cast<int>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kPerfSetlistPort) {
+    ui->shared.perfSetlistIndex.store(static_cast<int>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kPerfEntryPort) {
+    ui->shared.perfSetlistEntry.store(static_cast<int>(std::lround(v)));
+    ui->dirty = true;
+    return;
+  }
+  if (port == kPerfRevisionPort) {
+    ui->shared.perfRevision.store(
         static_cast<uint32_t>(std::lround(v)));
     ui->dirty = true;
     return;

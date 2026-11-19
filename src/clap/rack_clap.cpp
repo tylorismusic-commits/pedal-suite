@@ -376,7 +376,7 @@ struct Plugin {
   std::atomic<bool> rescanQueued{false};
   std::atomic<bool> latencyQueued{false};
   std::shared_ptr<const pedal::IrBank> irBank;
-  std::shared_ptr<const PerformanceData> performance;
+  PerformanceController performance;
   int lastIrIndex = -2;
   bool irDirty = true;
   std::vector<std::string> namNames;
@@ -386,79 +386,16 @@ struct Plugin {
   uint8_t lastCc[128] = {};
   float reportedGr[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
-  void reloadPerformance() {
-    std::atomic_store(&performance, loadPerformanceData());
-  }
-
+  void reloadPerformance() { performance.reload(); }
   void applyPerformanceValues(const std::vector<double>& values) {
-    if (values.empty()) return;
-    const size_t n = std::min(values.size(), static_cast<size_t>(P_COUNT));
-    for (size_t i = 0; i < n; ++i) {
-      shared.set(static_cast<uint32_t>(i), values[i]);
-    }
-    shared.perfProgramRevision.fetch_add(1, std::memory_order_release);
+    performance.applyValues(shared, values);
   }
-
-  void performanceBankStep(int delta) {
-    auto data = std::atomic_load(&performance);
-    if (!data || data->banks.empty()) return;
-    const int count = static_cast<int>(data->banks.size());
-    int bank = shared.perfBankIndex.load(std::memory_order_relaxed);
-    bank = (bank + delta + count) % count;
-    shared.perfBankIndex.store(bank, std::memory_order_relaxed);
-    shared.perfRevision.fetch_add(1, std::memory_order_release);
-  }
-
+  void performanceBankStep(int delta) { performance.bankStep(shared, delta); }
   void performanceSetlistStep(int delta) {
-    auto data = std::atomic_load(&performance);
-    if (!data || data->setlists.empty()) return;
-    const int setCount = static_cast<int>(data->setlists.size());
-    int set = std::clamp(
-        shared.perfSetlistIndex.load(std::memory_order_relaxed), 0,
-        setCount - 1);
-    const auto& entries = data->setlists[static_cast<size_t>(set)];
-    if (entries.empty()) return;
-    const int count = static_cast<int>(entries.size());
-    int entry = shared.perfSetlistEntry.load(std::memory_order_relaxed);
-    if (entry < 0) {
-      entry = delta > 0 ? 0 : count - 1;
-    } else {
-      entry = (entry + delta + count) % count;
-    }
-    applyPerformanceValues(entries[static_cast<size_t>(entry)]);
-    shared.perfSetlistIndex.store(set, std::memory_order_relaxed);
-    shared.perfSetlistEntry.store(entry, std::memory_order_relaxed);
-    shared.perfRevision.fetch_add(1, std::memory_order_release);
+    performance.setlistStep(shared, delta);
   }
+  void performanceProgram(int program) { performance.program(shared, program); }
 
-  void performanceProgram(int program) {
-    if (program < 0) return;
-    auto data = std::atomic_load(&performance);
-    if (!data) return;
-    if (!data->setlists.empty()) {
-      const int setCount = static_cast<int>(data->setlists.size());
-      const int set = std::clamp(
-          shared.perfSetlistIndex.load(std::memory_order_relaxed), 0,
-          setCount - 1);
-      const auto& entries = data->setlists[static_cast<size_t>(set)];
-      if (program < static_cast<int>(entries.size())) {
-        applyPerformanceValues(entries[static_cast<size_t>(program)]);
-        shared.perfSetlistEntry.store(program, std::memory_order_relaxed);
-        shared.perfRevision.fetch_add(1, std::memory_order_release);
-        return;
-      }
-    }
-    if (data->banks.empty()) return;
-    const int bankCount = static_cast<int>(data->banks.size());
-    const int bank = std::clamp(
-        shared.perfBankIndex.load(std::memory_order_relaxed), 0,
-        bankCount - 1);
-    const auto& presets = data->banks[static_cast<size_t>(bank)];
-    if (program < static_cast<int>(presets.size())) {
-      applyPerformanceValues(presets[static_cast<size_t>(program)]);
-      shared.perfRevision.fetch_add(1, std::memory_order_release);
-    }
-  }
 };
 
 const char* const kFeatures[] = {CLAP_PLUGIN_FEATURE_AUDIO_EFFECT,

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -132,5 +133,84 @@ inline std::shared_ptr<const PerformanceData> loadPerformanceData() {
   }
   return data;
 }
+
+
+class PerformanceController {
+public:
+  void reload() { std::atomic_store(&data_, loadPerformanceData()); }
+
+  void applyValues(Shared& shared, const std::vector<double>& values) const {
+    if (values.empty()) return;
+    const size_t n = std::min(values.size(), static_cast<size_t>(P_COUNT));
+    for (size_t i = 0; i < n; ++i) {
+      shared.set(static_cast<uint32_t>(i), values[i]);
+    }
+    shared.perfProgramRevision.fetch_add(1, std::memory_order_release);
+  }
+
+  void bankStep(Shared& shared, int delta) const {
+    auto data = std::atomic_load(&data_);
+    if (!data || data->banks.empty()) return;
+    const int count = static_cast<int>(data->banks.size());
+    int bank = shared.perfBankIndex.load(std::memory_order_relaxed);
+    bank = (bank + delta + count) % count;
+    shared.perfBankIndex.store(bank, std::memory_order_relaxed);
+    shared.perfRevision.fetch_add(1, std::memory_order_release);
+  }
+
+  void setlistStep(Shared& shared, int delta) const {
+    auto data = std::atomic_load(&data_);
+    if (!data || data->setlists.empty()) return;
+    const int setCount = static_cast<int>(data->setlists.size());
+    int set = std::clamp(
+        shared.perfSetlistIndex.load(std::memory_order_relaxed), 0,
+        setCount - 1);
+    const auto& entries = data->setlists[static_cast<size_t>(set)];
+    if (entries.empty()) return;
+    const int count = static_cast<int>(entries.size());
+    int entry = shared.perfSetlistEntry.load(std::memory_order_relaxed);
+    if (entry < 0) {
+      entry = delta > 0 ? 0 : count - 1;
+    } else {
+      entry = (entry + delta + count) % count;
+    }
+    applyValues(shared, entries[static_cast<size_t>(entry)]);
+    shared.perfSetlistIndex.store(set, std::memory_order_relaxed);
+    shared.perfSetlistEntry.store(entry, std::memory_order_relaxed);
+    shared.perfRevision.fetch_add(1, std::memory_order_release);
+  }
+
+  void program(Shared& shared, int program) const {
+    if (program < 0) return;
+    auto data = std::atomic_load(&data_);
+    if (!data) return;
+    if (!data->setlists.empty()) {
+      const int setCount = static_cast<int>(data->setlists.size());
+      const int set = std::clamp(
+          shared.perfSetlistIndex.load(std::memory_order_relaxed), 0,
+          setCount - 1);
+      const auto& entries = data->setlists[static_cast<size_t>(set)];
+      if (program < static_cast<int>(entries.size())) {
+        applyValues(shared, entries[static_cast<size_t>(program)]);
+        shared.perfSetlistEntry.store(program, std::memory_order_relaxed);
+        shared.perfRevision.fetch_add(1, std::memory_order_release);
+        return;
+      }
+    }
+    if (data->banks.empty()) return;
+    const int bankCount = static_cast<int>(data->banks.size());
+    const int bank = std::clamp(
+        shared.perfBankIndex.load(std::memory_order_relaxed), 0,
+        bankCount - 1);
+    const auto& presets = data->banks[static_cast<size_t>(bank)];
+    if (program < static_cast<int>(presets.size())) {
+      applyValues(shared, presets[static_cast<size_t>(program)]);
+      shared.perfRevision.fetch_add(1, std::memory_order_release);
+    }
+  }
+
+private:
+  std::shared_ptr<const PerformanceData> data_;
+};
 
 } // namespace pedal
