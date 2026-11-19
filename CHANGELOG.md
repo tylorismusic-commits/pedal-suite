@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.3-alpha — 2026-11-19
+
+- Restored the pedal cards to near their original size while keeping them
+  clear of the input and output meters.
+- Made 2- and 4-control pedal knob columns symmetrical inside each card.
+- Moved TUNER and MIDI above the pedals into the page-title row.
+
 ## 0.8.2-alpha — 2026-11-19
 
 - Narrowed the pedal cards and moved them left so the fourth pedal no longer

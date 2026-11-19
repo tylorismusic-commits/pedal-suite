@@ -24,16 +24,16 @@ constexpr double kPi = 3.14159265358979323846;
 
 // Pedalboard geometry.  The right-hand strip leaves room for the utility
 // buttons and keeps the fourth pedal clear of the output meter.
-constexpr double kPedalStartX = 38.0;
-constexpr double kPedalWidth = 210.0;
+constexpr double kPedalStartX = 46.0;
+constexpr double kPedalWidth = 228.0;
 constexpr double kPedalGap = 12.0;
 constexpr double kPedalY = 150.0;
 constexpr double kPedalH = 380.0;
-constexpr double kUtilityX = 926.0;
-constexpr double kUtilityW = 70.0;
+constexpr double kUtilityTunerX = 842.0;
+constexpr double kUtilityMidiX = 922.0;
+constexpr double kUtilityY = 106.0;
+constexpr double kUtilityW = 72.0;
 constexpr double kUtilityH = 24.0;
-constexpr double kTunerY = 150.0;
-constexpr double kMidiY = 182.0;
 
 // Rack preset browser geometry.
 constexpr double kPresetListX = 72.0;
@@ -452,7 +452,8 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
     widgets_.push_back(handle);
 
     const ModuleDesc* module = moduleDesc(type);
-    const double cx1 = x + 60, cx2 = x + 176;
+    const double cx1 = x + colW * 0.26;
+    const double cx2 = x + colW * 0.74;
     if (module->controlCount > 0) {
       const bool multiRow = module->controlCount >= 5;
       for (int k = 0; k < module->controlCount; ++k) {
@@ -1417,17 +1418,17 @@ void Panel::draw(cairo_t* cr, Shared& shared, const PanelState& state) {
   if (slotDragging_) drawDragGhost(cr, shared);
   drawLevelMeter(cr, 20, 100, 14, 520, state.inLevelL, state.inLevelR);
   drawLevelMeter(cr, 1006, 100, 14, 520, state.outLevelL, state.outLevelR);
-  // Utility stack in the right-hand strip, below the header buttons.
-  roundRect(cr, kUtilityX, kTunerY, kUtilityW, kUtilityH, 4);
+  // Utility buttons sit in the page-title row, above the pedals.
+  roundRect(cr, kUtilityTunerX, kUtilityY, kUtilityW, kUtilityH, 4);
   setRgb(cr, state.tunerOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
   cairo_fill(cr);
-  text(cr, "TUNER", kUtilityX + kUtilityW * 0.5, kTunerY + 15, 8.5, 1,
-       state.tunerOpen ? 0.10 : kDim.r, state.tunerOpen ? 0.08 : kDim.g,
+  text(cr, "TUNER", kUtilityTunerX + kUtilityW * 0.5, kUtilityY + 16, 8.5,
+       1, state.tunerOpen ? 0.10 : kDim.r, state.tunerOpen ? 0.08 : kDim.g,
        state.tunerOpen ? 0.05 : kDim.b);
-  roundRect(cr, kUtilityX, kMidiY, kUtilityW, kUtilityH, 4);
+  roundRect(cr, kUtilityMidiX, kUtilityY, kUtilityW, kUtilityH, 4);
   setRgb(cr, state.midiOpen ? kAccent : Rgb{0.20, 0.17, 0.14});
   cairo_fill(cr);
-  text(cr, "MIDI", kUtilityX + kUtilityW * 0.5, kMidiY + 15, 8.5, 1,
+  text(cr, "MIDI", kUtilityMidiX + kUtilityW * 0.5, kUtilityY + 16, 8.5, 1,
        state.midiOpen ? 0.10 : kDim.r, state.midiOpen ? 0.08 : kDim.g,
        state.midiOpen ? 0.05 : kDim.b);
   text(cr, "IN", 27, 640, 8, 1, kDim.r, kDim.g, kDim.b);
@@ -2003,8 +2004,8 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     }
     return true;
   }
-  if (x >= kUtilityX && x <= kUtilityX + kUtilityW &&
-      y >= kTunerY && y <= kTunerY + kUtilityH) {
+  if (x >= kUtilityTunerX && x <= kUtilityTunerX + kUtilityW &&
+      y >= kUtilityY && y <= kUtilityY + kUtilityH) {
     state.tunerOpen = !state.tunerOpen;
     state.midiOpen = false;
     state.aboutOpen = false;
@@ -2012,8 +2013,8 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     state.browserSlot = -1;
     return true;
   }
-  if (x >= kUtilityX && x <= kUtilityX + kUtilityW &&
-      y >= kMidiY && y <= kMidiY + kUtilityH) {
+  if (x >= kUtilityMidiX && x <= kUtilityMidiX + kUtilityW &&
+      y >= kUtilityY && y <= kUtilityY + kUtilityH) {
     state.midiOpen = !state.midiOpen;
     state.tunerOpen = false;
     state.aboutOpen = false;

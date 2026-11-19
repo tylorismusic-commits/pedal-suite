@@ -163,7 +163,7 @@ int main() {
 
   // MIDI mapping panel.
   panel.draw(cr, s, state);
-  panel.pointerDown(s, state, 961, 194, false);
+  panel.pointerDown(s, state, 958, 118, false);
   panel.pointerUp(s, state);
   check(state.midiOpen, "MIDI button opens the mapping panel");
   panel.draw(cr, s, state);
