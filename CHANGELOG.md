@@ -8,6 +8,8 @@
   longer wander; reported latency is 20 ms at any interval.
 - Delay pedals follow the session tempo when the host supplies one, with a
   SYNC switch and a HOST/FREE BPM readout.
+- Retune's Low Cut knob now works; the engine was clearing the filter on
+  every control update.
 - Slot mix and gain are smoothed over 4 ms, removing knob zipper noise.
 - Pitch controls are frozen while a pitch pedal is bypassed, so changing Pitch
   no longer scratches the dry signal or moves its delay.
