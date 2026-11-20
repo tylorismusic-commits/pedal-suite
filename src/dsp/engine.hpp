@@ -34,6 +34,9 @@ public:
     if (revision != 0 && revision == revision_) return;
     revision_ = revision;
     powerTarget_ = c.power ? 1.0f : 0.0f;
+    sync_ = c.sync;
+    if (c.bpm > 1.0f) bpm_ = c.bpm;
+    hostTempo_ = c.hostTempo;
     inputTarget_ = hdsp::dbToGain(c.inputDb);
     outputTarget_ = hdsp::dbToGain(c.outputDb);
     int namRank = 0;

@@ -693,6 +693,44 @@ int main() {
     check(finiteBoards, "random eight-slot boards stay finite");
     check(boundedBoards, "random boards stay bounded with sane latency");
   }
+  {
+    // Tempo sync: with a host tempo the delay time must follow the musical
+    // division, and the SYNC switch must be able to turn that off.
+    auto echoMs = [](bool syncOn) {
+      pedal::Shared s;
+      s.set(slotParam(0, kSlotOffsetType),
+            static_cast<double>(pedal::ModuleId::DigitalDelay));
+      s.set(slotParam(0, kSlotOffsetMix), 100.0);
+      s.set(slotParam(0, kSlotOffsetC0), 0.4);   // TIME
+      s.set(slotParam(0, kSlotOffsetC0 + 1), 0.0);   // FEEDBACK
+      s.set(slotParam(0, kSlotOffsetC0 + 2), 50.0);  // TONE
+      s.set(slotParam(0, kSlotOffsetC0 + 3), 100.0); // MIX
+      s.set(pedal::P_SYNC, syncOn ? 1.0 : 0.0);
+      s.bpm.store(120.0f, std::memory_order_relaxed);
+      s.hostTempo.store(true, std::memory_order_relaxed);
+      pedal::Engine e;
+      e.prepare(48000.0f);
+      e.setControls(pedal::controlsFrom(s));
+      const int n = 48000;
+      std::vector<float> l(n, 0.0f), r(n, 0.0f);
+      l[0] = r[0] = 0.5f;
+      pedal::Meters m;
+      e.process(l.data(), r.data(), n, m);
+      float peak = 0.0f;
+      int at = 0;
+      for (int i = 2400; i < n; ++i) {
+        if (std::fabs(l[i]) > peak) {
+          peak = std::fabs(l[i]);
+          at = i;
+        }
+      }
+      return at * 1000.0 / 48000.0;
+    };
+    const double freeMs = echoMs(false);
+    const double syncMs = echoMs(true);
+    std::printf("delay echo free %.0f ms, synced %.0f ms\n", freeMs, syncMs);
+    check(std::fabs(freeMs - syncMs) > 20.0, "tempo sync changes the delay time");
+  }
   std::printf("%d failure(s)\n", failures);
   return failures == 0 ? 0 : 1;
 }
