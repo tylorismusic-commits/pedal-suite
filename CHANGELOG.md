@@ -2,10 +2,12 @@
 
 ## Unreleased
 
-- New pitch engine for Pitch Drop, Retune and Laser: a waveform-similarity
-  overlap-add transposer instead of a phase vocoder.  Every grain is a literal
-  copy of the input, so chords keep their intervals and sustained notes no
-  longer wander; reported latency is 20 ms at any interval.
+- New pitch engine for Pitch Drop, Retune and Laser: a fixed 4096-sample
+  spectral transposer with an 8x overlap and no formant processing.  The
+  window and hop no longer depend on the pitch ratio, so sweeping a control
+  cannot click or re-grid the output, and a chord keeps ~99% of its energy on
+  the shifted partials instead of smearing into sidebands. Reported latency is
+  4608 samples (96 ms at 48 kHz), measured against the dry path.
 - Delay pedals follow the session tempo when the host supplies one, with a
   SYNC switch and a HOST/FREE BPM readout.
 - Retune's Low Cut knob now works; the engine was clearing the filter on

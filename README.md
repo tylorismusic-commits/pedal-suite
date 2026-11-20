@@ -61,8 +61,8 @@ monophonic tuner and MIDI learn/expression mapping.
 - **Bass Drive** — Drive, Blend, Tone, Level.
 - **Bass Fuzz** — Fuzz, Blend, Tone, Level.
 - **Pitch Drop** — Gojira-style Whammy Up, Whammy Down, Drop, Harmony
-  and Detune modes with Pitch, Mode, Glide, Tone and Mix; 20 ms latency.
-- **Retune** — Low-latency (20 ms) semitone/cent tuning with Semitones, Cents,
+  and Detune modes with Pitch, Mode, Glide, Tone and Mix; 96 ms latency.
+- **Retune** — Semitone/cent tuning with Semitones, Cents,
   Low Cut and Mix.
 - **Chorus** — Rate, Depth, Width, Mix.
 - **Flanger** — Rate, Depth, Feedback, Mix.
