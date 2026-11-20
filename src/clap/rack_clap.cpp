@@ -865,6 +865,17 @@ void pluginReset(const clap_plugin_t* p) {
 clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* proc) {
   Plugin* s = self(p);
   const uint32_t frames = proc->frames_count;
+  // Hosts publish tempo through clap_process_t::transport.
+  if (proc->transport) {
+    const clap_event_transport_t* t = proc->transport;
+    if ((t->flags & CLAP_TRANSPORT_HAS_TEMPO) && std::isfinite(t->tempo) &&
+        t->tempo > 1.0) {
+      s->engine.setTempo(static_cast<float>(t->tempo), true);
+      s->shared.bpm.store(static_cast<float>(t->tempo),
+                          std::memory_order_relaxed);
+      s->shared.hostTempo.store(true, std::memory_order_relaxed);
+    }
+  }
   if (proc->in_events) {
     applyEvents(s, proc->in_events);
   }
@@ -1068,6 +1079,8 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
                             std::memory_order_relaxed);
   emitGr(s, proc->out_events);
 
+  s->shared.bpm.store(s->meters.bpm, std::memory_order_relaxed);
+  s->shared.hostTempo.store(s->meters.hostTempo, std::memory_order_relaxed);
   s->shared.inPeakDb.store(s->meters.inPeakDb, std::memory_order_relaxed);
   s->shared.outPeakDb.store(s->meters.outPeakDb, std::memory_order_relaxed);
   s->shared.inPeakLDb.store(s->meters.inPeakLDb, std::memory_order_relaxed);

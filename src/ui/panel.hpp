@@ -74,6 +74,8 @@ struct PanelState {
   float outLevelL = -120.0f;
   float outLevelR = -120.0f;
   float slotGrDb[kSlotCount] = {};
+  float bpm = 120.0f;
+  bool hostTempo = false;
 };
 
 class Panel {

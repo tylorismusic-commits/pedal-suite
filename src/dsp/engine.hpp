@@ -180,6 +180,8 @@ public:
       power_ += (powerTarget_ - power_) * smooth_;
     }
 
+    meters.bpm = hostTempo_ ? bpm_ : 120.0f;
+    meters.hostTempo = hostTempo_;
     meters.inPeakLDb = hdsp::gainToDb(inL);
     meters.inPeakRDb = hdsp::gainToDb(inR);
     meters.inPeakDb = std::max(meters.inPeakLDb, meters.inPeakRDb);
@@ -348,6 +350,26 @@ private:
     }
   }
 
+public:
+  void setTempo(float bpm, bool valid) noexcept {
+    bpm_ = (std::isfinite(bpm) && bpm > 1.0f) ? bpm : 120.0f;
+    hostTempo_ = valid;
+  }
+
+private:
+  // Delay pedals read musical divisions while the host supplies a tempo.
+  float tempoTime(float knob) const noexcept {
+    if (!sync_ || !hostTempo_) return knob;
+    static constexpr float kDiv[9] = {0.25f, 1.0f / 3.0f, 0.5f, 2.0f / 3.0f,
+                                      1.0f,  4.0f / 3.0f, 1.5f, 2.0f, 4.0f};
+    const float bpm = bpm_ > 1.0f ? bpm_ : 120.0f;
+    const int idx = static_cast<int>(
+        std::lround(std::min(std::max(knob, 0.0f), 1.0f) * 8.0f));
+    float ms = kDiv[idx] * 60000.0f / bpm;
+    ms = std::min(std::max(ms, 20.0f), 1000.0f);
+    return std::min(std::max((ms - 20.0f) / 980.0f, 0.0f), 1.0f);
+  }
+
   void setSlotControls(int s, int type, const SlotControls& c) noexcept {
     switch (static_cast<ModuleId>(type)) {
       case ModuleId::Boost: boost_[s].setControls(boostControlsFrom(c)); break;
@@ -368,14 +390,26 @@ private:
       case ModuleId::Flanger: flanger_[s].setControls(flangerControlsFrom(c)); break;
       case ModuleId::Phaser: phaser_[s].setControls(phaserControlsFrom(c)); break;
       case ModuleId::Tremolo: tremolo_[s].setControls(tremoloControlsFrom(c)); break;
-      case ModuleId::AnalogDelay: analogDelay_[s].setControls(analogDelayControlsFrom(c)); break;
+      case ModuleId::AnalogDelay: {
+        SlotControls t = c;
+        t.c[0] = tempoTime(c.c[0]);
+        analogDelay_[s].setControls(analogDelayControlsFrom(t));
+      } break;
       case ModuleId::SpringReverb: springReverb_[s].setControls(springReverbControlsFrom(c)); break;
       case ModuleId::BassChorus: bassChorus_[s].setControls(bassChorusControlsFrom(c)); break;
       case ModuleId::Vibrato: vibrato_[s].setControls(vibratoControlsFrom(c)); break;
       case ModuleId::Octave: octave_[s].setControls(octaveControlsFrom(c)); break;
       case ModuleId::TapeEcho: tapeEcho_[s].setControls(tapeEchoControlsFrom(c)); break;
-      case ModuleId::DigitalDelay: digitalDelay_[s].setControls(digitalDelayControlsFrom(c)); break;
-      case ModuleId::PingPongDelay: pingPong_[s].setControls(pingPongControlsFrom(c)); break;
+      case ModuleId::DigitalDelay: {
+        SlotControls t = c;
+        t.c[0] = tempoTime(c.c[0]);
+        digitalDelay_[s].setControls(digitalDelayControlsFrom(t));
+      } break;
+      case ModuleId::PingPongDelay: {
+        SlotControls t = c;
+        t.c[0] = tempoTime(c.c[0]);
+        pingPong_[s].setControls(pingPongControlsFrom(t));
+      } break;
       case ModuleId::PlateReverb: plateReverb_[s].setControls(plateReverbControlsFrom(c)); break;
       case ModuleId::RoomReverb: roomReverb_[s].setControls(roomReverbControlsFrom(c)); break;
       case ModuleId::FetComp: fetComp_[s].setControls(fetCompControlsFrom(c)); break;
@@ -480,6 +514,8 @@ private:
                                        1.0f, 1.0f, 1.0f, 1.0f};
   float input_ = 1.0f, output_ = 1.0f, power_ = 1.0f;
   float inputTarget_ = 1.0f, outputTarget_ = 1.0f, powerTarget_ = 1.0f;
+  bool sync_ = true, hostTempo_ = false;
+  float bpm_ = 120.0f;
   SlotControls slot_[kSlotCount];
   int preparedType_[kSlotCount] = {-1, -1, -1, -1, -1, -1, -1, -1};
   uint64_t revision_ = 0;

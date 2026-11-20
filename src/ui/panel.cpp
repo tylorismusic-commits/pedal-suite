@@ -404,6 +404,8 @@ void Panel::text(cairo_t* cr, const char* s, double x, double y, double size,
 }
 
 void Panel::tick(Shared& shared, PanelState& state) const {
+  state.bpm = shared.bpm.load(std::memory_order_relaxed);
+  state.hostTempo = shared.hostTempo.load(std::memory_order_relaxed);
   state.inLevelL = shared.inPeakLDb.load(std::memory_order_relaxed);
   state.inLevelR = shared.inPeakRDb.load(std::memory_order_relaxed);
   state.outLevelL = shared.outPeakLDb.load(std::memory_order_relaxed);
@@ -570,6 +572,14 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
 
   knob(P_INPUT, 140, 675, 16, "", -1, true);
   knob(P_OUTPUT, 860, 675, 16, "", -1, true);
+  {
+    Widget sy{};
+    sy.kind = Kind::Pill;
+    sy.param = P_SYNC;
+    sy.x = 556; sy.y = 662; sy.w = 68; sy.h = 24;
+    sy.label = "SYNC";
+    widgets_.push_back(sy);
+  }
 
   const double colW = kPedalWidth;
   const double gap = kPedalGap;
@@ -903,6 +913,18 @@ void Panel::drawRack(cairo_t* cr, const Shared& shared,
   std::snprintf(pageLabel, sizeof(pageLabel), "PEDALBOARD  ·  PAGE %d",
                 state.boardPage + 1);
   text(cr, pageLabel, 520, 118, 15, 1, kText.r, kText.g, kText.b);
+  {
+    char tempo[48];
+    if (state.hostTempo) {
+      std::snprintf(tempo, sizeof(tempo), "HOST %.0f BPM", state.bpm);
+    } else {
+      std::snprintf(tempo, sizeof(tempo), "FREE %.0f BPM", state.bpm);
+    }
+    text(cr, tempo, 690, 679, 9, 0, kDim.r, kDim.g, kDim.b);
+    if (shared.get(P_SYNC) > 0.5 && !state.hostTempo) {
+      text(cr, "NO HOST TEMPO", 690, 692, 7, 0, 0.85f, 0.55f, 0.35f);
+    }
+  }
 
   const double colW = kPedalWidth, gap = kPedalGap, y = kPedalY, h = kPedalH;
   const int base = state.boardPage * 4;

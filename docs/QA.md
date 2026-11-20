@@ -21,7 +21,7 @@ fixed everything the measurements exposed. The automated equivalents live in
 | Precision Drive | 80 Hz, Attack 0 → 1 | −19.4 dB (tightened) |
 | Precision Drive | Gate 90%, quiet input | 80 dB reduction |
 | Wah | 700 Hz, Pedal 0 → 50% | +23.2 dB through the band-pass |
-| Laser | Pitch +12, 220 Hz input | 440.0 Hz (~21 ms reported latency) |
+| Laser | Pitch +12, 220 Hz input | 440.0 Hz (20 ms reported latency) |
 | Cab | unit IR, 220 Hz | transparent within 10% |
 | IR bank | 16-bit WAV load | 1 entry, normalised |
 | NAM | 220 Hz test model at 44.1/48/96 kHz | 220 Hz preserved |
@@ -74,7 +74,7 @@ the behaviour players use in front of high-gain amps, cabs and NAM profiles.
 The Laser follows the Misha Mansoor X design: an expression-swept pitch
 shifter with ring modulation and an envelope follower. Pedal sweeps ±12
 semitones around the Pitch setting, Sens adds envelope movement, and Ring
-blends in the metallic carrier. It reports its Signalsmith latency.
+blends in the metallic carrier. It reports its 20 ms transposer latency.
 
 The Wah is a band-pass state-variable filter with a 1.8–3 octave sweep and
 Q up to 12. MIDI CC 4 or 11 moves the first Wah in the chain.
@@ -146,7 +146,7 @@ tested at 48 kHz without dropouts or non-finite output.
 ## Known limitations
 
 - Octave is monophonic, like the analogue pedals it models.
-- Pitch Drop adds 1024 samples of Signalsmith latency (~21 ms at 48 kHz, reported to the host).
+- Pitch Drop adds 960 samples of transposer latency (20 ms at 48 kHz, reported to the host).
 - Reverb decay is calibrated for the default tone; heavy tone settings damp
   the tail earlier, as a real tank would.
 - Bypass tails are always on; there is no per-pedal trails switch yet.

@@ -55,6 +55,7 @@ enum ParamId : uint32_t {
   P_MIDI_EXPR_SLOT,
   P_MIDI_EXPR_CTL,
   P_MIDI_EXPR_CC,
+  P_SYNC,
   P_COUNT
 };
 
@@ -195,6 +196,8 @@ inline constexpr ParamSpec kParamSpecs[P_COUNT] = {
      false, nullptr, {}},
     {"midi_expr_cc", "Expression CC", "MIDI", 0.0, 127.0, 4.0, true, true,
      false, nullptr, {}},
+    {"sync", "Tempo Sync", "Global", 0.0, 1.0, 1.0, true, false, true, nullptr,
+     {}},
 };
 
 #undef SLOT_SPECS
@@ -266,6 +269,8 @@ public:
     return false;
   }
 
+  std::atomic<float> bpm{120.0f};
+  std::atomic<bool> hostTempo{false};
   std::atomic<float> inPeakDb, outPeakDb;
   std::atomic<float> inPeakLDb, inPeakRDb;
   std::atomic<float> outPeakLDb, outPeakRDb;
@@ -312,6 +317,9 @@ inline Controls controlsFrom(const Shared& s) noexcept {
   c.power = s.get(P_POWER) > 0.5;
   c.inputDb = static_cast<float>(s.get(P_INPUT));
   c.outputDb = static_cast<float>(s.get(P_OUTPUT));
+  c.sync = s.get(P_SYNC) > 0.5;
+  c.bpm = s.bpm.load(std::memory_order_relaxed);
+  c.hostTempo = s.hostTempo.load(std::memory_order_relaxed);
   for (int i = 0; i < kSlotCount; ++i) {
     SlotControls& d = c.slot[i];
     d.type = static_cast<int>(s.get(slotParam(i, kSlotOffsetType)) + 0.5);

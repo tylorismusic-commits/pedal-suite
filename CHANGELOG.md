@@ -2,12 +2,12 @@
 
 ## Unreleased
 
-- Replaced the Rubber Band live pitch shifter with bundled Signalsmith Stretch,
-  cutting pitch-pedal latency from roughly 76 ms to 21 ms at 48 kHz.
-- Auto-Wah uses a resonant low-pass sweep for a more vocal envelope wah.
-
-## Unreleased
-
+- New pitch engine for Pitch Drop, Retune and Laser: a waveform-similarity
+  overlap-add transposer instead of a phase vocoder.  Every grain is a literal
+  copy of the input, so chords keep their intervals and sustained notes no
+  longer wander; reported latency is 20 ms at any interval.
+- Delay pedals follow the session tempo when the host supplies one, with a
+  SYNC switch and a HOST/FREE BPM readout.
 - Slot mix and gain are smoothed over 4 ms, removing knob zipper noise.
 - Pitch controls are frozen while a pitch pedal is bypassed, so changing Pitch
   no longer scratches the dry signal or moves its delay.

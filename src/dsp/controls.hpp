@@ -26,10 +26,15 @@ struct Controls {
   bool power = true;
   float inputDb = 0.0f;
   float outputDb = 0.0f;
+  bool sync = true;         // delay pedals follow the host tempo
+  float bpm = 120.0f;       // host tempo when hostTempo is true
+  bool hostTempo = false;
   SlotControls slot[kSlotCount];
 };
 
 struct Meters {
+  float bpm = 120.0f;
+  bool hostTempo = false;
   float inPeakDb = -120.0f;
   float outPeakDb = -120.0f;
   float inPeakLDb = -120.0f;
