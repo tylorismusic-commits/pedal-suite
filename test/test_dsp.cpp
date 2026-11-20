@@ -300,6 +300,85 @@ int main() {
     check(retune.second > 0, "Retune reports latency");
   }
   {
+    // A bypassed pitch pedal must keep its latency in the path, otherwise the
+    // host re-aligns the track every time the footswitch is pressed.
+    Shared s;
+    initializeRack(s);
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::PitchDrop), false);
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    const int activeLatency = e.latencySamples();
+    s.set(slotParam(0, kSlotOffsetBypass), 1.0);
+    e.setControls(controlsFrom(s));
+    const int bypassLatency = e.latencySamples();
+    check(activeLatency > 0 && activeLatency == bypassLatency,
+          "pitch bypass keeps constant latency");
+  }
+  {
+    // Changing a slot's gain must ramp, not step.  A one-sample jump is the
+    // scratch users hear while turning a knob.
+    Shared s;
+    initializeRack(s);
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Boost), false);
+    s.set(slotParam(0, kSlotOffsetGain), 0.0);
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    const int block = 4096;
+    std::vector<float> l(block), r(block);
+    for (int i = 0; i < block; ++i) {
+      l[i] = r[i] = 0.2f * std::sin(2.0f * 3.14159265f * 1000.0f * i / 48000.0f);
+    }
+    Meters m;
+    e.process(l.data(), r.data(), block, m);
+    s.set(slotParam(0, kSlotOffsetGain), 12.0);
+    e.setControls(controlsFrom(s));
+    std::vector<float> l2 = l, r2 = r;
+    for (int i = 0; i < block; ++i) {
+      l2[i] = r2[i] = 0.2f * std::sin(2.0f * 3.14159265f * 1000.0f *
+                                       (i + block) / 48000.0f);
+    }
+    e.process(l2.data(), r2.data(), block, m);
+    float maxStep = 0.0f;
+    for (int i = 1; i < 64; ++i) {
+      maxStep = std::max(maxStep, std::fabs(l2[i] - l2[i - 1]));
+    }
+    check(maxStep < 0.12f, "slot gain changes are smoothed");
+  }
+  {
+    // Changing pitch on a bypassed pitch pedal must not move its dry delay;
+    // that was the scratch users heard with the pedal switched off.
+    auto render = [&](bool changePitch, std::vector<float>& out) {
+      Shared s;
+      initializeRack(s);
+      applyModuleDefaults(s, 0, static_cast<int>(ModuleId::PitchDrop), false);
+      s.set(slotParam(0, kSlotOffsetBypass), 1.0);
+      Engine e;
+      e.prepare(48000.0f);
+      e.setControls(controlsFrom(s));
+      const int n = 8192;
+      std::vector<float> l(n), r(n);
+      for (int i = 0; i < n; ++i) {
+        l[i] = r[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+      }
+      Meters m;
+      e.process(l.data(), r.data(), 4096, m);
+      if (changePitch) {
+        s.set(slotParam(0, kSlotOffsetC0), 1.0);
+        e.setControls(controlsFrom(s));
+      }
+      e.process(l.data() + 4096, r.data() + 4096, 4096, m);
+      out = l;
+    };
+    std::vector<float> a, b;
+    render(false, a);
+    render(true, b);
+    float diff = 0.0f;
+    for (int i = 4096; i < 8192; ++i) diff = std::max(diff, std::fabs(a[i] - b[i]));
+    check(diff < 1.0e-6f, "bypassed pitch controls do not scratch");
+  }
+  {
     const int n = 24000;
     std::vector<float> x(n);
     for (int i = 0; i < n; ++i) {

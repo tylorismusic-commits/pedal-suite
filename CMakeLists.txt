@@ -48,9 +48,10 @@ target_link_libraries(pedal_dsp PRIVATE nam_bridge)
 target_link_libraries(pedal_dsp PUBLIC PkgConfig::FFTW3F)
 target_include_directories(pedal_dsp PUBLIC
   "${PEDAL_DSP_DIR}/include" "${HEARTH_DSP_DIR}/include")
-target_link_libraries(pedal_dsp PUBLIC PkgConfig::RUBBERBAND)
 target_include_directories(pedal_dsp PRIVATE
-  "${PEDAL_DSP_DIR}/third_party/guitarix/plugins")
+  "${PEDAL_DSP_DIR}/third_party/guitarix/plugins"
+  "${PEDAL_DSP_DIR}/third_party/signalsmith-stretch"
+  "${PEDAL_DSP_DIR}/third_party/signalsmith-linear/include")
 
 enable_testing()
 
@@ -60,7 +61,6 @@ pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
 pkg_check_modules(FREETYPE REQUIRED IMPORTED_TARGET freetype2)
 pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
-pkg_check_modules(RUBBERBAND REQUIRED IMPORTED_TARGET rubberband)
 
 set(RACK_UI_SOURCES src/ui/panel.cpp)
 

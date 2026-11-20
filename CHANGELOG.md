@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Replaced the Rubber Band live pitch shifter with bundled Signalsmith Stretch,
+  cutting pitch-pedal latency from roughly 76 ms to 21 ms at 48 kHz.
+- Auto-Wah uses a resonant low-pass sweep for a more vocal envelope wah.
+
+## Unreleased
+
+- Slot mix and gain are smoothed over 4 ms, removing knob zipper noise.
+- Pitch controls are frozen while a pitch pedal is bypassed, so changing Pitch
+  no longer scratches the dry signal or moves its delay.
+- Auto-Wah now uses a resonant low-pass sweep with a wider range and stronger
+  sensitivity, so it audibly opens up.
+
 ## 0.8.9-alpha — 2026-11-19
 
 - LV2 now also keeps a plugin-side performance copy, so setlist and bank MIDI

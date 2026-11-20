@@ -21,6 +21,7 @@ public:
   void prepare(float sampleRate) noexcept {
     sr_ = sampleRate > 0.0f ? sampleRate : 48000.0f;
     smooth_ = 1.0f - std::exp(-1.0f / (0.01f * sr_));
+    slotSmooth_ = 1.0f - std::exp(-1.0f / (0.004f * sr_));
     for (int s = 0; s < kSlotCount; ++s) preparedType_[s] = -1;
     revision_ = 0;
     tuner_.prepare(sr_);
@@ -53,13 +54,25 @@ public:
       if (type != preparedType_[i] && allowed) {
         prepareSlot(i, type);
         preparedType_[i] = type;
+        // New module: start the mix and gain at their targets instead of
+        // ramping from the previous module's settings.
+        slotMix_[i] = slotMixTarget_[i] = std::clamp(c.slot[i].mix, 0.0f, 1.0f);
+        slotGain_[i] = slotGainTarget_[i] = hdsp::dbToGain(c.slot[i].gainDb);
       }
       if (preparedType_[i] == static_cast<int>(ModuleId::Nam) && !isNam) {
         nam_[i].clearModel();
       }
       if (isNam && !namActive_[i]) nam_[i].clearModel();
       slot_[i] = c.slot[i];
-      setSlotControls(i, type, c.slot[i]);
+      slotMixTarget_[i] = std::clamp(c.slot[i].mix, 0.0f, 1.0f);
+      slotGainTarget_[i] = hdsp::dbToGain(c.slot[i].gainDb);
+      // A bypassed pitch pedal still runs to keep its latency constant, but
+      // its pitch controls must be frozen.  Otherwise changing Pitch while
+      // bypassed changes the internal dry delay and scratches the signal.
+      if (!(c.slot[i].bypass &&
+            isPitchLatencyModule(static_cast<ModuleId>(type)))) {
+        setSlotControls(i, type, c.slot[i]);
+      }
       if (isNam && namActive_[i]) {
         if (namPath_.empty()) {
           nam_[i].clearModel();
@@ -124,8 +137,13 @@ public:
         if (id == ModuleId::Nam && !namActive_[s]) continue;
         if (id == ModuleId::Cab && !cabActive_[s]) continue;
         if (c.bypass) {
-          // Let delay and reverb tails ring out with the input muted.
-          if (moduleHasTails(c.type)) {
+          // Keep pitch-latency slots running at mix 0.  Their dry output is
+          // delayed by the same amount as the shifted path, so the footswitch
+          // can engage or bypass without a timing jump.
+          if (isPitchLatencyModule(id)) {
+            processSlot(s, id, l, r, 0.0f);
+          } else if (moduleHasTails(c.type)) {
+            // Let delay and reverb tails ring out with the input muted.
             float tailL = 0.0f, tailR = 0.0f;
             processSlot(s, id, tailL, tailR);
             l += tailL;
@@ -134,13 +152,16 @@ public:
           continue;
         }
         const float sl = l, sr = r;
-        processSlot(s, id, l, r);
-        const float mix = std::clamp(c.mix, 0.0f, 1.0f);
-        l = sl + (l - sl) * mix;
-        r = sr + (r - sr) * mix;
-        const float gain = hdsp::dbToGain(c.gainDb);
-        l *= gain;
-        r *= gain;
+        processSlot(s, id, l, r, -1.0f);
+        // Smooth slot mix and gain per sample.  Applying them directly makes
+        // every knob move a step discontinuity (a scratch), especially when a
+        // pedal is bypassed and only the dry path is heard.
+        slotMix_[s] += (slotMixTarget_[s] - slotMix_[s]) * slotSmooth_;
+        slotGain_[s] += (slotGainTarget_[s] - slotGain_[s]) * slotSmooth_;
+        l = sl + (l - sl) * slotMix_[s];
+        r = sr + (r - sr) * slotMix_[s];
+        l *= slotGain_[s];
+        r *= slotGain_[s];
       }
       const float active = power_;
       l = dryL + active * (l - dryL);
@@ -246,17 +267,24 @@ public:
     int latency = 0;
     for (int s = 0; s < kSlotCount; ++s) {
       const SlotControls& c = slot_[s];
+      const ModuleId id = static_cast<ModuleId>(c.type);
+      // Pitch slots stay in the signal path even when bypassed (at mix 0) so
+      // the reported latency must stay with them.  This stops the host from
+      // re-aligning the track every time a footswitch is pressed.
+      if (id == ModuleId::PitchDrop) {
+        latency += pitchDrop_[s].latencySamples();
+        continue;
+      }
+      if (id == ModuleId::Retune) {
+        latency += retune_[s].latencySamples();
+        continue;
+      }
+      if (id == ModuleId::Laser) {
+        latency += laser_[s].latencySamples();
+        continue;
+      }
       if (c.bypass) continue;
-      switch (static_cast<ModuleId>(c.type)) {
-        case ModuleId::PitchDrop:
-          latency += pitchDrop_[s].latencySamples();
-          break;
-        case ModuleId::Retune:
-          latency += retune_[s].latencySamples();
-          break;
-        case ModuleId::Laser:
-          latency += laser_[s].latencySamples();
-          break;
+      switch (id) {
         case ModuleId::Nam:
           if (namActive_[s]) latency += nam_[s].latencySamples();
           break;
@@ -369,6 +397,29 @@ private:
     }
   }
 
+  static bool isPitchLatencyModule(ModuleId id) noexcept {
+    return id == ModuleId::PitchDrop || id == ModuleId::Retune ||
+           id == ModuleId::Laser;
+  }
+
+  inline void processSlot(int s, ModuleId id, float& l, float& r,
+                          float mixOverride) noexcept {
+    switch (id) {
+      case ModuleId::PitchDrop:
+        pitchDrop_[s].process(l, r, mixOverride);
+        break;
+      case ModuleId::Retune:
+        retune_[s].process(l, r, mixOverride);
+        break;
+      case ModuleId::Laser:
+        laser_[s].process(l, r, mixOverride);
+        break;
+      default:
+        processSlot(s, id, l, r);
+        break;
+    }
+  }
+
   inline void processSlot(int s, ModuleId id, float& l, float& r) noexcept {
     switch (id) {
       case ModuleId::Boost: boost_[s].process(l, r); break;
@@ -421,6 +472,12 @@ private:
 private:
   float sr_ = 48000.0f;
   float smooth_ = 0.01f;
+  float slotSmooth_ = 0.005f;
+  float slotMix_[kSlotCount] = {};
+  float slotGain_[kSlotCount] = {};
+  float slotMixTarget_[kSlotCount] = {};
+  float slotGainTarget_[kSlotCount] = {1.0f, 1.0f, 1.0f, 1.0f,
+                                       1.0f, 1.0f, 1.0f, 1.0f};
   float input_ = 1.0f, output_ = 1.0f, power_ = 1.0f;
   float inputTarget_ = 1.0f, outputTarget_ = 1.0f, powerTarget_ = 1.0f;
   SlotControls slot_[kSlotCount];
