@@ -59,7 +59,15 @@ find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
 pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
 pkg_check_modules(FREETYPE REQUIRED IMPORTED_TARGET freetype2)
-pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
+# The editor host is X11 today.  macOS builds the portable targets (DSP,
+# LV2, panel, tests) until the Cocoa view lands, so X11 stays optional.
+option(SUITE_NO_X11 "Skip X11 editor targets (portable subset)" OFF)
+if(APPLE OR SUITE_NO_X11)
+  set(SUITE_X11 OFF)
+else()
+  pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
+  set(SUITE_X11 ON)
+endif()
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 
 set(RACK_UI_SOURCES src/ui/panel.cpp)
@@ -111,6 +119,7 @@ set(LV2_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/lv2"
 
 pkg_check_modules(LV2 REQUIRED IMPORTED_TARGET lv2)
 
+if(SUITE_X11)
 add_library(pedal_suite MODULE src/clap/rack_clap.cpp ${RACK_UI_SOURCES})
 target_include_directories(pedal_suite PRIVATE
   "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/third_party/clap/include")
@@ -139,6 +148,7 @@ add_custom_target(pedal_suite_bundle ALL
 install(TARGETS pedal_suite LIBRARY DESTINATION "${CLAP_DIR}")
 install(FILES ${RACK_RESOURCE_FILES}
         DESTINATION "${CLAP_DIR}/PedalSuite.resources")
+endif()  # SUITE_X11
 
 
 # ---------------------------------------------------------------------------
@@ -158,6 +168,7 @@ set_target_properties(pedal_suite_lv2 PROPERTIES
   OUTPUT_NAME "pedal_suite"
   LIBRARY_OUTPUT_DIRECTORY "${LV2_BUNDLE_DIR}")
 
+if(SUITE_X11)
 add_library(pedal_suite_lv2_ui MODULE src/ui/lv2_ui.cpp ${RACK_UI_SOURCES})
 target_include_directories(pedal_suite_lv2_ui PRIVATE
   "${CMAKE_SOURCE_DIR}/src")
@@ -169,6 +180,7 @@ set_target_properties(pedal_suite_lv2_ui PROPERTIES
   PREFIX ""
   OUTPUT_NAME "pedal_suite_ui"
   LIBRARY_OUTPUT_DIRECTORY "${LV2_BUNDLE_DIR}")
+endif()  # SUITE_X11
 
 add_custom_target(pedal_suite_lv2_bundle ALL
   COMMAND ${CMAKE_COMMAND} -E make_directory "${LV2_BUNDLE_DIR}"
@@ -179,8 +191,12 @@ add_custom_target(pedal_suite_lv2_bundle ALL
           "${CMAKE_SOURCE_DIR}/assets/fonts/Jost-ExtraBold.ttf"
           "${CMAKE_SOURCE_DIR}/assets/fonts/OFL.txt"
           "${LV2_BUNDLE_DIR}/"
-  DEPENDS pedal_suite_lv2 pedal_suite_lv2_ui)
+  DEPENDS pedal_suite_lv2)
+if(SUITE_X11)
+  add_dependencies(pedal_suite_lv2_bundle pedal_suite_lv2_ui)
+endif()
 
+if(SUITE_X11)
 add_custom_target(dist
   COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/dist"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -195,9 +211,14 @@ add_custom_target(dist
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
   DEPENDS pedal_suite_lv2_bundle pedal_suite_bundle
   COMMENT "Packing pedal-suite-${PROJECT_VERSION}")
+endif()  # SUITE_X11
 
-install(TARGETS pedal_suite_lv2 pedal_suite_lv2_ui
+install(TARGETS pedal_suite_lv2
         LIBRARY DESTINATION "${LV2_DIR}/pedal-suite.lv2")
+if(SUITE_X11)
+  install(TARGETS pedal_suite_lv2_ui
+          LIBRARY DESTINATION "${LV2_DIR}/pedal-suite.lv2")
+endif()
 install(FILES
   lv2/manifest.ttl
   lv2/pedal_suite.ttl
