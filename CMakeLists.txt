@@ -173,6 +173,74 @@ if(DYLIBBUNDLER)
             -d "${PEDAL_CLAP_BUNDLE}/Contents/Frameworks"
             -p "@loader_path/../Frameworks")
 endif()
+# ---------------------------------------------------------------------------
+# VST3 and AUv2 projections of the same CLAP (clap-wrapper)
+#
+# Both wrappers load the .clap we just built from their own Contents/PlugIns,
+# so the bundles stay self-contained: no copy of the plug-in has to be
+# installed for the wrapper to work.
+# ---------------------------------------------------------------------------
+set(CLAP_WRAPPER_DOWNLOAD_DEPENDENCIES ON)
+add_subdirectory(third_party/clap-wrapper EXCLUDE_FROM_ALL)
+
+set(PEDAL_VST3_BUNDLE "${CMAKE_BINARY_DIR}/vst3/PedalSuite.vst3")
+set(PEDAL_AUV2_BUNDLE "${CMAKE_BINARY_DIR}/au/PedalSuite.component")
+
+add_library(pedal_suite_vst3 MODULE)
+add_dependencies(pedal_suite_vst3 pedal_suite_bundle)
+target_add_vst3_wrapper(TARGET pedal_suite_vst3
+  OUTPUT_NAME "PedalSuite"
+  BUNDLE_IDENTIFIER "com.tylorismusic.pedalsuite"
+  BUNDLE_VERSION "${PROJECT_VERSION}"
+  ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/vst3"
+  MACOS_EMBEDDED_CLAP_LOCATION "${PEDAL_CLAP_BUNDLE}")
+
+add_library(pedal_suite_auv2 MODULE)
+add_dependencies(pedal_suite_auv2 pedal_suite_bundle)
+target_add_auv2_wrapper(TARGET pedal_suite_auv2
+  OUTPUT_NAME "PedalSuite"
+  BUNDLE_IDENTIFIER "com.tylorismusic.pedalsuite"
+  BUNDLE_VERSION "${PROJECT_VERSION}"
+  MANUFACTURER_NAME "tylorismusic"
+  MANUFACTURER_CODE "Tylr"
+  SUBTYPE_CODE "PdSu"
+  INSTRUMENT_TYPE "aufx"
+  MACOS_EMBEDDED_CLAP_LOCATION "${PEDAL_CLAP_BUNDLE}")
+# The AUv2 build helper loads the CLAP bundle to read its metadata, and
+# clap-wrapper only orders it after the CLAP library -- not after our bundle
+# target, whose POST_BUILD runs dylibbundler over the same bundle.  Without
+# this the helper can dlopen a bundle that is being rewritten (SIGSEGV).
+add_dependencies(pedal_suite-build-helper pedal_suite_bundle)
+set_target_properties(pedal_suite_auv2 PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/au")
+
+# The wrapper generates Contents/Info.plist with its AudioComponents entry at
+# build time and copies it PRE_BUILD.  With the Makefile generator CMake then
+# writes its own default bundle plist, which has no AudioComponents, so the
+# component never registers (auval: "didn't find the component").  Copy the
+# generated plist again POST_BUILD; the signing targets run afterwards.
+add_custom_command(TARGET pedal_suite_auv2 POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          "${CMAKE_BINARY_DIR}/pedal_suite_auv2-build-helper-output/auv2_Info.plist"
+          "$<TARGET_BUNDLE_DIR:pedal_suite_auv2>/Contents/Info.plist"
+  COMMENT "Installing the generated AUv2 Info.plist")
+
+# Embedding the CLAP happens PRE_BUILD, which invalidates any signature the
+# wrapper had, so re-sign the finished bundles.
+find_program(CODESIGN codesign)
+if(CODESIGN)
+  add_custom_target(pedal_suite_vst3_sign ALL
+    COMMAND "${CODESIGN}" --force --deep --sign - "${PEDAL_VST3_BUNDLE}"
+    COMMENT "Ad-hoc signing ${PEDAL_VST3_BUNDLE}"
+    DEPENDS pedal_suite_vst3
+    VERBATIM)
+  add_custom_target(pedal_suite_auv2_sign ALL
+    COMMAND "${CODESIGN}" --force --deep --sign - "${PEDAL_AUV2_BUNDLE}"
+    COMMENT "Ad-hoc signing ${PEDAL_AUV2_BUNDLE}"
+    DEPENDS pedal_suite_auv2
+    VERBATIM)
+endif()
+
 install(DIRECTORY "${PEDAL_CLAP_BUNDLE}" DESTINATION "${CLAP_DIR}")
 elseif(SUITE_X11)
 add_library(pedal_suite MODULE src/clap/rack_clap.cpp ${RACK_UI_SOURCES})
