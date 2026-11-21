@@ -1,11 +1,11 @@
 name: macOS
 
-# Compile and test the portable half of the plug-in on Apple Silicon.
+# Compile and test the plug-in on Apple Silicon.
 #
-# The editor host is still X11, so the CLAP target and the LV2 UI are skipped
-# on macOS (see CMakeLists.txt).  This job proves the DSP, metadata, presets,
-# LV2 bundle and the cairo panel compile and run with AppleClang.  Once the
-# Cocoa view replaces the X11 editor this workflow grows the CLAP UI.
+# The CLAP editor is a Cocoa NSView on macOS (see src/ui/cocoa_view.mm), so the
+# CLAP target and its self-contained .clap bundle are built here.  The LV2 UI
+# is still an X11 host and is skipped on macOS (see CMakeLists.txt).
+# Pass -DSUITE_NO_X11=ON to reproduce the portable subset on Linux.
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Toolchain
         run: |
-          brew install cmake pkg-config cairo freetype lv2 lilv fftw
+          brew install cmake pkg-config cairo freetype lv2 lilv fftw dylibbundler
           pkg-config --modversion cairo lv2 fftw3f
           cmake --version | head -1
 
@@ -43,3 +43,20 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build-macos --output-on-failure
+
+      - name: Check the CLAP bundle
+        run: |
+          file build-macos/clap/PedalSuite.clap/Contents/MacOS/PedalSuite
+          otool -L build-macos/clap/PedalSuite.clap/Contents/MacOS/PedalSuite | head -12
+          if otool -L build-macos/clap/PedalSuite.clap/Contents/MacOS/PedalSuite | grep -q '@executable_path'; then
+            echo "bundle still references @executable_path"; exit 1
+          fi
+          codesign --verify --verbose build-macos/clap/PedalSuite.clap
+
+      - name: Upload CLAP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PedalSuite-macos-clap
+          path: build-macos/clap
+          if-no-files-found: warn

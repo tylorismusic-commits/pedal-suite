@@ -119,7 +119,62 @@ set(LV2_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/lv2"
 
 pkg_check_modules(LV2 REQUIRED IMPORTED_TARGET lv2)
 
-if(SUITE_X11)
+set(PEDAL_RESOURCE_FILES
+  "${CMAKE_SOURCE_DIR}/assets/fonts/Jost-ExtraBold.ttf"
+  "${CMAKE_SOURCE_DIR}/assets/fonts/OFL.txt")
+
+# ---------------------------------------------------------------------------
+# CLAP plugin: one cairo editor (X11 on Linux, Cocoa on macOS).
+# ---------------------------------------------------------------------------
+if(APPLE)
+enable_language(OBJCXX)
+add_library(pedal_suite MODULE
+  src/clap/rack_clap.cpp
+  ${RACK_UI_SOURCES}
+  src/ui/cocoa_view.mm)
+target_include_directories(pedal_suite PRIVATE
+  "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/third_party/clap/include"
+  ${CAIRO_INCLUDE_DIRS})
+target_compile_definitions(pedal_suite PRIVATE SUITE_MACOS_COCOA=1)
+target_compile_options(pedal_suite PRIVATE -fobjc-arc)
+target_link_libraries(pedal_suite PRIVATE pedal_dsp
+  PkgConfig::CAIRO PkgConfig::FREETYPE
+  "-framework Cocoa" "-framework CoreGraphics" "-framework QuartzCore"
+  Threads::Threads ${CMAKE_DL_LIBS})
+target_compile_features(pedal_suite PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(pedal_suite PRIVATE -Wall -Wextra -fvisibility=hidden)
+endif()
+set_target_properties(pedal_suite PROPERTIES
+  PREFIX "" OUTPUT_NAME "PedalSuite" SUFFIX ".dylib"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/macos")
+
+set(PEDAL_CLAP_BUNDLE "${CMAKE_BINARY_DIR}/clap/PedalSuite.clap")
+find_program(DYLIBBUNDLER dylibbundler)
+add_custom_target(pedal_suite_bundle ALL
+  COMMAND ${CMAKE_COMMAND} -E remove_directory "${PEDAL_CLAP_BUNDLE}"
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+          "${PEDAL_CLAP_BUNDLE}/Contents/MacOS"
+  COMMAND ${CMAKE_COMMAND} -E copy
+          "$<TARGET_FILE:pedal_suite>"
+          "${PEDAL_CLAP_BUNDLE}/Contents/MacOS/PedalSuite"
+  COMMAND ${CMAKE_COMMAND} -E copy
+          "${CMAKE_SOURCE_DIR}/packaging/macos/Info.plist"
+          "${PEDAL_CLAP_BUNDLE}/Contents/Info.plist"
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+          "${PEDAL_CLAP_BUNDLE}/Contents/Resources/PedalSuite.resources"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PEDAL_RESOURCE_FILES}
+          "${PEDAL_CLAP_BUNDLE}/Contents/Resources/PedalSuite.resources/"
+  DEPENDS pedal_suite ${PEDAL_RESOURCE_FILES})
+if(DYLIBBUNDLER)
+  add_custom_command(TARGET pedal_suite_bundle POST_BUILD
+    COMMAND "${DYLIBBUNDLER}" -od -b
+            -x "${PEDAL_CLAP_BUNDLE}/Contents/MacOS/PedalSuite"
+            -d "${PEDAL_CLAP_BUNDLE}/Contents/Frameworks"
+            -p "@loader_path/../Frameworks")
+endif()
+install(DIRECTORY "${PEDAL_CLAP_BUNDLE}" DESTINATION "${CLAP_DIR}")
+elseif(SUITE_X11)
 add_library(pedal_suite MODULE src/clap/rack_clap.cpp ${RACK_UI_SOURCES})
 target_include_directories(pedal_suite PRIVATE
   "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/third_party/clap/include")
@@ -135,20 +190,16 @@ set_target_properties(pedal_suite PROPERTIES
   PREFIX "" OUTPUT_NAME "PedalSuite" SUFFIX ".clap"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/clap")
 
-set(RACK_RESOURCE_FILES
-  "${CMAKE_SOURCE_DIR}/assets/fonts/Jost-ExtraBold.ttf"
-  "${CMAKE_SOURCE_DIR}/assets/fonts/OFL.txt")
-
 add_custom_target(pedal_suite_bundle ALL
   COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/clap/PedalSuite.resources"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${RACK_RESOURCE_FILES}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PEDAL_RESOURCE_FILES}
           "${CMAKE_BINARY_DIR}/clap/PedalSuite.resources/"
-  DEPENDS pedal_suite ${RACK_RESOURCE_FILES})
+  DEPENDS pedal_suite ${PEDAL_RESOURCE_FILES})
 
 install(TARGETS pedal_suite LIBRARY DESTINATION "${CLAP_DIR}")
-install(FILES ${RACK_RESOURCE_FILES}
+install(FILES ${PEDAL_RESOURCE_FILES}
         DESTINATION "${CLAP_DIR}/PedalSuite.resources")
-endif()  # SUITE_X11
+endif()  # APPLE / SUITE_X11
 
 
 # ---------------------------------------------------------------------------
