@@ -141,7 +141,10 @@ int main() {
           std::printf("preset '%s' value out of range at %d\n", p.name,
                       value.param);
         }
-        if (value.param >= P_SLOT0_TYPE) {
+        // Only the slot block: MIDI parameters live after it and some of
+        // their indices happen to land on the same stride pattern.
+        const int slotEnd = P_SLOT0_TYPE + kSlotCount * kSlotStride;
+        if (value.param >= P_SLOT0_TYPE && value.param < slotEnd) {
           const int offset =
               (value.param - P_SLOT0_TYPE) % kSlotStride;
           if (offset == kSlotOffsetType) ++types;
