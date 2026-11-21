@@ -973,6 +973,28 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
     for (uint32_t i = 0; i < count; ++i) {
       const auto* header = proc->in_events->get(proc->in_events, i);
       if (!header || header->space_id != CLAP_CORE_EVENT_SPACE_ID) continue;
+
+      // MIDI control is opt-in: a rack on a MIDI instrument track would
+      // otherwise react to the instrument's own notes and CCs.  While it is
+      // off, only the arm note is observed (it switches control on); every
+      // other event is ignored.
+      if (s->shared.get(P_MIDI_ENABLE) <= 0.5) {
+        bool arm = false;
+        if (header->type == CLAP_EVENT_NOTE_ON) {
+          const auto* note = reinterpret_cast<const clap_event_note_t*>(header);
+          arm = isMidiArmNote(note->key, note->velocity > 0.0 ? 1 : 0);
+        } else if (header->type == CLAP_EVENT_MIDI) {
+          const auto* midi = reinterpret_cast<const clap_event_midi_t*>(header);
+          if ((midi->data[0] & 0xF0) == 0x90) {
+            arm = isMidiArmNote(midi->data[1] & 0x7F, midi->data[2] & 0x7F);
+          }
+        }
+        if (arm) {
+          s->shared.set(P_MIDI_ENABLE, 1.0);
+        }
+        continue;
+      }
+
       if (header->type == CLAP_EVENT_NOTE_ON) {
         const auto* note = reinterpret_cast<const clap_event_note_t*>(header);
         if (note->velocity <= 0.0) continue;

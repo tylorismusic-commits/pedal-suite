@@ -1476,6 +1476,15 @@ void Panel::drawMidi(cairo_t* cr, const Shared& shared,
   roundRect(cr, bx + 0.5, by + 0.5, bw - 1, bh - 1, 6);
   cairo_stroke(cr);
 
+  const bool midiOn = shared.get(P_MIDI_ENABLE) > 0.5;
+  roundRect(cr, bx + 24, by + 16, 168, 26, 4);
+  setRgb(cr, midiOn ? kAccent : Rgb{0.20, 0.17, 0.14});
+  cairo_fill(cr);
+  text(cr, midiOn ? "MIDI CONTROL  ON" : "MIDI CONTROL  OFF", bx + 108,
+       by + 33, 8.5, 1, midiOn ? 0.10 : kDim.r, midiOn ? 0.08 : kDim.g,
+       midiOn ? 0.05 : kDim.b);
+  text(cr, "ARM NOTE 0", bx + bw - 24, by + 33, 8, 2, kDim.r, kDim.g, kDim.b);
+
   text(cr, "MIDI MAPPING", bx + bw * 0.5, by + 36, 18, 1, kText.r, kText.g,
        kText.b);
   text(cr, "Learn a note or CC per pedal · expression maps one CC to a control",
@@ -2327,6 +2336,11 @@ bool Panel::pointerDown(Shared& shared, PanelState& state, double x, double y,
     const double bx = 180, by = 100, bw = 680, bh = 540;
     if (x < bx || x > bx + bw || y < by || y > by + bh) {
       state.midiOpen = false;
+      return true;
+    }
+    if (x >= bx + 24 && x <= bx + 192 && y >= by + 16 && y <= by + 42) {
+      shared.set(P_MIDI_ENABLE,
+                 shared.get(P_MIDI_ENABLE) > 0.5 ? 0.0 : 1.0);
       return true;
     }
     if (x >= bx + bw - 110 && x <= bx + bw - 20 && y >= by + bh - 40 &&

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- MIDI control is now **off by default**, so the rack can sit before a MIDI
+  instrument without its notes and CCs changing pedals.  The MIDI mapping
+  dialog has an ON/OFF switch, and a note-on at C-1 (MIDI 0, below a normal
+  bass/guitar range) arms it for the session.
+
+## Unreleased
+
 - New pitch engine for Pitch Drop, Retune and Laser: a fixed 4096-sample
   spectral transposer with an 8x overlap and no formant processing.  The
   window and hop no longer depend on the pitch ratio, so sweeping a control

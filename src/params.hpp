@@ -56,8 +56,24 @@ enum ParamId : uint32_t {
   P_MIDI_EXPR_CTL,
   P_MIDI_EXPR_CC,
   P_SYNC,
+  // Appended at the end so existing parameter indices and saved presets keep
+  // their meaning.  MIDI control is off until either this switch is turned on
+  // or the arm note arrives.
+  P_MIDI_ENABLE,
   P_COUNT
 };
+
+// MIDI control is off by default so the rack can sit before a MIDI instrument
+// without its notes and CCs changing pedal settings.  A note-on at this key
+// arms MIDI control for the rest of the session; C-1 sits below the normal
+// range of a bass or guitar patch.
+constexpr int kMidiArmNote = 0;
+
+// True for the note-on that arms MIDI control.  Note-offs and any other key
+// are ignored, so holding or releasing the arm note cannot toggle anything.
+inline bool isMidiArmNote(int key, int velocity) {
+  return key == kMidiArmNote && velocity > 0;
+}
 
 constexpr uint32_t kSlotStride = 16;
 constexpr int kSlotOffsetType = 0;
@@ -198,6 +214,8 @@ inline constexpr ParamSpec kParamSpecs[P_COUNT] = {
      false, nullptr, {}},
     {"sync", "Tempo Sync", "Global", 0.0, 1.0, 1.0, true, false, true, nullptr,
      {}},
+    {"midi_enable", "MIDI Control", "MIDI", 0.0, 1.0, 0.0, true, false, true,
+     nullptr, {}},
 };
 
 #undef SLOT_SPECS

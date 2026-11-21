@@ -115,6 +115,13 @@ int main() {
     toggleSlotBypass(m, 3);
     const bool off = m.get(slotParam(3, kSlotOffsetBypass)) <= 0.5;
     check(on && off, "MIDI footswitch toggles bypass");
+
+    Shared gate;
+    initializeRack(gate);
+    check(gate.get(P_MIDI_ENABLE) <= 0.5, "MIDI control is off by default");
+    check(isMidiArmNote(kMidiArmNote, 100), "arm note enables MIDI control");
+    check(!isMidiArmNote(kMidiArmNote, 0), "arm note release is ignored");
+    check(!isMidiArmNote(36, 100), "ordinary notes do not arm MIDI control");
     Shared w;
     initializeRack(w);
     applyModuleDefaults(w, 5, static_cast<int>(ModuleId::Wah), false);
