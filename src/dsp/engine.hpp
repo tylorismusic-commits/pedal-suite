@@ -72,8 +72,8 @@ public:
       // A bypassed pitch pedal still runs to keep its latency constant, but
       // its pitch controls must be frozen.  Otherwise changing Pitch while
       // bypassed changes the internal dry delay and scratches the signal.
-      if (!(c.slot[i].bypass &&
-            isPitchLatencyModule(static_cast<ModuleId>(type)))) {
+      const ModuleId typeId = static_cast<ModuleId>(type);
+      if (!(c.slot[i].bypass && freezeControlsWhenBypassed(typeId))) {
         setSlotControls(i, type, c.slot[i]);
       }
       if (isNam && namActive_[i]) {
@@ -442,14 +442,21 @@ private:
            id == ModuleId::Retune || id == ModuleId::Laser;
   }
 
+  // Only the pedals whose internal dry delay moves with the pitch control need
+  // their knobs frozen while bypassed.  The Whammy and Drop keep a fixed dry
+  // delay, so their controls can update live.
+  static bool freezeControlsWhenBypassed(ModuleId id) noexcept {
+    return id == ModuleId::Retune || id == ModuleId::Laser;
+  }
+
   inline void processSlot(int s, ModuleId id, float& l, float& r,
                           float mixOverride) noexcept {
     switch (id) {
       case ModuleId::Whammy:
-        whammy_[s].process(l, r);
+        whammy_[s].process(l, r, mixOverride);
         break;
       case ModuleId::Drop:
-        drop_[s].process(l, r);
+        drop_[s].process(l, r, mixOverride);
         break;
       case ModuleId::Retune:
         retune_[s].process(l, r, mixOverride);
