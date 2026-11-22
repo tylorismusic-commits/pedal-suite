@@ -1768,7 +1768,7 @@ void Panel::drawIrPicker(cairo_t* cr, const Shared& shared,
          isSelected ? kAccent.b : kText.b);
   }
 
-  text(cr, (state.pickerNam ? namDir() : irDir()).c_str(), bx + bw * 0.5,
+  text(cr, prettyPath(state.pickerNam ? namDir() : irDir()).c_str(), bx + bw * 0.5,
        by + 384, 6.5, 1, kDim.r, kDim.g, kDim.b);
   roundRect(cr, bx + 20, by + 396, 58, 26, 4);
   setRgb(cr, scroll > 0 ? Rgb{0.20, 0.17, 0.14} : Rgb{0.12, 0.11, 0.10});

@@ -216,6 +216,19 @@ inline std::vector<std::string> listIrFiles(const std::string& dir) {
 
 inline std::string namDir() { return dataDir() + "/nam"; }
 
+// "~"-abbreviated path for the UI: the macOS Application Support path is too
+// long to draw in full.
+inline std::string prettyPath(const std::string& path) {
+  const char* home = std::getenv("HOME");
+  if (home && *home) {
+    const std::string prefix(home);
+    if (path.size() > prefix.size() && path.compare(0, prefix.size(), prefix) == 0) {
+      return "~" + path.substr(prefix.size());
+    }
+  }
+  return path;
+}
+
 // Both folders are created so a fresh install has somewhere to drop captures
 // and IRs; on macOS that is ~/Library/Application Support/PedalSuite.
 inline void ensureUserDirs() {
