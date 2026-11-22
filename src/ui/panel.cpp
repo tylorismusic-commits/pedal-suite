@@ -698,6 +698,9 @@ void Panel::layout(const Shared& shared, const PanelState& state) {
         if (control.stepped && control.format == ControlFormat::Semitones) {
           steps = 25;
         }
+        if (control.stepped && control.format == ControlFormat::DropSemis) {
+          steps = 13;  // unison down to one octave, one semitone apart
+        }
         knob(slotParam(slot, kSlotOffsetC0 + control.param), kx, ky, kr,
              control.label, slot, true, control.param, steps);
       }

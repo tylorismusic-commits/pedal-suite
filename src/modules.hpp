@@ -184,7 +184,7 @@ inline constexpr ControlDesc kWhammyControls[] = {
     {3, "MIX", "Mix", ControlFormat::Percent},
 };
 inline constexpr ControlDesc kDropControls[] = {
-    {0, "DROP", "Drop", ControlFormat::DropSemis},
+    {0, "DROP", "Drop", ControlFormat::DropSemis, true},
     {1, "TONE", "Tone", ControlFormat::Percent},
     {2, "MIX", "Mix", ControlFormat::Percent},
 };
