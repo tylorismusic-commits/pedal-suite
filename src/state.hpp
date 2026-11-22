@@ -18,7 +18,7 @@
 namespace pedal {
 
 constexpr uint32_t kStateMagic = 0x53524B32;  // "SRK2"
-constexpr uint32_t kStateVersion = 2;
+constexpr uint32_t kStateVersion = 3;
 constexpr uint32_t kStateMaxParams = 4096;
 
 inline std::vector<uint8_t> serializeState(const Shared& shared, double scale) {
@@ -40,6 +40,42 @@ inline std::vector<uint8_t> serializeState(const Shared& shared, double scale) {
   }
   put(&scale, sizeof(scale));
   return blob;
+}
+
+// Version 2 stored the old Pitch Drop module, which had five controls
+// (Pitch, Mode, Glide, Tone, Mix).  That slot is the Whammy now, with four
+// (Pitch, Glide, Tone, Mix), so the old values would land on the wrong knobs --
+// in particular the old Tone became the new Mix, which mixed the dry signal
+// back in and made the pedal sound like two pitches at once.  Re-map them.
+inline void migratePitchDrop(Shared& shared) {
+  for (int slot = 0; slot < kSlotCount; ++slot) {
+    const int type = static_cast<int>(
+        shared.get(slotParam(slot, kSlotOffsetType)) + 0.5);
+    if (type != static_cast<int>(ModuleId::Whammy)) {
+      continue;
+    }
+    const double pitch = shared.get(slotParam(slot, kSlotOffsetC0 + 0));
+    const int mode = std::clamp(
+        static_cast<int>(std::lround(
+            shared.get(slotParam(slot, kSlotOffsetC0 + 1)) * 4.0)),
+        0, 4);
+    const double glide = shared.get(slotParam(slot, kSlotOffsetC0 + 2));
+    const double tone = shared.get(slotParam(slot, kSlotOffsetC0 + 3));
+
+    double semis = 0.0;
+    switch (mode) {
+      case 0: semis = 24.0 * pitch; break;
+      case 1: semis = -24.0 * pitch; break;
+      case 2: semis = -std::round(24.0 * pitch); break;
+      case 3: semis = std::round(-24.0 + 48.0 * pitch) + 7.0; break;
+      default: semis = 0.0; break;  // detune: leave unison
+    }
+    const double bipolar = std::clamp(0.5 + semis / 48.0, 0.0, 1.0);
+    shared.setFromHost(slotParam(slot, kSlotOffsetC0 + 0), bipolar);
+    shared.setFromHost(slotParam(slot, kSlotOffsetC0 + 1), glide);
+    shared.setFromHost(slotParam(slot, kSlotOffsetC0 + 2), tone);
+    shared.setFromHost(slotParam(slot, kSlotOffsetC0 + 3), 1.0);
+  }
 }
 
 inline bool deserializeState(const void* data, size_t size, Shared& shared,
@@ -65,7 +101,7 @@ inline bool deserializeState(const void* data, size_t size, Shared& shared,
       !get(&count, sizeof(count))) {
     return false;
   }
-  if (magic != kStateMagic || version != kStateVersion ||
+  if (magic != kStateMagic || (version < 2 || version > kStateVersion) ||
       count > kStateMaxParams) {
     return false;
   }
@@ -78,6 +114,10 @@ inline bool deserializeState(const void* data, size_t size, Shared& shared,
     if (i < static_cast<uint32_t>(P_COUNT)) {
       shared.setFromHost(i, value);
     }
+  }
+
+  if (version < 3) {
+    migratePitchDrop(shared);
   }
 
   // The UI scale is optional so a state written by a future build without it

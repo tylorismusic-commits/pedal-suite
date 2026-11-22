@@ -47,6 +47,53 @@ int main() {
   check(std::fabs(b.get(P_OUTPUT) + 3.5) < 1e-9,
         "state restores global output");
   {
+    // A version-2 state carries the old five-knob Pitch Drop module.  That slot
+    // is the Whammy now: the pitch has to be re-mapped and the Mix forced to
+    // 100%, because the old Tone knob would otherwise become Mix and blend the
+    // dry signal back in.
+    Shared before;
+    initializeRack(before);
+    before.set(slotParam(0, kSlotOffsetType),
+               static_cast<double>(ModuleId::Whammy));
+    before.set(slotParam(0, kSlotOffsetC0 + 0), 0.2917);  // +7 st in old "up"
+    before.set(slotParam(0, kSlotOffsetC0 + 1), 0.0);     // mode: up
+    before.set(slotParam(0, kSlotOffsetC0 + 2), 0.15);    // glide
+    before.set(slotParam(0, kSlotOffsetC0 + 3), 0.55);    // tone
+    before.set(slotParam(0, kSlotOffsetC0 + 4), 0.80);    // old mix
+
+    std::vector<uint8_t> blob;
+    auto put = [&](const void* d, size_t n) {
+      const uint8_t* b = static_cast<const uint8_t*>(d);
+      blob.insert(blob.end(), b, b + n);
+    };
+    const uint32_t magic = kStateMagic;
+    const uint32_t version = 2;
+    const uint32_t count = P_COUNT;
+    put(&magic, sizeof(magic));
+    put(&version, sizeof(version));
+    put(&count, sizeof(count));
+    for (uint32_t i = 0; i < count; ++i) {
+      const double v = before.get(i);
+      put(&v, sizeof(v));
+    }
+    const double scale = 1.0;
+    put(&scale, sizeof(scale));
+
+    Shared after;
+    check(deserializeState(blob.data(), blob.size(), after),
+          "version-2 state loads");
+    const double pitch = after.get(slotParam(0, kSlotOffsetC0 + 0));
+
+    check(std::fabs(pitch - (0.5 + 7.0 / 48.0)) < 1e-3,
+          "old Pitch Drop pitch becomes a bipolar Whammy setting");
+    check(std::fabs(after.get(slotParam(0, kSlotOffsetC0 + 1)) - 0.15) < 1e-9,
+          "old glide keeps its knob");
+    check(std::fabs(after.get(slotParam(0, kSlotOffsetC0 + 2)) - 0.55) < 1e-9,
+          "old tone keeps its knob");
+    check(std::fabs(after.get(slotParam(0, kSlotOffsetC0 + 3)) - 1.0) < 1e-9,
+          "old Pitch Drop patch becomes fully wet");
+  }
+  {
     Shared s;
     initializeRack(s);
     bool ok = true;
