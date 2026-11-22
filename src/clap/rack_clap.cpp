@@ -530,6 +530,9 @@ bool paramsInfo(const clap_plugin_t* p, uint32_t index,
 
   const ParamSpec& s = kParamSpecs[index];
   info->flags = CLAP_PARAM_IS_AUTOMATABLE;
+  if (index == P_BYPASS) {
+    info->flags |= CLAP_PARAM_IS_BYPASS;
+  }
   if (s.stepped) info->flags |= CLAP_PARAM_IS_STEPPED;
   if (s.hidden) info->flags |= CLAP_PARAM_IS_HIDDEN;
   // Power is a normal parameter.  It must NOT be flagged CLAP_PARAM_IS_BYPASS:

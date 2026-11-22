@@ -18,7 +18,7 @@
 namespace pedal {
 
 constexpr uint32_t kStateMagic = 0x53524B32;  // "SRK2"
-constexpr uint32_t kStateVersion = 3;
+constexpr uint32_t kStateVersion = 4;
 constexpr uint32_t kStateMaxParams = 4096;
 
 inline std::vector<uint8_t> serializeState(const Shared& shared, double scale) {

@@ -2059,8 +2059,20 @@
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#midi> ;
     ] ,
     [
-        a lv2:OutputPort , lv2:ControlPort ;
+        a lv2:InputPort , lv2:ControlPort ;
         lv2:index 159 ;
+        lv2:symbol "bypass" ;
+        lv2:name "Bypass" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <https://github.com/tylorismusic-commits/pedal-suite#global> ;
+    ] ,
+    [
+        a lv2:OutputPort , lv2:ControlPort ;
+        lv2:index 160 ;
         lv2:symbol "in_peak_l" ;
         lv2:name "Input Peak Left" ;
         lv2:default 0 ;
@@ -2072,7 +2084,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 160 ;
+        lv2:index 161 ;
         lv2:symbol "in_peak_r" ;
         lv2:name "Input Peak Right" ;
         lv2:default 0 ;
@@ -2084,7 +2096,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 161 ;
+        lv2:index 162 ;
         lv2:symbol "out_peak_l" ;
         lv2:name "Output Peak Left" ;
         lv2:default 0 ;
@@ -2096,7 +2108,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 162 ;
+        lv2:index 163 ;
         lv2:symbol "out_peak_r" ;
         lv2:name "Output Peak Right" ;
         lv2:default 0 ;
@@ -2108,7 +2120,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 163 ;
+        lv2:index 164 ;
         lv2:symbol "in_peak" ;
         lv2:name "Input Peak" ;
         lv2:default 0 ;
@@ -2120,7 +2132,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 164 ;
+        lv2:index 165 ;
         lv2:symbol "out_peak" ;
         lv2:name "Output Peak" ;
         lv2:default 0 ;
@@ -2132,7 +2144,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 165 ;
+        lv2:index 166 ;
         lv2:symbol "slot1_gr" ;
         lv2:name "Slot 1 Gain Reduction" ;
         lv2:default 0 ;
@@ -2143,7 +2155,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 166 ;
+        lv2:index 167 ;
         lv2:symbol "slot2_gr" ;
         lv2:name "Slot 2 Gain Reduction" ;
         lv2:default 0 ;
@@ -2154,7 +2166,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 167 ;
+        lv2:index 168 ;
         lv2:symbol "slot3_gr" ;
         lv2:name "Slot 3 Gain Reduction" ;
         lv2:default 0 ;
@@ -2165,7 +2177,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 168 ;
+        lv2:index 169 ;
         lv2:symbol "slot4_gr" ;
         lv2:name "Slot 4 Gain Reduction" ;
         lv2:default 0 ;
@@ -2176,7 +2188,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 169 ;
+        lv2:index 170 ;
         lv2:symbol "slot5_gr" ;
         lv2:name "Slot 5 Gain Reduction" ;
         lv2:default 0 ;
@@ -2187,7 +2199,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 170 ;
+        lv2:index 171 ;
         lv2:symbol "slot6_gr" ;
         lv2:name "Slot 6 Gain Reduction" ;
         lv2:default 0 ;
@@ -2198,7 +2210,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 171 ;
+        lv2:index 172 ;
         lv2:symbol "slot7_gr" ;
         lv2:name "Slot 7 Gain Reduction" ;
         lv2:default 0 ;
@@ -2209,7 +2221,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 172 ;
+        lv2:index 173 ;
         lv2:symbol "slot8_gr" ;
         lv2:name "Slot 8 Gain Reduction" ;
         lv2:default 0 ;
@@ -2220,7 +2232,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 173 ;
+        lv2:index 174 ;
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:default 0 ;
@@ -2232,7 +2244,7 @@
     ] ,
     [
         a lv2:InputPort , atom:AtomPort ;
-        lv2:index 174 ;
+        lv2:index 175 ;
         lv2:symbol "midi_in" ;
         lv2:name "MIDI In" ;
         atom:bufferType atom:Sequence ;
@@ -2240,7 +2252,7 @@
     ] ,
     [
         a lv2:InputPort , lv2:ControlPort ;
-        lv2:index 175 ;
+        lv2:index 176 ;
         lv2:symbol "midi_learn_slot" ;
         lv2:name "MIDI Learn Slot" ;
         lv2:default -1 ;
@@ -2251,7 +2263,7 @@
     ] ,
     [
         a lv2:InputPort , lv2:ControlPort ;
-        lv2:index 176 ;
+        lv2:index 177 ;
         lv2:symbol "midi_learn_expr" ;
         lv2:name "MIDI Learn Expression" ;
         lv2:default 0 ;
@@ -2263,7 +2275,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 177 ;
+        lv2:index 178 ;
         lv2:symbol "midi_learn_slot_state" ;
         lv2:name "MIDI Learn Slot State" ;
         lv2:default -1 ;
@@ -2274,7 +2286,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 178 ;
+        lv2:index 179 ;
         lv2:symbol "midi_learn_expr_state" ;
         lv2:name "MIDI Learn Expression State" ;
         lv2:default 0 ;
@@ -2285,7 +2297,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 179 ;
+        lv2:index 180 ;
         lv2:symbol "midi_setlist_next" ;
         lv2:name "MIDI Setlist Next" ;
         lv2:default 0 ;
@@ -2296,7 +2308,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 180 ;
+        lv2:index 181 ;
         lv2:symbol "midi_setlist_prev" ;
         lv2:name "MIDI Setlist Previous" ;
         lv2:default 0 ;
@@ -2307,7 +2319,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 181 ;
+        lv2:index 182 ;
         lv2:symbol "midi_setlist_pc_seq" ;
         lv2:name "MIDI Setlist PC Seq" ;
         lv2:default 0 ;
@@ -2318,7 +2330,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 182 ;
+        lv2:index 183 ;
         lv2:symbol "midi_setlist_pc_value" ;
         lv2:name "MIDI Setlist PC Value" ;
         lv2:default 0 ;
@@ -2329,7 +2341,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 183 ;
+        lv2:index 184 ;
         lv2:symbol "midi_bank_next" ;
         lv2:name "MIDI Bank Next" ;
         lv2:default 0 ;
@@ -2340,7 +2352,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 184 ;
+        lv2:index 185 ;
         lv2:symbol "midi_bank_prev" ;
         lv2:name "MIDI Bank Previous" ;
         lv2:default 0 ;
@@ -2351,7 +2363,7 @@
     ] ,
     [
         a lv2:InputPort , lv2:ControlPort ;
-        lv2:index 185 ;
+        lv2:index 186 ;
         lv2:symbol "editor_open" ;
         lv2:name "Editor Open" ;
         lv2:default 0 ;
@@ -2362,7 +2374,7 @@
     ] ,
     [
         a lv2:InputPort , lv2:ControlPort ;
-        lv2:index 186 ;
+        lv2:index 187 ;
         lv2:symbol "perf_bank_in" ;
         lv2:name "Performance Bank" ;
         lv2:default 0 ;
@@ -2373,7 +2385,7 @@
     ] ,
     [
         a lv2:InputPort , lv2:ControlPort ;
-        lv2:index 187 ;
+        lv2:index 188 ;
         lv2:symbol "perf_setlist_in" ;
         lv2:name "Performance Setlist" ;
         lv2:default 0 ;
@@ -2384,7 +2396,7 @@
     ] ,
     [
         a lv2:InputPort , lv2:ControlPort ;
-        lv2:index 188 ;
+        lv2:index 189 ;
         lv2:symbol "perf_entry_in" ;
         lv2:name "Performance Entry" ;
         lv2:default -1 ;
@@ -2395,7 +2407,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 189 ;
+        lv2:index 190 ;
         lv2:symbol "perf_bank" ;
         lv2:name "Performance Bank" ;
         lv2:default 0 ;
@@ -2406,7 +2418,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 190 ;
+        lv2:index 191 ;
         lv2:symbol "perf_setlist" ;
         lv2:name "Performance Setlist" ;
         lv2:default 0 ;
@@ -2417,7 +2429,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 191 ;
+        lv2:index 192 ;
         lv2:symbol "perf_entry" ;
         lv2:name "Performance Entry" ;
         lv2:default -1 ;
@@ -2428,7 +2440,7 @@
     ] ,
     [
         a lv2:OutputPort , lv2:ControlPort ;
-        lv2:index 192 ;
+        lv2:index 193 ;
         lv2:symbol "perf_revision" ;
         lv2:name "Performance Revision" ;
         lv2:default 0 ;

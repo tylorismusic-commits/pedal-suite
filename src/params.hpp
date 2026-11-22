@@ -60,6 +60,9 @@ enum ParamId : uint32_t {
   // their meaning.  MIDI control is off until either this switch is turned on
   // or the arm note arrives.
   P_MIDI_ENABLE,
+  // Appended: a host-visible bypass switch (1 = bypassed) so the DAW's own
+  // Bypass button reaches the plug-in through the CLAP, VST3 and AU wrappers.
+  P_BYPASS,
   P_COUNT
 };
 
@@ -216,6 +219,8 @@ inline constexpr ParamSpec kParamSpecs[P_COUNT] = {
      {}},
     {"midi_enable", "MIDI Control", "MIDI", 0.0, 1.0, 0.0, true, false, true,
      nullptr, {}},
+    {"bypass", "Bypass", "Global", 0.0, 1.0, 0.0, true, false, true, nullptr,
+     {}},
 };
 
 #undef SLOT_SPECS
@@ -332,7 +337,7 @@ private:
 
 inline Controls controlsFrom(const Shared& s) noexcept {
   Controls c;
-  c.power = s.get(P_POWER) > 0.5;
+  c.power = s.get(P_POWER) > 0.5 && s.get(P_BYPASS) <= 0.5;
   c.inputDb = static_cast<float>(s.get(P_INPUT));
   c.outputDb = static_cast<float>(s.get(P_OUTPUT));
   c.sync = s.get(P_SYNC) > 0.5;
