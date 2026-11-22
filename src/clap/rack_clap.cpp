@@ -15,6 +15,8 @@
 #include <sys/time.h>
 
 #include <atomic>
+#include <cctype>
+#include <filesystem>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -103,6 +105,9 @@ public:
   explicit Editor(Shared& shared) : shared_(shared) {}
 
   std::function<void()> requestFlush;
+  // Files dropped on the editor.  Set by the plug-in; the view calls it on the
+  // main thread with the paths Finder handed over.
+  std::function<void(const std::vector<std::string>&)> onFilesDropped;
 
   double scale() const { return scale_.load(std::memory_order_relaxed); }
   UiSize size() const { return sizeForScale(scale()); }
@@ -111,6 +116,7 @@ public:
     if (!cocoa_) {
       panel_.loadFont(bundleResourceDir());
       cocoa_ = std::make_unique<CocoaView>();
+      cocoa_->onFilesDropped = onFilesDropped;
       cocoa_->setContent(&panel_, &shared_, &state_);
     }
     if (parent) cocoa_->attach(parent);
@@ -144,6 +150,9 @@ public:
   // Called when the user changes a control, so the host can ask for a
   // process call and pick up the new values.
   std::function<void()> requestFlush;
+  // Unused on X11 (drops arrive through the XDND target), but the plug-in
+  // prepares the same callback for both editors.
+  std::function<void(const std::vector<std::string>&)> onFilesDropped;
 
   double scale() const { return scale_.load(std::memory_order_relaxed); }
   UiSize size() const { return sizeForScale(scale()); }
@@ -439,6 +448,8 @@ struct Plugin {
   PerformanceController performance;
   int lastIrIndex = -2;
   bool irDirty = true;
+  // Set from the editor's drop handler; the audio thread reloads the banks.
+  std::atomic<bool> filesChanged{false};
   std::vector<std::string> namNames;
   int lastNamIndex = -2;
   // Channel width per audio port.  Logic hides a stereo-only effect on mono
@@ -1178,6 +1189,19 @@ clap_process_status pluginProcess(const clap_plugin_t* p, const clap_process_t* 
     }
   }
 
+  if (s->filesChanged.exchange(false, std::memory_order_acquire)) {
+    s->irBank = pedal::loadIrBank(
+        pedal::irDir(), static_cast<int>(std::lround(s->sampleRate)));
+    s->namNames = pedal::listNamFiles(pedal::namDir());
+    s->shared.irBankCount.store(
+        s->irBank ? static_cast<int>(s->irBank->entries.size()) : 0,
+        std::memory_order_relaxed);
+    s->shared.namBankCount.store(static_cast<int>(s->namNames.size()),
+                                 std::memory_order_relaxed);
+    s->lastIrIndex = -2;
+    s->lastNamIndex = -2;
+  }
+
   s->engine.setControls(controlsFrom(s->shared), s->shared.revision());
 
   const int irIndex =
@@ -1318,6 +1342,41 @@ void pluginOnMainThread(const clap_plugin_t* p) {
   }
 }
 
+// Copies a dropped file into one of the user folders.  Returns false if the
+// file could not be copied.
+bool copyDroppedFile(const std::string& src, const std::string& dir) {
+  std::error_code ec;
+  std::filesystem::create_directories(dir, ec);
+  const auto name = std::filesystem::path(src).filename();
+  if (name.empty()) return false;
+  std::filesystem::copy_file(src, std::filesystem::path(dir) / name,
+                             std::filesystem::copy_options::overwrite_existing,
+                             ec);
+  return !ec;
+}
+
+// Main thread: a .nam capture or a .wav IR dropped on the editor.  The banks
+// are owned by the audio thread, so this only marks them for reload.
+void importDroppedFiles(Plugin* s, const std::vector<std::string>& paths) {
+  bool changed = false;
+  for (const auto& path : paths) {
+    std::string ext = std::filesystem::path(path).extension().string();
+    for (char& c : ext) {
+      c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+    if (ext == ".nam") {
+      changed = copyDroppedFile(path, pedal::namDir()) || changed;
+    } else if (ext == ".wav") {
+      changed = copyDroppedFile(path, pedal::irDir()) || changed;
+    }
+  }
+  if (!changed) return;
+  s->filesChanged.store(true, std::memory_order_release);
+  if (s->host && s->host->request_process) {
+    s->host->request_process(s->host);
+  }
+}
+
 Plugin* createPlugin(const clap_host_t* host) {
   Plugin* s = new Plugin();
   s->host = host;
@@ -1334,6 +1393,7 @@ Plugin* createPlugin(const clap_host_t* host) {
   s->plugin.get_extension = pluginGetExtension;
   s->plugin.on_main_thread = pluginOnMainThread;
   s->engine.prepare(48000.0f);
+  pedal::ensureUserDirs();
   initializeRack(s->shared);
   s->reloadPerformance();
   s->irBank = pedal::loadIrBank(pedal::irDir(), 48000);
@@ -1349,6 +1409,9 @@ Plugin* createPlugin(const clap_host_t* host) {
     if (s->host && s->host->request_process) {
       s->host->request_process(s->host);
     }
+  };
+  s->editor.onFilesDropped = [s](const std::vector<std::string>& paths) {
+    importDroppedFiles(s, paths);
   };
   return s;
 }

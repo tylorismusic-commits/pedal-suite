@@ -8,6 +8,9 @@
 #include "ui/cocoa_view.hpp"
 
 #include <algorithm>
+#include <functional>
+#include <string>
+#include <vector>
 #include <cmath>
 
 #include <cairo.h>
@@ -24,6 +27,7 @@ struct ViewState {
   Panel* panel = nullptr;
   Shared* shared = nullptr;
   PanelState* state = nullptr;
+  std::function<void(const std::vector<std::string>&)> onFilesDropped;
 };
 
 struct Placement {
@@ -72,6 +76,34 @@ void logicalPoint(NSView* view, NSPoint point, double* lx, double* ly) {
 
 - (BOOL)isOpaque {
   return YES;
+}
+
+// Files dragged in from Finder: a .nam capture or a .wav impulse response.
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
+  (void)sender;
+  return NSDragOperationCopy;
+}
+
+- (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
+  (void)sender;
+  return NSDragOperationCopy;
+}
+
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
+  NSArray<NSURL*>* urls = [[sender draggingPasteboard]
+      readObjectsForClasses:@[ [NSURL class] ]
+                    options:@{NSPasteboardURLReadingFileURLsOnlyKey : @YES}];
+  std::vector<std::string> paths;
+  for (NSURL* url in urls) {
+    if (url.isFileURL && url.fileSystemRepresentation) {
+      paths.emplace_back(url.fileSystemRepresentation);
+    }
+  }
+  if (viewState && viewState->onFilesDropped && !paths.empty()) {
+    viewState->onFilesDropped(paths);
+    return YES;
+  }
+  return NO;
 }
 
 - (void)viewDidMoveToWindow {
@@ -256,6 +288,7 @@ void CocoaView::setContent(Panel* panel, Shared* shared, PanelState* state) {
   impl_->state.shared = shared;
   impl_->state.state = state;
   if (impl_->view) impl_->view->viewState = &impl_->state;
+  impl_->state.onFilesDropped = onFilesDropped;
 }
 
 void CocoaView::attach(void* parentNsView) {
@@ -268,6 +301,8 @@ void CocoaView::attach(void* parentNsView) {
     impl_->view->surfaceWidth = 0;
     impl_->view->surfaceHeight = 0;
     impl_->view->refreshTimer = nil;
+    [impl_->view registerForDraggedTypes:@[ NSPasteboardTypeFileURL ]];
+    impl_->state.onFilesDropped = onFilesDropped;
     impl_->view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
   }
   NSView* parent = (__bridge NSView*)parentNsView;

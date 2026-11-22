@@ -148,13 +148,31 @@ struct IrBank {
   std::vector<IrEntry> entries;
 };
 
-inline std::string irDir() {
-  const char* xdg = std::getenv("XDG_DATA_HOME");
-  if (xdg && *xdg) return std::string(xdg) + "/pedal-suite/irs";
+inline std::string dataDir() {
+#ifdef __APPLE__
   const char* home = std::getenv("HOME");
-  if (home && *home) return std::string(home) + "/.local/share/pedal-suite/irs";
-  return "pedal-suite/irs";
+  if (home && *home) {
+    const std::string modern =
+        std::string(home) + "/Library/Application Support/PedalSuite";
+    const std::string legacy =
+        std::string(home) + "/.local/share/pedal-suite";
+    std::error_code ec;
+    if (!std::filesystem::exists(modern, ec) &&
+        std::filesystem::exists(legacy, ec)) {
+      return legacy;
+    }
+    return modern;
+  }
+#else
+  const char* xdg = std::getenv("XDG_DATA_HOME");
+  if (xdg && *xdg) return std::string(xdg) + "/pedal-suite";
+  const char* home = std::getenv("HOME");
+  if (home && *home) return std::string(home) + "/.local/share/pedal-suite";
+#endif
+  return "pedal-suite";
 }
+
+inline std::string irDir() { return dataDir() + "/irs"; }
 
 inline bool isWavName(const std::string& name) {
   if (name.size() < 4) return false;
@@ -194,13 +212,16 @@ inline std::vector<std::string> listIrFiles(const std::string& dir) {
   return listFilesWithExt(dir, ".wav");
 }
 
-inline std::string namDir() {
-  const char* xdg = std::getenv("XDG_DATA_HOME");
-  if (xdg && *xdg) return std::string(xdg) + "/pedal-suite/nam";
-  const char* home = std::getenv("HOME");
-  if (home && *home) return std::string(home) + "/.local/share/pedal-suite/nam";
-  return "pedal-suite/nam";
+inline std::string namDir() { return dataDir() + "/nam"; }
+
+// Both folders are created so a fresh install has somewhere to drop captures
+// and IRs; on macOS that is ~/Library/Application Support/PedalSuite.
+inline void ensureUserDirs() {
+  std::error_code ec;
+  std::filesystem::create_directories(irDir(), ec);
+  std::filesystem::create_directories(namDir(), ec);
 }
+
 
 inline std::vector<std::string> listNamFiles(const std::string& dir) {
   return listFilesWithExt(dir, ".nam");

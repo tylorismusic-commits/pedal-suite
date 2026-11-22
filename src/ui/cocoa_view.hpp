@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace pedal {
 
@@ -24,6 +27,10 @@ public:
   void attach(void* parentNsView);
   void detach();
   void resize(int width, int height);
+
+  // Called with the paths of files dropped onto the editor.  The plug-in copies
+  // them into its user folders and rescans.
+  std::function<void(const std::vector<std::string>&)> onFilesDropped;
 
 private:
   struct Impl;
