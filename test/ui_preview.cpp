@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 
   applyModuleDefaults(s, 4, static_cast<int>(ModuleId::BassDrive));
   applyModuleDefaults(s, 5, static_cast<int>(ModuleId::BassFuzz));
-  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::PitchDrop));
+  applyModuleDefaults(s, 6, static_cast<int>(ModuleId::Whammy));
   applyModuleDefaults(s, 7, static_cast<int>(ModuleId::Retune));
   state.selectedSlot = 6;
   panel.draw(cr, s, state);

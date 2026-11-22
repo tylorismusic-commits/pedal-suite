@@ -96,7 +96,7 @@
         lv2:name "Module" ;
         lv2:default 1 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -111,7 +111,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -141,7 +141,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot1> ;
     ] ,
     [
@@ -305,7 +306,7 @@
         lv2:name "Module" ;
         lv2:default 2 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -320,7 +321,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -350,7 +351,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot2> ;
     ] ,
     [
@@ -514,7 +516,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -529,7 +531,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -559,7 +561,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot3> ;
     ] ,
     [
@@ -723,7 +726,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -738,7 +741,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -768,7 +771,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot4> ;
     ] ,
     [
@@ -932,7 +936,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -947,7 +951,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -977,7 +981,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot5> ;
     ] ,
     [
@@ -1141,7 +1146,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1156,7 +1161,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -1186,7 +1191,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot6> ;
     ] ,
     [
@@ -1350,7 +1356,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1365,7 +1371,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -1395,7 +1401,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot7> ;
     ] ,
     [
@@ -1559,7 +1566,7 @@
         lv2:name "Module" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 43 ;
+        lv2:maximum 44 ;
         lv2:portProperty lv2:integer ;
         lv2:scalePoint [ rdf:value 0 ; rdfs:label "Off" ] ,
             [ rdf:value 1 ; rdfs:label "Boost" ] ,
@@ -1574,7 +1581,7 @@
             [ rdf:value 10 ; rdfs:label "Tone Bender" ] ,
             [ rdf:value 11 ; rdfs:label "Bass Drive" ] ,
             [ rdf:value 12 ; rdfs:label "Bass Fuzz" ] ,
-            [ rdf:value 13 ; rdfs:label "Pitch Drop" ] ,
+            [ rdf:value 13 ; rdfs:label "Whammy" ] ,
             [ rdf:value 14 ; rdfs:label "Retune" ] ,
             [ rdf:value 15 ; rdfs:label "Chorus" ] ,
             [ rdf:value 16 ; rdfs:label "Flanger" ] ,
@@ -1604,7 +1611,8 @@
             [ rdf:value 40 ; rdfs:label "Laser" ] ,
             [ rdf:value 41 ; rdfs:label "Cab" ] ,
             [ rdf:value 42 ; rdfs:label "NAM Amp" ] ,
-            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ;
+            [ rdf:value 43 ; rdfs:label "Auto-Wah" ] ,
+            [ rdf:value 44 ; rdfs:label "Drop" ] ;
         pg:group <https://github.com/tylorismusic-commits/pedal-suite#slot8> ;
     ] ,
     [

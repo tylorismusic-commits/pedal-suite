@@ -232,7 +232,8 @@ public:
     for (auto& p : toneBender_) p.reset();
     for (auto& p : bassDrive_) p.reset();
     for (auto& p : bassFuzz_) p.reset();
-    for (auto& p : pitchDrop_) p.reset();
+    for (auto& p : whammy_) p.reset();
+    for (auto& p : drop_) p.reset();
     for (auto& p : retune_) p.reset();
     for (auto& p : chorus_) p.reset();
     for (auto& p : flanger_) p.reset();
@@ -276,8 +277,8 @@ public:
       // Pitch slots stay in the signal path even when bypassed (at mix 0) so
       // the reported latency must stay with them.  This stops the host from
       // re-aligning the track every time a footswitch is pressed.
-      if (id == ModuleId::PitchDrop) {
-        latency += pitchDrop_[s].latencySamples();
+      if (id == ModuleId::Whammy || id == ModuleId::Drop) {
+        latency += whammy_[s].latencySamples();
         continue;
       }
       if (id == ModuleId::Retune) {
@@ -318,7 +319,8 @@ private:
       case ModuleId::ToneBender: toneBender_[s].prepare(sr_); break;
       case ModuleId::BassDrive: bassDrive_[s].prepare(sr_); break;
       case ModuleId::BassFuzz: bassFuzz_[s].prepare(sr_); break;
-      case ModuleId::PitchDrop: pitchDrop_[s].prepare(sr_); break;
+      case ModuleId::Whammy: whammy_[s].prepare(sr_); break;
+      case ModuleId::Drop: drop_[s].prepare(sr_); break;
       case ModuleId::Retune: retune_[s].prepare(sr_); break;
       case ModuleId::Chorus: chorus_[s].prepare(sr_); break;
       case ModuleId::Flanger: flanger_[s].prepare(sr_); break;
@@ -387,7 +389,8 @@ private:
       case ModuleId::ToneBender: toneBender_[s].setControls(toneBenderControlsFrom(c)); break;
       case ModuleId::BassDrive: bassDrive_[s].setControls(bassDriveControlsFrom(c)); break;
       case ModuleId::BassFuzz: bassFuzz_[s].setControls(bassFuzzControlsFrom(c)); break;
-      case ModuleId::PitchDrop: pitchDrop_[s].setControls(pitchDropControlsFrom(c)); break;
+      case ModuleId::Whammy: whammy_[s].setControls(whammyControlsFrom(c)); break;
+      case ModuleId::Drop: drop_[s].setControls(dropControlsFrom(c)); break;
       case ModuleId::Retune: retune_[s].setControls(retuneControlsFrom(c)); break;
       case ModuleId::Chorus: chorus_[s].setControls(chorusControlsFrom(c)); break;
       case ModuleId::Flanger: flanger_[s].setControls(flangerControlsFrom(c)); break;
@@ -435,15 +438,18 @@ private:
   }
 
   static bool isPitchLatencyModule(ModuleId id) noexcept {
-    return id == ModuleId::PitchDrop || id == ModuleId::Retune ||
-           id == ModuleId::Laser;
+    return id == ModuleId::Whammy || id == ModuleId::Drop ||
+           id == ModuleId::Retune || id == ModuleId::Laser;
   }
 
   inline void processSlot(int s, ModuleId id, float& l, float& r,
                           float mixOverride) noexcept {
     switch (id) {
-      case ModuleId::PitchDrop:
-        pitchDrop_[s].process(l, r, mixOverride);
+      case ModuleId::Whammy:
+        whammy_[s].process(l, r);
+        break;
+      case ModuleId::Drop:
+        drop_[s].process(l, r);
         break;
       case ModuleId::Retune:
         retune_[s].process(l, r, mixOverride);
@@ -471,7 +477,8 @@ private:
       case ModuleId::ToneBender: toneBender_[s].process(l, r); break;
       case ModuleId::BassDrive: bassDrive_[s].process(l, r); break;
       case ModuleId::BassFuzz: bassFuzz_[s].process(l, r); break;
-      case ModuleId::PitchDrop: pitchDrop_[s].process(l, r); break;
+      case ModuleId::Whammy: whammy_[s].process(l, r); break;
+      case ModuleId::Drop: drop_[s].process(l, r); break;
       case ModuleId::Retune: retune_[s].process(l, r); break;
       case ModuleId::Chorus: chorus_[s].process(l, r); break;
       case ModuleId::Flanger: flanger_[s].process(l, r); break;
@@ -534,7 +541,8 @@ private:
   stomp::modules::ToneBender toneBender_[kSlotCount];
   stomp::modules::BassDrive bassDrive_[kSlotCount];
   stomp::modules::BassFuzz bassFuzz_[kSlotCount];
-  stomp::modules::PitchDrop pitchDrop_[kSlotCount];
+  stomp::modules::Whammy whammy_[kSlotCount];
+  stomp::modules::Drop drop_[kSlotCount];
   stomp::modules::Retune retune_[kSlotCount];
   stomp::modules::Chorus chorus_[kSlotCount];
   stomp::modules::Flanger flanger_[kSlotCount];

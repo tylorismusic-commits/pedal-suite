@@ -84,14 +84,22 @@ inline stomp::modules::FuzzFaceControls fuzzFaceControlsFrom(
   return out;
 }
 
-inline stomp::modules::PitchDropControls pitchDropControlsFrom(
+inline stomp::modules::WhammyControls whammyControlsFrom(
     const SlotControls& c) noexcept {
-  stomp::modules::PitchDropControls out;
+  stomp::modules::WhammyControls out;
   out.pitch = c.c[0];
-  out.mode = static_cast<int>(std::lround(std::clamp(c.c[1], 0.0f, 1.0f) * 4.0f));
-  out.glide = c.c[2];
-  out.tone = c.c[3];
-  out.mix = c.c[4];
+  out.glide = c.c[1];
+  out.tone = c.c[2];
+  out.mix = c.c[3];
+  return out;
+}
+
+inline stomp::modules::DropControls dropControlsFrom(
+    const SlotControls& c) noexcept {
+  stomp::modules::DropControls out;
+  out.semitones = c.c[0];
+  out.tone = c.c[1];
+  out.mix = c.c[2];
   return out;
 }
 

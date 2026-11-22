@@ -87,9 +87,8 @@ inline constexpr PresetValue kGojiraDrop[] = {
     PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::TightGate)),
     PV(PC(0, 0), 0.60), PV(PC(0, 1), 0.08), PV(PC(0, 2), 0.90),
     PV(PC(0, 3), 1.00),
-    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::PitchDrop)),
-    PV(PC(1, 0), 0.0833), PV(PC(1, 1), 0.50), PV(PC(1, 2), 0.02),
-    PV(PC(1, 3), 0.55), PV(PC(1, 4), 1.0),
+    PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Drop)),
+    PV(PC(1, 0), 0.0833), PV(PC(1, 1), 0.55), PV(PC(1, 2), 1.0),
     PV(PS(2, kSlotOffsetType), static_cast<int>(ModuleId::Distortion)),
     PV(PC(2, 0), 0.75), PV(PC(2, 1), 0.50), PV(PC(2, 2), 0.45),
     PV(PS(3, kSlotOffsetType), static_cast<int>(ModuleId::Eq3)),
@@ -152,9 +151,9 @@ inline constexpr PresetValue kAutoFunk[] = {
 
 inline constexpr PresetValue kPitchLead[] = {
     PV(P_POWER, 1),
-    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::PitchDrop)),
-    PV(PC(0, 0), 0.2917), PV(PC(0, 1), 0.00), PV(PC(0, 2), 0.15),
-    PV(PC(0, 3), 0.55), PV(PC(0, 4), 0.80),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::Whammy)),
+    PV(PC(0, 0), 0.6458), PV(PC(0, 1), 0.15),
+    PV(PC(0, 2), 0.55), PV(PC(0, 3), 0.80),
     PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Overdrive)),
     PV(PC(1, 0), 0.50), PV(PC(1, 1), 0.55), PV(PC(1, 2), 0.50),
     PV(PC(1, 3), 1.00),
@@ -376,9 +375,9 @@ inline constexpr PresetValue kSynthBass[] = {
 
 inline constexpr PresetValue kProgLead[] = {
     PV(P_POWER, 1),
-    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::PitchDrop)),
-    PV(PC(0, 0), 0.50), PV(PC(0, 1), 0.67), PV(PC(0, 2), 0.10),
-    PV(PC(0, 3), 0.55), PV(PC(0, 4), 0.45),
+    PV(PS(0, kSlotOffsetType), static_cast<int>(ModuleId::Whammy)),
+    PV(PC(0, 0), 0.75), PV(PC(0, 1), 0.10),
+    PV(PC(0, 2), 0.55), PV(PC(0, 3), 0.45),
     PV(PS(1, kSlotOffsetType), static_cast<int>(ModuleId::Overdrive)),
     PV(PC(1, 0), 0.55), PV(PC(1, 1), 0.60), PV(PC(1, 2), 0.50),
     PV(PC(1, 3), 0.85),

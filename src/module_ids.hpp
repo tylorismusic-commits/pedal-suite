@@ -20,7 +20,7 @@ enum ModuleId : int {
   ToneBender,
   BassDrive,
   BassFuzz,
-  PitchDrop,
+  Whammy,
   Retune,
   Chorus,
   Flanger,
@@ -51,6 +51,7 @@ enum ModuleId : int {
   Cab,
   Nam,
   AutoWah,
+  Drop,
   Count
 };
 
@@ -59,13 +60,13 @@ constexpr int kModuleCount = static_cast<int>(ModuleId::Count);
 inline constexpr const char* kModuleLabels[] = {
     "Off",       "Boost",     "808 Drive",  "Treble Boost", "Overdrive",
     "Blues Drive", "Distortion", "Rat",     "Big Fuzz",   "Fuzz Face",
-    "Tone Bender", "Bass Drive", "Bass Fuzz", "Pitch Drop", "Retune",
+    "Tone Bender", "Bass Drive", "Bass Fuzz", "Whammy", "Retune",
     "Chorus", "Flanger", "Phaser", "Tremolo", "Analog Delay",
     "Spring Reverb", "Bass Chorus", "Vibrato", "Octave", "Tape Echo",
     "Digital Delay", "Ping-Pong", "Plate Reverb", "Room Reverb",
     "FET Comp", "Opto Comp", "Envelope Filter", "Noise Gate", "Tight Gate",
     "3-Band EQ", "Bass EQ", "Lo-Fi", "Tape Sat", "Precision Drive", "Wah",
-    "Laser", "Cab", "NAM Amp", "Auto-Wah"};
+    "Laser", "Cab", "NAM Amp", "Auto-Wah", "Drop"};
 
 static_assert(sizeof(kModuleLabels) / sizeof(kModuleLabels[0]) == kModuleCount,
               "kModuleLabels must cover every module id");
@@ -208,13 +209,19 @@ constexpr double defaultControlValue(ModuleId id, int control) noexcept {
         case 3: return 0.50;  // Level
         default: return 0.50;
       }
-    case ModuleId::PitchDrop:
+    case ModuleId::Whammy:
       switch (control) {
-        case 0: return 0.00;  // Pitch (unison)
-        case 1: return 0.00;  // Whammy Up
-        case 2: return 0.20;  // Glide
-        case 3: return 0.50;  // Tone
-        case 4: return 1.00;  // Mix
+        case 0: return 0.50;  // Pitch (unison)
+        case 1: return 0.20;  // Glide
+        case 2: return 0.60;  // Tone
+        case 3: return 1.00;  // Mix
+        default: return 0.50;
+      }
+    case ModuleId::Drop:
+      switch (control) {
+        case 0: return 0.00;  // Drop (unison)
+        case 1: return 0.50;  // Tone
+        case 2: return 1.00;  // Mix
         default: return 0.50;
       }
     case ModuleId::Retune:

@@ -267,8 +267,9 @@ int main() {
       initializeRack(s);
       applyModuleDefaults(s, 0, static_cast<int>(id), false);
       s.set(slotParam(0, kSlotOffsetC0 + control), value);
-      if (id == ModuleId::PitchDrop) {
-        s.set(slotParam(0, kSlotOffsetC0 + 2), 0.0);
+      if (id == ModuleId::Whammy) {
+        // Glide to zero so the measurement is not taken during the ramp.
+        s.set(slotParam(0, kSlotOffsetC0 + 1), 0.0);
       }
       Engine e;
       e.prepare(48000.0f);
@@ -290,10 +291,14 @@ int main() {
       const double seconds = (n - start) / 48000.0;
       return std::make_pair(crossings * 0.5 / seconds, latency);
     };
-    const auto pitch = shifted(ModuleId::PitchDrop, 0, 0.5);
-    check(std::fabs(pitch.first - 440.0) < 30.0,
-          "Pitch Drop shifts up an octave");
-    check(pitch.second > 0, "Pitch Drop reports latency");
+    const auto pitch = shifted(ModuleId::Whammy, 0, 0.75);
+    check(std::fabs(pitch.first - 440.0) < 40.0,
+          "Whammy shifts up an octave");
+    check(pitch.second > 0, "Whammy reports latency");
+    const auto drop = shifted(ModuleId::Drop, 0, 0.5);
+    check(std::fabs(drop.first - 155.6) < 20.0,
+          "Drop shifts down six semitones");
+    check(drop.second > 0, "Drop reports latency");
     const auto retune = shifted(ModuleId::Retune, 0, 1.0);
     check(std::fabs(retune.first - 440.0) < 30.0,
           "Retune shifts up twelve semitones");
@@ -304,7 +309,7 @@ int main() {
     // host re-aligns the track every time the footswitch is pressed.
     Shared s;
     initializeRack(s);
-    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::PitchDrop), false);
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Whammy), false);
     Engine e;
     e.prepare(48000.0f);
     e.setControls(controlsFrom(s));
@@ -352,7 +357,7 @@ int main() {
     auto render = [&](bool changePitch, std::vector<float>& out) {
       Shared s;
       initializeRack(s);
-      applyModuleDefaults(s, 0, static_cast<int>(ModuleId::PitchDrop), false);
+      applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Whammy), false);
       s.set(slotParam(0, kSlotOffsetBypass), 1.0);
       Engine e;
       e.prepare(48000.0f);

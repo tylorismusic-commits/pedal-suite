@@ -83,6 +83,12 @@ inline std::string formatControlValue(const ModuleDesc& module,
     case ControlFormat::Ratio2To20:
       std::snprintf(buf, sizeof(buf), "%.1f : 1", 2.0f + 18.0f * v);
       return buf;
+    case ControlFormat::DropSemis: {
+      const int semis = -static_cast<int>(std::lround(v * 12.0f));
+      if (semis == 0) return "0 st";
+      std::snprintf(buf, sizeof(buf), "%+d st", semis);
+      return buf;
+    }
     case ControlFormat::PitchSemis: {
       const int semis = static_cast<int>(std::lround(v * 48.0f)) - 24;
       if (semis == 0) return "0 st";
@@ -415,37 +421,6 @@ inline std::string formatParamValue(const Shared& shared, uint32_t id,
         const ModuleDesc* module = moduleDesc(type);
         const ControlDesc* desc = controlFor(*module, control);
         if (desc) {
-          if (module->id == ModuleId::PitchDrop && control == 0) {
-            const int mode = std::clamp(
-                static_cast<int>(std::lround(
-                    shared.get(slotParam(slot, kSlotOffsetC0 + 1)) * 4.0)),
-                0, 4);
-            const double v = std::clamp(value, 0.0, 1.0);
-            char buf[32];
-            switch (mode) {
-              case 0:
-              case 1: {
-                const double semis = (mode == 0 ? 24.0 : -24.0) * v;
-                if (std::lround(semis) == 0) return "0 st";
-                std::snprintf(buf, sizeof(buf), "%+.0f st", semis);
-                return buf;
-              }
-              case 2: {
-                const double semis = -std::round(24.0 * v);
-                if (std::lround(semis) == 0) return "0 st";
-                std::snprintf(buf, sizeof(buf), "%.0f st", semis);
-                return buf;
-              }
-              case 3:
-                std::snprintf(buf, sizeof(buf), "%+.0f st",
-                              std::round(-24.0 + 48.0 * v) + 7.0);
-                return buf;
-              default:
-                std::snprintf(buf, sizeof(buf), "±%.0f ct",
-                              2.0 + 28.0 * v);
-                return buf;
-            }
-          }
           return formatControlValue(*module, *desc, value);
         }
       }
@@ -697,25 +672,6 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
   }
 
   if (desc) {
-    if (module && module->id == ModuleId::PitchDrop && desc->param == 0 &&
-        desc->format == ControlFormat::PitchSemis) {
-      const int slot =
-          static_cast<int>((id - P_SLOT0_TYPE) / kSlotStride);
-      const int mode = std::clamp(
-          static_cast<int>(std::lround(
-              shared.get(slotParam(slot, kSlotOffsetC0 + 1)) * 4.0)),
-          0, 4);
-      switch (mode) {
-        case 0: v = v / 24.0; break;
-        case 1: v = -v / 24.0; break;
-        case 2: v = -v / 24.0; break;
-        case 3: v = (v - 7.0 + 24.0) / 48.0; break;
-        default: v = (std::fabs(v) - 2.0) / 28.0; break;
-      }
-      v = std::min(std::max(v, 0.0), 1.0);
-      *out = v;
-      return true;
-    }
     if (desc->labels.count > 0) {
       const int choice = choiceIndexForText(
           desc->labels.names, desc->labels.count, text, desc->toggled);
@@ -776,6 +732,10 @@ inline bool parseParamValue(const Shared& shared, uint32_t id,
       case ControlFormat::PitchSemis:
         v = (v + 24.0) / 48.0;
         v = std::round(v * 48.0) / 48.0;
+        break;
+      case ControlFormat::DropSemis:
+        v = -v / 12.0;
+        v = std::round(v * 12.0) / 12.0;
         break;
       case ControlFormat::TightReleaseMs: v = (v - 1.0) / 199.0; break;
       case ControlFormat::ScHpfHz:

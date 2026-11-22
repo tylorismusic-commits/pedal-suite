@@ -102,6 +102,7 @@ enum class ControlFormat {
   PedalDriveDb,
   Ratio2To20,
   PitchSemis,
+  DropSemis,
   TightReleaseMs,
 };
 
@@ -176,16 +177,16 @@ inline constexpr ControlDesc kBigFuzzControls[] = {
     {1, "TONE", "Tone", ControlFormat::Percent},
     {2, "LEVEL", "Level", ControlFormat::PedalLevelDb},
 };
-inline constexpr const char* kPitchModeLabels[] = {
-    "Whammy Up", "Whammy Down", "Drop", "Harmony", "Detune"};
-
-inline constexpr ControlDesc kPitchDropControls[] = {
+inline constexpr ControlDesc kWhammyControls[] = {
     {0, "PITCH", "Pitch", ControlFormat::PitchSemis},
-    {1, "MODE", "Mode", ControlFormat::Percent, true,
-     labels(kPitchModeLabels)},
-    {2, "GLIDE", "Glide", ControlFormat::Percent},
-    {3, "TONE", "Tone", ControlFormat::Percent},
-    {4, "MIX", "Mix", ControlFormat::Percent},
+    {1, "GLIDE", "Glide", ControlFormat::Percent},
+    {2, "TONE", "Tone", ControlFormat::Percent},
+    {3, "MIX", "Mix", ControlFormat::Percent},
+};
+inline constexpr ControlDesc kDropControls[] = {
+    {0, "DROP", "Drop", ControlFormat::DropSemis},
+    {1, "TONE", "Tone", ControlFormat::Percent},
+    {2, "MIX", "Mix", ControlFormat::Percent},
 };
 inline constexpr ControlDesc kRetuneControls[] = {
     {0, "SEMITONES", "Semitones", ControlFormat::Semitones, true},
@@ -454,11 +455,11 @@ inline constexpr ModuleDesc kModules[] = {
      static_cast<int>(sizeof(kBassFuzzControls) /
                       sizeof(kBassFuzzControls[0])),
      kBassFuzzControls},
-    {ModuleId::PitchDrop, "Pitch Drop", "Mod",
-     "Gojira-style whammy pitch pedal", false, false, 0,
-     static_cast<int>(sizeof(kPitchDropControls) /
-                      sizeof(kPitchDropControls[0])),
-     kPitchDropControls},
+    {ModuleId::Whammy, "Whammy", "Mod",
+     "Pitch pedal: time-domain, up or down two octaves like the DT", false,
+     false, 0,
+     static_cast<int>(sizeof(kWhammyControls) / sizeof(kWhammyControls[0])),
+     kWhammyControls},
     {ModuleId::Retune, "Retune", "Mod",
      "Low-latency step tuning", false, false, 0,
      static_cast<int>(sizeof(kRetuneControls) /
@@ -591,12 +592,18 @@ inline constexpr ModuleDesc kModules[] = {
      static_cast<int>(sizeof(kAutoWahControls) /
                       sizeof(kAutoWahControls[0])),
      kAutoWahControls},
+    {ModuleId::Drop, "Drop", "Mod",
+     "Polyphonic drop tune: darker and quicker than the clean engine", false,
+     false, 0,
+     static_cast<int>(sizeof(kDropControls) / sizeof(kDropControls[0])),
+     kDropControls},
 };
 
 inline constexpr const char* kModuleSources[] = {
     "\u2014",
     "Pedal Suite exclusive",
     "Amp Suite",
+    "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",
     "Pedal Suite exclusive",

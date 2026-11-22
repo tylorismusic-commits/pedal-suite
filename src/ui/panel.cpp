@@ -131,9 +131,12 @@ ModuleStyle styleFor(int type) {
     case ModuleId::BassFuzz:
       return {{0.20, 0.10, 0.26}, {0.08, 0.03, 0.12},
               {0.88, 0.52, 1.00}, {0.94, 0.87, 0.98}};
-    case ModuleId::PitchDrop:
+    case ModuleId::Whammy:
       return {{0.42, 0.07, 0.10}, {0.18, 0.02, 0.04},
               {1.00, 0.42, 0.36}, {0.98, 0.86, 0.82}};
+    case ModuleId::Drop:
+      return {{0.20, 0.10, 0.40}, {0.08, 0.03, 0.18},
+              {0.72, 0.42, 1.00}, {0.92, 0.86, 1.00}};
     case ModuleId::Retune:
       return {{0.07, 0.20, 0.38}, {0.02, 0.08, 0.18},
               {0.44, 0.82, 1.00}, {0.82, 0.93, 1.00}};
