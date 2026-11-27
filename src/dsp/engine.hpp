@@ -389,8 +389,14 @@ private:
       case ModuleId::ToneBender: toneBender_[s].setControls(toneBenderControlsFrom(c)); break;
       case ModuleId::BassDrive: bassDrive_[s].setControls(bassDriveControlsFrom(c)); break;
       case ModuleId::BassFuzz: bassFuzz_[s].setControls(bassFuzzControlsFrom(c)); break;
-      case ModuleId::Whammy: whammy_[s].setControls(whammyControlsFrom(c)); break;
-      case ModuleId::Drop: drop_[s].setControls(dropControlsFrom(c)); break;
+      case ModuleId::Whammy:
+        whammy_[s].setControls(whammyControlsFrom(c));
+        whammy_[s].setBypassed(c.bypass);
+        break;
+      case ModuleId::Drop:
+        drop_[s].setControls(dropControlsFrom(c));
+        drop_[s].setBypassed(c.bypass);
+        break;
       case ModuleId::Retune: retune_[s].setControls(retuneControlsFrom(c)); break;
       case ModuleId::Chorus: chorus_[s].setControls(chorusControlsFrom(c)); break;
       case ModuleId::Flanger: flanger_[s].setControls(flangerControlsFrom(c)); break;

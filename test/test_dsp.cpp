@@ -419,6 +419,37 @@ int main() {
     }
   }
   {
+    // The host's own Bypass button arrives as P_BYPASS; it has to mute the
+    // chain the same way the power switch does.
+    Shared s;
+    initializeRack(s);
+    applyModuleDefaults(s, 0, static_cast<int>(ModuleId::Drop), false);
+    s.set(slotParam(0, kSlotOffsetC0), 1.0);  // one octave down
+    s.set(P_BYPASS, 1.0);
+    Engine e;
+    e.prepare(48000.0f);
+    e.setControls(controlsFrom(s));
+    const int n = 24000;
+    std::vector<float> l(n), r(n);
+    for (int i = 0; i < n; ++i) {
+      l[i] = r[i] = 0.2f * std::sin(2.0f * 3.14159265f * 220.0f * i / 48000.0f);
+    }
+    Meters m;
+    e.process(l.data(), r.data(), n, m);
+    const int start = std::min(n - 1, e.latencySamples() + 2000);
+    int crossings = 0;
+    float prev = 0.0f;
+    for (int i = start; i < n; ++i) {
+      if ((prev <= 0.0f && l[i] > 0.0f) || (prev >= 0.0f && l[i] < 0.0f)) {
+        ++crossings;
+      }
+      prev = l[i];
+    }
+    const double hz = crossings * 0.5 / ((n - start) / 48000.0);
+    check(std::fabs(hz - 220.0) < 20.0,
+          "host bypass switch passes the dry signal");
+  }
+  {
     const int n = 24000;
     std::vector<float> x(n);
     for (int i = 0; i < n; ++i) {
